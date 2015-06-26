@@ -3,8 +3,6 @@
 
     <string name="api_base_uri">https://api.spark.io</string>
 
-    <string name="oauth_client_id">spark-android-app-3168</string>
-    <string name="oauth_client_secret">9bf694a6164e458fdb8daffe48b4ffe9d34db33f</string>
     <!-- ATTENTION: This should be NONE for any production build; setting it to anything else
     will log HTTP headers, meaning that the user's token (and other potentially sensitive info)
     would be logged in plaintext! -->

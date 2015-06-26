@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+     User must edit client id credentials to match his app with Particle cloud API credentials
+    -->
+    <string name="oauth_client_id">spark-android-app-1234</string>
+    <string name="oauth_client_secret">9bf694a6164e458fdb8daffe48b4ffe9d34db33f</string>
+</resources>
