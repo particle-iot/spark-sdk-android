@@ -1,16 +1,12 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.jfrog.bintray'
-//apply plugin: 'com.github.dcendents.android-maven'
-//apply plugin: 'bintray-release'
-
+apply plugin: 'com.novoda.bintray-release'
 
 // This is the library version used when deploying the artifact
-version = '0.9.0'
+version = '0.1.0'
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-//    resourcePrefix "particlecloud__"
 
     defaultConfig {
         minSdkVersion 15
@@ -28,12 +24,6 @@ android {
         disable 'InvalidPackage'
     }
 
-    buildTypes {
-//        release {
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
-    }
 }
 
 dependencies {
@@ -50,40 +40,19 @@ dependencies {
 }
 
 
-//Properties properties = new Properties()
-//properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
-//
-//publish {
-//    bintrayUser = properties.getProperty("bintray.user")
-//    bintrayKey = properties.getProperty("bintray.apikey")
-//    userOrg = 'particle'
-//    groupId = 'io.particle'
-//    artifactId = 'cloud-sdk'
-//    version = project.version
-//    description = 'The cloud Particle cloud SDK for Android'
-//    licences = ['Apache-2.0']
-//    website = 'https://github.com/spark/spark-sdk-android'
-//    issueTracker = "${website}/issues"
-//    repository = "${website}.git"
-////    dryRun = true
-//}
-//
-//task sourcesJar(type: Jar) {
-//    from android.sourceSets.main.java.srcDirs
-//    classifier = 'sources'
-//}
-//
-//task javadoc(type: Javadoc) {
-//    source = android.sourceSets.main.java.srcDirs
-//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//}
-//
-//task javadocJar(type: Jar, dependsOn: javadoc) {
-//    classifier = 'javadoc'
-//    from javadoc.destinationDir
-//}
-//
-//artifacts {
-//    archives javadocJar
-//    archives sourcesJar
-//}
+
+publish {
+    userOrg = 'particle'
+    repoName = 'android'
+    groupId = 'io.particle'
+    artifactId = 'cloud-sdk'
+    publishVersion = project.version
+    licences = ['Apache-2.0']
+//    publications = ['maven']
+    desc = 'Particle (formerly Spark) Android Cloud SDK library\n' +
+            'The Particle Android Cloud SDK enables Android apps to interact with Particle-powered connected products via the Particle Cloud.\n' +
+            'Library will allow you to easily manage active user sessions to Particle cloud, query for device info,\n' +
+            'read and write data to/from Spark Core/Photon devices and (via exposed variables and functions)\n' +
+            'publish and subscribe events to/from the cloud or to/from devices (coming soon).'
+    website = 'https://github.com/spark/spark-sdk-android'
+}

@@ -1,2 +1,2 @@
 include ':cloudsdk'
-
+include ':example_app'
