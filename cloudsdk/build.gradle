@@ -9,7 +9,7 @@ ext {
 
     publishedGroupId = 'io.particle'
     libraryName = 'Particle (formerly Spark) Android Cloud SDK library '
-    artifact = 'cloud-sdk'
+    artifact = 'cloudsdk'
 
     libraryDescription = 'Particle (formerly Spark) Android Cloud SDK library\n' +
             'The Particle Android Cloud SDK enables Android apps to interact with Particle-powered connected products via the Particle Cloud.\n' +
