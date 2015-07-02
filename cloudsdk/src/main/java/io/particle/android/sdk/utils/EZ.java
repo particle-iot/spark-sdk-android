@@ -14,8 +14,6 @@ import java.io.IOException;
 
 /**
  * Analgesic shortcuts for Android dev't.
- * <p/>
- * Created by jensck on 11/22/14.
  */
 public class EZ {
 

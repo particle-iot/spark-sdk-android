@@ -46,9 +46,6 @@ public class Py {
         if (obj == null) {
             return false;
 
-        } else if (obj instanceof Truthiable) {
-            return ((Truthiable) obj).isTruthy();
-
         } else if (obj instanceof Collection) {
             return (!((Collection<?>) obj).isEmpty());
 
@@ -109,9 +106,6 @@ public class Py {
      * <p/>
      * Call truthy() on each object in the varargs - this is called all() in
      * Python, so that's what I'm calling it here.
-     *
-     * @param objects
-     * @return
      */
     public static boolean all(Object... objects) {
         if (!truthy(objects)) {
@@ -132,9 +126,6 @@ public class Py {
      * <p/>
      * Calls truthy() on each object in the varargs - this is called any() in
      * Python, so that's what I'm calling it here.
-     *
-     * @param objects
-     * @return
      */
     public static boolean any(Object... objects) {
         if (!truthy(objects)) {
@@ -148,58 +139,6 @@ public class Py {
             }
         }
         return false;
-    }
-
-    /**
-     * Calls {@link #range(int, int)} with a <code>start</code> param of 0
-     *
-     * @param stop
-     * @return {@link Py#Ranger}
-     */
-    public static Ranger range(int stop) {
-        return range(0, stop);
-    }
-
-    /**
-     * Generally, for-each loops &gt; traditional for loops, but the latter is
-     * extremely resource friendly. This class makes it easy to do for-each
-     * loops for a given range of <code>int</code>s.
-     * <p/>
-     * Wherever you'd write this (which is surprisingly easy to get wrong)...
-     * <p/>
-     * <pre>
-     * <code>
-     * for (int i = 0; i < rangeStop; i++) {
-     *     doStuff(i);
-     * }
-     * </code>
-     * </pre>
-     * <p/>
-     * ...instead, write this:
-     * <p/>
-     * <pre>
-     * <code>
-     * for (IntValue valueHolder : range(numIds)) {
-     *     doStuff(valueHolder.value);
-     * }
-     * </code>
-     * </pre>
-     * <p/>
-     * <em>(note the use of <code>range()</code>, implying a static import of the function, which is recommended)</em>
-     * <p/>
-     * Inspired by Python's range() function, with which it shares similar
-     * behavior (e.g.: if you do range(-5), you will iterate zero times, since
-     * there are no numbers between 0 and -5 if you're counting forwards. This
-     * is also the same behavior you get when using those values in an
-     * equivalent for loop in Java, or when using those values with Ruby's range
-     * operator)
-     *
-     * @param start
-     * @param stop
-     * @return {@link Py#Ranger}
-     */
-    public static Ranger range(int start, int stop) {
-        return new Ranger(start, stop);
     }
 
     /**
@@ -325,11 +264,6 @@ public class Py {
     // returns an initialized but empty Map.
     public static <K, V> Map<K, V> frozenmap() {
         return Collections.unmodifiableMap(new ArrayMap<K, V>());
-    }
-
-    public interface Truthiable {
-
-        boolean isTruthy();
     }
 
     /**
@@ -472,73 +406,4 @@ public class Py {
         }
     }
 
-    /**
-     * See docs on {@link Py#range(int, int)}
-     *
-     * @author <a href="mailto:jens.knutson@gmail.com">Jens Knutson</a>
-     */
-    public static class Ranger implements Iterable<Ranger.IntValue>, Iterator<Ranger.IntValue> {
-
-        private final Ranger.IntValue currentValue;
-        private final int stopBefore;
-
-        private Ranger(int start, int stop) {
-            validateArgs(start);
-            // doing this here means that in .hasNext() we can just use the
-            // post-increment operator, which is crazy-fast
-            this.currentValue = new IntValue(start - 1);
-            this.stopBefore = stop;
-        }
-
-        private void validateArgs(int start) {
-            if (start == Integer.MIN_VALUE) {
-                String errMsg = "Sorry, ranges can't start with Integer.MIN_VALUE.  Lame, I know, since it looks like it would "
-                        + "work anyway, but I didn't have time to properly test all the combinations of ranges which "
-                        + "might use Intger.MIN/MAX, so... 'Patches Accepted'";
-                throw new IllegalArgumentException(errMsg);
-            }
-        }
-
-        @Override
-        public Iterator<IntValue> iterator() {
-            return this;
-        }
-
-        @Override
-        public boolean hasNext() {
-            currentValue.value++;
-            return currentValue.value < stopBefore;
-        }
-
-        @Override
-        public Ranger.IntValue next() {
-            return currentValue;
-        }
-
-        @Override
-        public void remove() {
-            throw new RuntimeException("Not supported");
-        }
-
-        /**
-         * Just a simple holder for an <code>int</code>.
-         * <p/>
-         * It's designed for performance, so it uses <code>int</code> instead of
-         * <code>Integer</code> to avoid any auto(un)boxing, and it allows
-         * direct access to the value instead of using a method, since this can
-         * be meaningfully faster for loops with many iterations, esp when those
-         * inner loops are on one's UI thread(!)
-         *
-         * @author <a href="mailto:jens.knutson@gmail.com">Jens Knutson</a>
-         */
-        public static class IntValue {
-
-            public int value;
-
-            public IntValue(int initialValue) {
-                value = initialValue;
-            }
-        }
-
-    }
 }
