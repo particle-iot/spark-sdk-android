@@ -24,16 +24,26 @@ artifacts {
     archives sourcesJar
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+// FIXME: this feels hackish, but it works for now, and it shouldn't
+// have any side effects* for anyone building the lib locally,
+// so #SHIPIT
+//
+// * My apologies if this turns out not to be true.  Patches welcome!
+Properties authDataProps = new Properties()
+try {
+    authDataProps.load(project.rootProject.file('../bintray_user_auth_secrets.properties').newDataInputStream())
+} catch (Exception e) {
+    // do nothing; this is the default state for everyone who isn't publishing
+    // the lib.
+}
 
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = authDataProps.getProperty("bintray.user")
+    key = authDataProps.getProperty("bintray.apikey")
 
     configurations = ['archives']
     pkg {
-        userOrg = 'particle' // An optional organization name when the repo belongs to one of the user's orgs
+        userOrg = bintrayOrg
         repo = bintrayRepo
         name = bintrayName
         desc = libraryDescription
@@ -43,8 +53,7 @@ bintray {
         publish = true
         publicDownloadNumbers = false
         version {
-            desc = libraryDescription
-            sign = false
+//            desc = libraryDescription
             gpg {
                 sign = false // Determines whether to GPG sign the files. The default is false
                 // passphrase = properties.getProperty("bintray.gpg.password") // Optional. The passphrase for GPG signing'
@@ -52,3 +61,4 @@ bintray {
         }
     }
 }
+

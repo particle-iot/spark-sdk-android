@@ -6,7 +6,8 @@ version = '0.1.2'
 ext {
     bintrayRepo = 'android'
     bintrayName = 'cloud-sdk'
-
+    bintrayOrg = 'particle'
+    
     publishedGroupId = 'io.particle'
     libraryName = 'Particle (formerly Spark) Android Cloud SDK library '
     artifact = 'cloudsdk'
