@@ -19,7 +19,7 @@ shared: true
 
 # Particle (_formerly Spark_) Android Cloud SDK
 
-## WARNING: This documentation is currently under heavy construction - some info here is not yet updated/corrected 
+## WARNING: This documentation is currently under heavy construction; some info here is not yet updated/corrected.
 
 <!---
 Android Cloud SDK
@@ -43,9 +43,8 @@ Spark has been recently rebranded as Particle!  Classes like `SparkCloud` and `S
 
 **Beta notice**
 
-This SDK is still under development and is currently released as Beta, although tested, bugs and issues may be present, some code might require cleanups.
+This SDK is still under development and is currently in beta.  Although it is tested and mostly API-stable, bugs and other issues may be present, and the API may be subject to change prior to leaving beta.  (See rebranding notice above.)
 
-Note that all the REST API methods are intentionally implemented as synchronous, blocking calls.  To spare developers some of the awkwardness of making async calls and returning results back to the UI thread, we have supplied the `Async` and `ApiWork` convenience classes, purpose-built wrappers around `AsyncTask` for use with these blocking APIs.
 
 ## Getting Started
 
@@ -56,6 +55,9 @@ You can also [download the SDK as a zip](https://github.com/spark/spark-sdk-andr
 For some usage examples, check out [Usage](#android-cloud-sdk-usage) below, or play with the `example_app` module included here in the repo.
 
 ## Usage
+
+**NOTE:** all SDK methods are intentionally implemented as synchronous, blocking calls, including network calls.  This blocking API avoids nested callbacks and other complexity, making it easy to write a series of synchronous calls while on a non-UI thread.  To spare developers some of the awkwardness of making async calls and returning results back to the UI thread, we have supplied the `Async` and `ApiWork` set of convenience classes, a purpose-built wrapper around `AsyncTask` for use with these APIs.  (See [Extras](#android-cloud-sdk-usage-extras) for more info on this.)
+
 
 Cloud SDK usage mostly involves two main classes:
 
