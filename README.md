@@ -19,7 +19,7 @@ shared: true
 
 # Particle (_formerly Spark_) Android Cloud SDK
 
-## WARNING: This documentation is currently under heavy construction - some info here is not updated/correct 
+## WARNING: This documentation is currently under heavy construction - some info here is not yet updated/corrected 
 
 <!---
 Android Cloud SDK
@@ -28,45 +28,51 @@ Android Cloud SDK
 
 The Particle Android Cloud SDK enables Android apps to interact with Particle-powered connected products via the Particle Cloud. It’s an easy-to-use wrapper for Particle REST API. The Cloud SDK will allow you to:
 
-- Manage user sessions for the Particle Cloud (access tokens, encrypted session management)
-- Claim/Unclaim devices for a user account
 - Get a list of instances of user's Particle devices
 - Read variables from devices
 - Invoke functions on devices
-- Publish events from the mobile app and subscribe to events coming from devices *(Coming Soon)*
+- Manage access tokens for the Particle Cloud
+- Claim & unclaim devices for a user account
+- *(Coming Soon)* Publish events from the mobile app and subscribe to events coming from devices
 
-All cloud operations should take place asynchronously and use the analgesic AsyncTask wrapper for making Particle cloud API calls and for reporting results allowing you to build  responsive apps for your Particle products and projects.
-Android Cloud SDK is implemented as an open-source maven dependency published in the standard [JCenter repository](https://bintray.com/particle/android/cloud-sdk/) for easy integration with Android Studio. See [Installation](#android-cloud-sdk-installation) section for more details.
 
 **Rebranding notice**
 
-Spark has been recently rebranded as Particle.
-Code currently refers to `SparkCloud` and `SparkDevice`, this will eventually be replaced with `ParticleCloud` and `ParticleDevice`. This should not bother or affect your code.
+Spark has been recently rebranded as Particle!  Classes like `SparkCloud` and `SparkDevice` this will soon be replaced with `ParticleCloud` and `ParticleDevice`, _et al._
+
 
 **Beta notice**
 
 This SDK is still under development and is currently released as Beta, although tested, bugs and issues may be present, some code might require cleanups.
 
+Note that all the REST API methods are intentionally implemented as synchronous, blocking calls.  To spare developers some of the awkwardness of making async calls and returning results back to the UI thread, we have supplied the `Async` and `ApiWork` convenience classes, purpose-built wrappers around `AsyncTask` for use with these blocking APIs.
+
 ## Getting Started
 
-- Perform the installation step described under the **Installation** section below for integrating in your own project
-- You can also 'git pull' or [Download Particle Android Cloud SDK](https://github.com/spark/spark-sdk-android/archive/master.zip) and try out the included Android example app under module 'example_app'.
-- Be sure to check [Usage](#android-cloud-sdk-usage) before you begin for some code examples
+The SDK is available as a gradle/maven dependency via [JCenter](https://bintray.com/particle/android/cloud-sdk/).  See [Installation](#android-cloud-sdk-installation) section for more details.  (spoiler: just add `compile 'io.particle:cloudsdk:0.1.2'` to your `build.gradle`)
+
+You can also [download the SDK as a zip](https://github.com/spark/spark-sdk-android/archive/master.zip).
+
+For some usage examples, check out [Usage](#android-cloud-sdk-usage) below, or play with the `example_app` module included here in the repo.
 
 ## Usage
 
-Cloud SDK usage involves two basic classes: first is `SparkCloud` which is a singleton object that enables all basic cloud operations such as user authentication, device listing, claiming etc. Second class is `SparkDevice` which is an instance represnting a claimed device in the current user session. Each object enables device-specific operation such as: getting its info, invoking functions and reading variables from it.
+Cloud SDK usage mostly involves two main classes:
 
-### Utilities & wrappers
+1. `SparkCloud`, a singleton which enables all basic cloud operations such as user authentication, retrieving a device list, claiming, etc.
+2. `SparkDevice`, which represents an instance of a claimed device in the current user session. (WIP: clearly explain "session" or don't mention it at all)  Each instance enables device-specific operations: invoking functions, reading variables, and getting basic info about the device (name, version info, etc).
 
-Provided utility classes are:
+### Extras
 
-- Async.executeAsync
-- Toaster
-- Py
-- EZ
+(WIP) further explain usages for the utils?  Give examples?
 
-(WIP)explain usages for the essential utils we provide
+The SDK also ships with a handful of helpful utility classes:
+
+- Async.executeAsync: as mentioned above, this is a purpose-built wrapper around AsyncTask.  (WIP: improve docs here or, preferably, improve class-level javadoc and just refer people to that.)
+- Toaster: Another boilerplate-killer util.  `Toast.makeToast(blah blah blah)` is absurd, when all you really wanted was an ultra-lightweight way to say "put this string on the screen for a sec".  `Toaster` makes this dream come true.
+- EZ: Misc. shortcuts for killing boilerplate code, like Toaster, but which have no simple taxonomic classification
+- Py: There's nothing Particle or Android specific about this, but it's worth calling out.  This class brings a little Python joy to your Java, like easy collection constructors and a Python-like _truthiness_ check (called `truthy()`).  Quick quiz: unless you have special, specific requirements, like thread safety or immutability, which `List` implementation do you use Every. Single. Time.?  It's `ArrayList`, isn't it?  `Py.java` embraces this fact and gives you `Py.list()`.  For further Pythonic happiness, use it like a static import, so you can just do `list()` the way you could in Python.  Also included here is `truthy()`, which, if you know Python, does exactly what you think.
+
 
 Here are few examples for the most common use cases to get your started:
 
@@ -223,13 +229,13 @@ Also clears user session and access token
 ---
 
 ### Additional reference
-(WIP)what here? javadoc generated reference link?
+(WIP) include link to generated javadoc, or (better yet) find a better way to browse javadoc for an installed lib within Android Studio, and recommend using that
 
 For additional reference check out the [Reference in Cocoadocs website](http://cocoadocs.org/docsets/Spark-SDK/) for full coverage of `SparkDevice` and `SparkCloud` functions and member variables. In addition you can consult the javadoc style comments in `SparkCloud.h` and `SparkDevice.h` for each public method. If Particle Android Cloud SDK is integrated in your XCode project you should be able to press `Esc` to get an auto-complete hints for each cloud and device method.
 
 ## Installation
 
-Particle Android Cloud SDK is available through as a [JCenter repository](https://bintray.com/particle/android/cloud-sdk/). JCenter is the default dependency repository for Android Studio. To install the Android Cloud SDK in your project, add the following to your app module gradle file:
+The SDK is available through [JCenter](https://bintray.com/particle/android/cloud-sdk/).  To install the Android Cloud SDK in your project, add the following to your app module gradle file:
 
 (WIP)what do we do with versioning here? We don't want to update the documentation each time we update version in the cloud SDK, on the other hand we don't want to break users apps when something changes
 
@@ -239,7 +245,7 @@ dependencies {
 }
 ```
 
-make sure your _main project_ gradle file contains (that's the default):
+and make sure your _main project_ gradle file contains the following (it's probably already there, since it's the default):
 
 ```gradle
 allprojects {
@@ -253,7 +259,7 @@ then sync and rebuild your module.
 
 ## Communication
 
-- If you **need help**, use [Our community website](http://community.particle.io), use the `Mobile` category for dicussion/troubleshooting Android apps using the Particle Android Cloud SDK.
+- If you **need help**, head to [our community website](http://community.particle.io), under the `Mobile` category for dicussion/troubleshooting around Android apps using the Particle Android Cloud SDK.
 - If you are certain you **found a bug**, _and can provide steps to reliably reproduce it_, open an issue, label it as `bug`.
 - If you **have a feature request**, open an issue with an `enhancement` label on it
 - If you **want to contribute**, submit a pull request, be sure to check out spark.github.io for our contribution guidelines, and please sign the [CLA](https://docs.google.com/a/particle.io/forms/d/1_2P-vRKGUFg5bmpcKLHO_qNZWGi5HKYnfrrkd-sbZoA/viewform).
@@ -261,10 +267,9 @@ then sync and rebuild your module.
 
 ## Maintainers
 
-- Jens Knutsen [Github](https://github.com/jensck/) | [Twitter]()(WIP)update Jens twitter page
+- Jens Knutson [Github](https://github.com/jensck/) | [Google+](https://google.com/+JensKnutson)
 - Ido Kleinman [Github](https://www.github.com/idokleinman) | [Twitter](https://www.twitter.com/idokleinman)
 
 ## License
 
 Particle Android Cloud SDK is available under the Apache License 2.0. See the LICENSE file for more info.
-
