@@ -19,7 +19,7 @@ shared: true
 
 # Particle (_formerly Spark_) Android Cloud SDK
 
-## WARNING: This documentation is currently under heavy construction; some info here is not yet updated/corrected.
+**Note:** _This documentation is still undergoing minor construction; some info here may not yet be fully updated/corrected._
 
 <!---
 Android Cloud SDK
