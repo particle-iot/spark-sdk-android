@@ -17,6 +17,9 @@ import java.util.Set;
 
 /**
  * Python-inspired painkillers for Java
+ * <p>
+ * For extra Pythonic happiness, use these as static imports, and you can
+ * do things like <code>list()</code>, the way you could in Python!
  *
  * @author jens.knutson@gmail.com
  */
@@ -24,22 +27,19 @@ public class Py {
 
     /**
      * Test the "truthiness" of an object, ala Python - see http://goo.gl/JebVU
-     * <p/>
+     * <p>
      * The following will all return <code>false</code>:
      * <ul>
      * <li>null
      * <li>Any empty collection/array/iterable
      * <li>a empty string, i.e.: ""
-     * <li>a Number (like Integer or Long, or their primitive equivalents) with
-     * a value of 0
-     * <li>Anything with the Truthiable interface where .isTruthy() returns
-     * false
+     * <li>a Number (like Integer or Long, or their primitive equivalents) with a value of 0
      * <li>A Boolean (or primitive equiv.) which evaluates to false
      * </ul>
-     * <p/>
+     * <p>
      * Anything else will return true.
      *
-     * @param obj
+     * @param obj the target to be evaluated
      * @return is obj "truthy"
      */
     public static boolean truthy(Object obj) {
@@ -103,7 +103,7 @@ public class Py {
 
     /**
      * Return true *only* if *every* object in the varargs array is truthy
-     * <p/>
+     * <p>
      * Call truthy() on each object in the varargs - this is called all() in
      * Python, so that's what I'm calling it here.
      */
@@ -123,7 +123,7 @@ public class Py {
 
     /**
      * Return true if *any* object in the varargs array is truthy
-     * <p/>
+     * <p>
      * Calls truthy() on each object in the varargs - this is called any() in
      * Python, so that's what I'm calling it here.
      */
@@ -142,13 +142,12 @@ public class Py {
     }
 
     /**
-     * Simple function to create inline Collections without all the extra noise
-     * <p/>
-     * The main utility here is for creating inline 'foreach' loops, like to
-     * check if an arbitrary number of vars are null, e.g.:
-     * <p/>
-     * for (Object x : list(foo, bar, baz, quux) { if (x == null) throw new
-     * SomeException("You screwed up!"); }
+     * A simple function to create lists without all the extra noise.
+     * <p>
+     * Quick quiz: unless you have special, specific requirements, like
+     * thread safety or immutability, which List implementation do you use
+     * <em>every time</em>?  It's ArrayList, isn't it?
+     * The Py class embraces this fact and gives you Py.list().
      *
      * @param objects arbitrary number of objects.
      * @return a List from the objects param
@@ -160,6 +159,10 @@ public class Py {
     // get around empty constructors complaining about zero-arg varargs calls
     // like the one above when the list content
     // uses generics
+
+    /**
+     * (See {@link #list(Object[])} for documentation)
+     */
     public static <T> List<T> list() {
         return new ArrayList<>();
     }
@@ -198,7 +201,7 @@ public class Py {
 
     /**
      * Like Py.list(), but returns an immutable sequence.
-     * <p/>
+     * <p>
      * Named after the same concept in Python, which in turn was named after the
      * pre-existing mathematical concept of a "tuple"
      *
@@ -215,7 +218,7 @@ public class Py {
 
     /**
      * Just like Py.set(), but it returns an immutable Set.
-     * <p/>
+     * <p>
      * Called "frozen"set because that's what Python calls it - might as well,
      * given the context and purpose of this class.
      *
@@ -270,11 +273,11 @@ public class Py {
      * A Set implementation that offers an interface similar to Python's set
      * objects, which offer methods for the simple, standard terms of set theory
      * (e.g.: "union", "intersection", etc).
-     * <p/>
+     * <p>
      * These methods all create new sets instead of modifying existing ones in
      * place. In keeping with the theme of this class, this is similar to what
      * the Python methods of the same name will do.
-     * <p/>
+     * <p>
      * This is different than what Java's sets do, but Java's sets use different
      * method names which match their behavior, so I believe this shouldn't
      * cause anyone to trip up.
@@ -309,7 +312,7 @@ public class Py {
         /**
          * Return a new set with elements common to this set and all elements
          * from <code>others</code>.
-         * <p/>
+         * <p>
          * This method is separate from {{@link #getIntersection(Collection...)}
          * because until Java 1.7's SafeVarargs annotation, there was no way to
          * call a varargs method using generic collections without getting a

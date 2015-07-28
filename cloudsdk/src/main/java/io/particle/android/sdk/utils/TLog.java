@@ -3,6 +3,10 @@ package io.particle.android.sdk.utils;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
 
+/**
+ * NOTE: this class is likely to be deprecated soon in favor of Jake Wharton's Timber:
+ * https://goo.gl/xmQYYU
+ */
 public class TLog {
 
     private static final ArrayMap<Class<?>, TLog> loggers = new ArrayMap<>();

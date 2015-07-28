@@ -3,7 +3,10 @@
 
     <string name="api_base_uri">https://api.spark.io</string>
 
-    <!-- ATTENTION: This should be NONE for any production build; setting it to anything else
+    <!-- This value should match one of the members of Retrofit's LogLevel class:
+    NONE, BASIC, HEADERS, HEADERS_AND_ARGS, or FULL
+
+    ATTENTION: This should be NONE for any production build; setting it to anything else
     will log HTTP headers, meaning that the user's token (and other potentially sensitive info)
     would be logged in plaintext! -->
     <string name="http_log_level">NONE</string>
