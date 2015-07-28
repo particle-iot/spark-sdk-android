@@ -53,33 +53,6 @@ public class ApiDefs {
         Response flashFile(@Path("deviceID") String deviceID,
                            @Part("file") TypedOutput file);
 
-        // FIXME: remove
-//        @Multipart
-//        @POST("/path/to/api")
-//        uploadFile(
-//                @Query("paramteer") String value,
-//                @Part("file") TypedFileString fileData,
-//                @Header("[...]")[...]
-//        );
-//        [...]
-//
-//        public class TypedFileString extends TypedString {
-//            private final String filename;
-//
-//            public TypedFileString(String string, String filename) {
-//                super(string);
-//                this.filename = filename;
-//            }
-//
-//            @Override public String fileName() {
-//                return filename;
-//            }
-//        }
-//
-//        TypedFileString typedFileString = new TypedFileString("text", "test.txt");
-//        uploadFile(123456, typedFileString, [...]);
-
-
         @GET("/v1/devices/{deviceID}/{variable}")
         ReadVariableResponse getVariable(@Path("deviceID") String deviceID,
                                          @Path("variable") String variable);
@@ -89,8 +62,12 @@ public class ApiDefs {
                                           @Path("function") String function,
                                           @Body FunctionArgs args);
 
+        /**
+         * Newer versions of OkHttp <em>require</em> a body for POSTs, but just pass in
+         * a blank string for the body and all is well.
+         */
         @POST("/v1/device_claims")
-        ClaimCodeResponse generateClaimCode();
+        ClaimCodeResponse generateClaimCode(@Body String blankBody);
 
         @FormUrlEncoded
         @POST("/v1/devices")

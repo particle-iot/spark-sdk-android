@@ -336,7 +336,8 @@ public class SparkCloud {
      */
     public Responses.ClaimCodeResponse generateClaimCode() throws SparkCloudException {
         try {
-            return mainApi.generateClaimCode();
+            // appease newer OkHttp versions with a blank POST body
+            return mainApi.generateClaimCode("");
         } catch (RetrofitError error) {
             throw new SparkCloudException(error);
         }
