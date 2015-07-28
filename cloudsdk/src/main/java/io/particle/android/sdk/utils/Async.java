@@ -124,10 +124,16 @@ public class Async {
             if (!shouldCallCallbacks()) {
                 return;
             }
+
             work.onTaskFinished();
             if (exception == null && ioException == null) {
                 work.onSuccess(result);
+                
             } else {
+                // FIXME: this error handling isn't quite right; fix it.
+                if (exception == null) {
+                    exception = new SparkCloudException(ioException);
+                }
                 log.e("Error calling API: " + exception.getBestMessage(), exception);
                 work.onFailure(exception);
             }

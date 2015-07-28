@@ -100,6 +100,13 @@ public class SparkCloudException extends Exception {
     private boolean checkedForServerErrorMsg = false;
     private String serverErrorMessage;
 
+    public SparkCloudException(Exception exception) {
+        super(exception);
+        // FIXME: ugly hack to get around even uglier bug.
+        this.innerError = RetrofitError.unexpectedError("(URL UNKNOWN)", exception);
+        this.responseData = null;
+    }
+
     SparkCloudException(RetrofitError innerError) {
         this.innerError = innerError;
         this.responseData = buildResponseData(innerError);
@@ -142,6 +149,7 @@ public class SparkCloudException extends Exception {
         // FIXME: this isn't the right place for user-facing data
         if (getKind() == Kind.NETWORK ) {
             return "Unable to connect to the server.";
+
         } else if (getKind() == Kind.UNEXPECTED) {
             return "Unknown error communicating with server.";
         }
