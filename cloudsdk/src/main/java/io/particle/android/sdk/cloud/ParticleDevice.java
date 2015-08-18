@@ -30,17 +30,17 @@ import static io.particle.android.sdk.utils.Py.set;
 
 
 // FIXME:
-// this should be just a proxy to SparkCloud, and should hold NO STATE of its own!
+// this should be just a proxy to ParticleCloud, and should hold NO STATE of its own!
 // create a separate DeviceState class or something to wrap up all this stuff, and use some
 // getters to expose the fields
-public class SparkDevice {
+public class ParticleDevice {
 
 
-    public enum SparkDeviceType {
+    public enum ParticleDeviceType {
         CORE,
         PHOTON;
 
-        public static SparkDeviceType fromInt(int intValue) {
+        public static ParticleDeviceType fromInt(int intValue) {
             switch (intValue) {
                 case 0:
                     return CORE;
@@ -86,11 +86,11 @@ public class SparkDevice {
     }
 
 
-    private static final int MAX_SPARK_FUNCTION_ARG_LENGTH = 63;
+    private static final int MAX_PARTICLE_FUNCTION_ARG_LENGTH = 63;
 
     private final ApiDefs.CloudApi mainApi;
     private final LocalBroadcastManager broadcastManager;
-    private final SparkCloud cloud;
+    private final ParticleCloud cloud;
 
     private volatile String deviceId;
     private volatile String name;
@@ -99,15 +99,15 @@ public class SparkDevice {
     private volatile List<String> functions = list();
     private volatile Map<String, Object> variables = map();
     private volatile String version;
-    private volatile SparkDeviceType deviceType;
+    private volatile ParticleDeviceType deviceType;
     private volatile boolean requiresUpdate;
 
 
-    // No public constructor -- use the supplied Builder class via SparkDevice.newBuilder()
-    private SparkDevice(ApiDefs.CloudApi mainApi, LocalBroadcastManager broadcastManager,
-                        SparkCloud cloud, String deviceId, String name, boolean isConnected,
-                        List<String> functions, Map<String, Object> variables, String version,
-                        SparkDeviceType deviceType, boolean requiresUpdate, boolean isFlashing) {
+    // No public constructor -- use the supplied Builder class via ParticleDevice.newBuilder()
+    private ParticleDevice(ApiDefs.CloudApi mainApi, LocalBroadcastManager broadcastManager,
+                           ParticleCloud cloud, String deviceId, String name, boolean isConnected,
+                           List<String> functions, Map<String, Object> variables, String version,
+                           ParticleDeviceType deviceType, boolean requiresUpdate, boolean isFlashing) {
         this.mainApi = mainApi;
         this.broadcastManager = broadcastManager;
         this.cloud = cloud;
@@ -141,7 +141,7 @@ public class SparkDevice {
      *
      * @param newName the new name to use
      */
-    public void setName(String newName) throws SparkCloudException {
+    public void setName(String newName) throws ParticleCloudException {
         // FIXME: later on look into what iOS ends up doing here.
         String oldName = name;
         name = newName;
@@ -154,7 +154,7 @@ public class SparkDevice {
             // oops, change the name back.
             name = oldName;
             broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
-            throw new SparkCloudException(e);
+            throw new ParticleCloudException(e);
         }
     }
 
@@ -194,7 +194,7 @@ public class SparkDevice {
         return requiresUpdate;
     }
 
-    public SparkDeviceType getDeviceType() {
+    public ParticleDeviceType getDeviceType() {
         return deviceType;
     }
 
@@ -204,7 +204,7 @@ public class SparkDevice {
      * @param variableName Variable name
      * @return result value
      */
-    public int getVariable(String variableName) throws SparkCloudException, IOException, VariableDoesNotExistException {
+    public int getVariable(String variableName) throws ParticleCloudException, IOException, VariableDoesNotExistException {
         if (!variables.containsKey(variableName))
             throw new VariableDoesNotExistException(variableName);
 
@@ -212,7 +212,7 @@ public class SparkDevice {
         try {
             reply = mainApi.getVariable(deviceId, variableName);
         } catch (RetrofitError e) {
-            throw new SparkCloudException(e);
+            throw new ParticleCloudException(e);
         }
 
         this.isConnected = reply.coreInfo.connected;
@@ -228,11 +228,11 @@ public class SparkDevice {
      *
      * @param functionName Function name
      * @param args         Array of arguments to pass to the function on the device.
-     *                     Arguments must not be more than MAX_SPARK_FUNCTION_ARG_LENGTH chars
+     *                     Arguments must not be more than MAX_PARTICLE_FUNCTION_ARG_LENGTH chars
      *                     in length. If any arguments are longer, a runtime exception will be thrown.
      * @return value of 1 represents success
      */
-    public int callFunction(String functionName, List<String> args) throws SparkCloudException, IOException, FunctionDoesNotExistException {
+    public int callFunction(String functionName, List<String> args) throws ParticleCloudException, IOException, FunctionDoesNotExistException {
         // TODO: check response of calling a non-existent function
         if (!functions.contains(functionName))
             throw new FunctionDoesNotExistException(functionName);
@@ -243,15 +243,15 @@ public class SparkDevice {
         }
 
         String argsString = StringUtils.join(args, ",");
-        Preconditions.checkArgument(argsString.length() < MAX_SPARK_FUNCTION_ARG_LENGTH,
+        Preconditions.checkArgument(argsString.length() < MAX_PARTICLE_FUNCTION_ARG_LENGTH,
                 String.format("Arguments '%s' exceed max args length of %d",
-                        argsString, MAX_SPARK_FUNCTION_ARG_LENGTH));
+                        argsString, MAX_PARTICLE_FUNCTION_ARG_LENGTH));
 
         Responses.CallFunctionResponse response;
         try {
             response = mainApi.callFunction(deviceId, functionName, new FunctionArgs(argsString));
         } catch (RetrofitError e) {
-            throw new SparkCloudException(e);
+            throw new ParticleCloudException(e);
         }
 
         this.isConnected = response.connected;
@@ -268,7 +268,7 @@ public class SparkDevice {
      * @param functionName Function name
      * @return value of the function
      */
-    public int callFunction(String functionName) throws SparkCloudException, IOException, FunctionDoesNotExistException {
+    public int callFunction(String functionName) throws ParticleCloudException, IOException, FunctionDoesNotExistException {
         return callFunction(functionName, new ArrayList<String>());
     }
 
@@ -285,12 +285,12 @@ public class SparkDevice {
     /**
      * Remove device from current logged in user account
      */
-    public void unclaim() throws SparkCloudException {
+    public void unclaim() throws ParticleCloudException {
         try {
             mainApi.unclaimDevice(deviceId);
             broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
         } catch (RetrofitError e) {
-            throw new SparkCloudException(e);
+            throw new ParticleCloudException(e);
         }
     }
 
@@ -307,7 +307,7 @@ public class SparkDevice {
         return isFlashing;
     }
 
-    public void flashKnownApp(final KnownApp knownApp) throws SparkCloudException {
+    public void flashKnownApp(final KnownApp knownApp) throws ParticleCloudException {
         performFlashingChange(new FlashingChange() {
             @Override
             public void executeFlashingChange() throws RetrofitError {
@@ -316,7 +316,7 @@ public class SparkDevice {
         });
     }
 
-    public void flashBinaryFile(final File file) throws SparkCloudException {
+    public void flashBinaryFile(final File file) throws ParticleCloudException {
         performFlashingChange(new FlashingChange() {
             @Override
             public void executeFlashingChange() throws RetrofitError {
@@ -325,7 +325,7 @@ public class SparkDevice {
         });
     }
 
-    public void flashBinaryFile(final InputStream stream) throws SparkCloudException, IOException {
+    public void flashBinaryFile(final InputStream stream) throws ParticleCloudException, IOException {
         final byte[] bytes = Okio.buffer(Okio.source(stream)).readByteArray();
         performFlashingChange(new FlashingChange() {
             @Override
@@ -341,15 +341,15 @@ public class SparkDevice {
         // FIXME: ugh, this is another side effect of swapping out SparkDevices all the time.
         // impl the suggesting at the top of this class to resolve.
         try {
-            SparkDevice currentDevice = cloud.getDevice(deviceId);  // gets the current device
+            ParticleDevice currentDevice = cloud.getDevice(deviceId);  // gets the current device
             currentDevice.isFlashing = false;
-        } catch (SparkCloudException e) {
+        } catch (ParticleCloudException e) {
             e.printStackTrace();
         }
         broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
     }
 
-    public SparkCloud getCloud() {
+    public ParticleCloud getCloud() {
         return cloud;
     }
 
@@ -357,7 +357,7 @@ public class SparkDevice {
         void executeFlashingChange() throws RetrofitError;
     }
 
-    private void performFlashingChange(FlashingChange flashingChange) throws SparkCloudException {
+    private void performFlashingChange(FlashingChange flashingChange) throws ParticleCloudException {
         try {
             flashingChange.executeFlashingChange();
             broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
@@ -370,15 +370,15 @@ public class SparkDevice {
             });
         } catch (RetrofitError e) {
             resetFlashingState();
-            throw new SparkCloudException(e);
+            throw new ParticleCloudException(e);
         } finally {
             broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
         }
     }
 
 
-    // FIXME: these methods are called out in the SparkDevice.h file
-    // but aren't actually implemented in SparkDevice.m?!  (How does
+    // FIXME: these methods are called out in the ParticleDevice.h file
+    // but aren't actually implemented in ParticleDevice.m?!  (How does
     // that even compile?)  Anyway, impl this.
 //    public void compileAndFlash(String sourceCode) {
 //
@@ -396,7 +396,7 @@ public class SparkDevice {
 
         private transient ApiDefs.CloudApi mainApi;
         private transient LocalBroadcastManager broadcastManager;
-        private transient SparkCloud cloud;
+        private transient ParticleCloud cloud;
 
         @SerializedName("id")
         private String deviceId;
@@ -422,7 +422,7 @@ public class SparkDevice {
         @SerializedName("device_needs_update")
         private boolean requiresUpdate;
 
-        private transient SparkDevice.SparkDeviceType deviceType;
+        private transient ParticleDeviceType deviceType;
         private transient boolean isFlashing;
 
         private void validate() {
@@ -435,10 +435,10 @@ public class SparkDevice {
             }
         }
 
-        SparkDevice build() {
+        ParticleDevice build() {
             if (deviceType == null) {
                 // FIXME: expand this later.
-                deviceType = productId == 0 ? SparkDeviceType.CORE : SparkDeviceType.PHOTON;
+                deviceType = productId == 0 ? ParticleDeviceType.CORE : ParticleDeviceType.PHOTON;
             }
 
             validate();  // throws if invalid args found
@@ -450,7 +450,7 @@ public class SparkDevice {
                 functions = list();
             }
 
-            return new SparkDevice(mainApi, broadcastManager, cloud, deviceId, name, isConnected, functions,
+            return new ParticleDevice(mainApi, broadcastManager, cloud, deviceId, name, isConnected, functions,
                     variables, version, deviceType, requiresUpdate, isFlashing);
         }
 
@@ -464,7 +464,7 @@ public class SparkDevice {
             return this;
         }
 
-        Builder setSparkCloud(SparkCloud cloud) {
+        Builder setParticleCloud(ParticleCloud cloud) {
             this.cloud = cloud;
             return this;
         }
@@ -504,7 +504,7 @@ public class SparkDevice {
             return this;
         }
 
-        Builder setDeviceType(SparkDevice.SparkDeviceType deviceType) {
+        Builder setDeviceType(ParticleDeviceType deviceType) {
             this.deviceType = deviceType;
             return this;
         }
@@ -523,7 +523,7 @@ public class SparkDevice {
             return mainApi;
         }
 
-        SparkCloud getCloud() {
+        ParticleCloud getCloud() {
             return cloud;
         }
 
@@ -555,7 +555,7 @@ public class SparkDevice {
             return version;
         }
 
-        SparkDevice.SparkDeviceType getDeviceType() {
+        ParticleDeviceType getDeviceType() {
             return deviceType;
         }
 

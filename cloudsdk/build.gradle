@@ -15,7 +15,7 @@ ext {
     libraryDescription = 'Particle (formerly Spark) Android Cloud SDK library\n' +
             'The Particle Android Cloud SDK enables Android apps to interact with Particle-powered connected products via the Particle Cloud.\n' +
             'Library will allow you to easily manage active user sessions to Particle cloud, query for device info,\n' +
-            'read and write data to/from Spark Core/Photon devices and (via exposed variables and functions)\n' +
+            'read and write data to/from Particle Core/Photon devices and (via exposed variables and functions)\n' +
             'publish and subscribe events to/from the cloud or to/from devices (coming soon).'
 
     siteUrl = 'https://github.com/spark/spark-sdk-android'

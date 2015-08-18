@@ -20,36 +20,36 @@ import static io.particle.android.sdk.utils.Py.set;
 import static io.particle.android.sdk.utils.Py.truthy;
 
 
-public class SparkCloud {
+public class ParticleCloud {
 
-    private static final TLog log = TLog.get(SparkCloud.class);
+    private static final TLog log = TLog.get(ParticleCloud.class);
 
-    private static SparkCloud instance;
+    private static ParticleCloud instance;
 
     /**
-     * Singleton instance of SparkCloud class
+     * Singleton instance of ParticleCloud class
      *
-     * @return SparkCloud
+     * @return ParticleCloud
      */
-    public synchronized static SparkCloud get(Context context) {
+    public synchronized static ParticleCloud get(Context context) {
         // TODO: try to eliminate singleton, consider replacing with dependency
         // injection where initializer gets:
         // CloudConnection, CloudEndpoint (URL) to allow private cloud
         if (instance == null) {
-            log.d("Initializing SparkCloud instance");
+            log.d("Initializing ParticleCloud instance");
             instance = buildInstance(context);
         }
         return instance;
     }
 
-    private static SparkCloud buildInstance(Context context) {
+    private static ParticleCloud buildInstance(Context context) {
         Context appContext = context.getApplicationContext();
         SDKGlobals.init(appContext);
 
         // FIXME: see if this TokenGetterDelegate setter issue can be resolved reasonably
         TokenGetter tokenGetter = new TokenGetter();
         ApiFactory factory = new ApiFactory(appContext, tokenGetter);
-        SparkCloud cloud = new SparkCloud(
+        ParticleCloud cloud = new ParticleCloud(
                 factory.buildCloudApi(),
                 factory.buildIdentityApi(),
                 SDKGlobals.getAppDataStorage(),
@@ -62,7 +62,7 @@ public class SparkCloud {
 
     private static class TokenGetter implements ApiFactory.TokenGetterDelegate {
 
-        volatile SparkCloud cloud;
+        volatile ParticleCloud cloud;
 
         @Override
         public String getTokenValue() {
@@ -77,19 +77,19 @@ public class SparkCloud {
     private final TokenDelegate tokenDelegate = new TokenDelegate();
     private final LocalBroadcastManager broadcastManager;
 
-    private volatile SparkAccessToken token;
-    private volatile SparkUser user;
+    private volatile ParticleAccessToken token;
+    private volatile ParticleUser user;
 
-    private volatile Map<String, SparkDevice> deviceCache = map();
+    private volatile Map<String, ParticleDevice> deviceCache = map();
 
-    private SparkCloud(ApiDefs.CloudApi mainApi, ApiDefs.IdentityApi identityApi,
-                       AppDataStorage appDataStorage, LocalBroadcastManager broadcastManager) {
+    private ParticleCloud(ApiDefs.CloudApi mainApi, ApiDefs.IdentityApi identityApi,
+                          AppDataStorage appDataStorage, LocalBroadcastManager broadcastManager) {
         this.mainApi = mainApi;
         this.identityApi = identityApi;
         this.appDataStorage = appDataStorage;
         this.broadcastManager = broadcastManager;
-        this.user = SparkUser.fromSavedSession();
-        this.token = SparkAccessToken.fromSavedSession();
+        this.user = ParticleUser.fromSavedSession();
+        this.token = ParticleAccessToken.fromSavedSession();
         if (token != null) {
             token.setDelegate(new TokenDelegate());
         }
@@ -110,40 +110,40 @@ public class SparkCloud {
     }
 
     /**
-     * Login with existing account credentials to Spark cloud
+     * Login with existing account credentials to Particle cloud
      *
      * @param user     User name, must be a valid email address
      * @param password Password
      */
-    public void logIn(String user, String password) throws SparkCloudException {
+    public void logIn(String user, String password) throws ParticleCloudException {
         try {
             Responses.LogInResponse response = identityApi.logIn("password", user, password);
-            this.token = SparkAccessToken.fromNewSession(response);
+            this.token = ParticleAccessToken.fromNewSession(response);
             this.token.setDelegate(tokenDelegate);
-            this.user = SparkUser.fromNewCredentials(user, password);
+            this.user = ParticleUser.fromNewCredentials(user, password);
 
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
 
     }
 
     /**
-     * Sign up with new account credentials to Spark cloud
+     * Sign up with new account credentials to Particle cloud
      *
      * @param user     Required user name, must be a valid email address
      * @param password Required password
      */
-    public void signUpWithUser(String user, String password) throws SparkCloudException {
+    public void signUpWithUser(String user, String password) throws ParticleCloudException {
         try {
             identityApi.signUp(user, password);
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
     }
 
     /**
-     * Sign up with new account credentials to Spark cloud
+     * Sign up with new account credentials to Particle cloud
      *
      * @param email      Required user name, must be a valid email address
      * @param password   Required password
@@ -151,7 +151,7 @@ public class SparkCloud {
      * @param orgName    Organization name to include in cloud API endpoint URL
      */
     public void signUpWithOrganization(String email, String password, String inviteCode,
-                                       String orgName) throws SparkCloudException {
+                                       String orgName) throws ParticleCloudException {
         // TODO: review against spec
         if (!truthy(orgName)) {
             throw new IllegalArgumentException("Organization name not specified");
@@ -160,7 +160,7 @@ public class SparkCloud {
         try {
             identityApi.signUpWithOrganizationalUser(email, password, inviteCode, orgName);
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
     }
 
@@ -171,8 +171,8 @@ public class SparkCloud {
         if (token != null) {
             token.cancelExpiration();
         }
-        SparkUser.removeSession();
-        SparkAccessToken.removeSession();
+        ParticleUser.removeSession();
+        ParticleAccessToken.removeSession();
         token = null;
         user = null;
     }
@@ -180,7 +180,7 @@ public class SparkCloud {
     /**
      * Get an array of instances of all user's claimed devices
      */
-    public List<SparkDevice> getDevices() throws SparkCloudException {
+    public List<ParticleDevice> getDevices() throws ParticleCloudException {
         List<Models.SimpleDevice> simpleDevices;
         try {
             simpleDevices = mainApi.getDevices();
@@ -188,44 +188,44 @@ public class SparkCloud {
             appDataStorage.saveUserHasClaimedDevices(truthy(simpleDevices));
 //            appDataStorage.saveUserHasClaimedDevices(true);
 //
-            List<SparkDevice> devices = list();
+            List<ParticleDevice> devices = list();
 
             // FIXME: TEST DATA, REMOVE
-//            devices.add(SparkDevice.newBuilder()
+//            devices.add(ParticleDevice.newBuilder()
 //                            .setName("PhotonsSoldCounter")
-//                            .setDeviceType(SparkDevice.SparkDeviceType.PHOTON)
+//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
 //                            .setDeviceId("ECB6F4DD1DE54700849DACA4")
 //                            .setIsConnected(false)
 //                            .setMainApi(mainApi)
 //                            .build()
 //            );
-//            devices.add(SparkDevice.newBuilder()
+//            devices.add(ParticleDevice.newBuilder()
 //                            .setName("test_core2")
-//                            .setDeviceType(SparkDevice.SparkDeviceType.PHOTON)
+//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
 //                            .setDeviceId("408B061A70B746D18110BD6A")
 //                            .setIsConnected(false)
 //                            .setMainApi(mainApi)
 //                            .build()
 //            );
-//            devices.add(SparkDevice.newBuilder()
+//            devices.add(ParticleDevice.newBuilder()
 //                            .setName("CoreOnTheTable")
-//                            .setDeviceType(SparkDevice.SparkDeviceType.PHOTON)
+//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
 //                            .setDeviceId("8DFDA5C4C8A1408DB1CA4677")
 //                            .setIsConnected(false)
 //                            .setMainApi(mainApi)
 //                            .build()
 //            );
-//            devices.add(SparkDevice.newBuilder()
+//            devices.add(ParticleDevice.newBuilder()
 //                            .setName("Custom_FW")
-//                            .setDeviceType(SparkDevice.SparkDeviceType.PHOTON)
+//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
 //                            .setDeviceId("74AF91816D364B338D38ABD3")
 //                            .setIsConnected(true)
 //                            .setMainApi(mainApi)
 //                            .build()
 //            );
-//            devices.add(SparkDevice.newBuilder()
+//            devices.add(ParticleDevice.newBuilder()
 //                            .setName("zombie_pirate")
-//                            .setDeviceType(SparkDevice.SparkDeviceType.PHOTON)
+//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
 //                            .setDeviceId("824E7FBD7B194D9D982552A6")
 //                            .setIsConnected(true)
 //                            .setMainApi(mainApi)
@@ -233,44 +233,44 @@ public class SparkCloud {
 //            );
 
             for (Models.SimpleDevice simpleDevice : simpleDevices) {
-                SparkDevice.Builder builder;
+                ParticleDevice.Builder builder;
                 if (simpleDevice.isConnected) {
                     builder = mainApi.getDevice(simpleDevice.id);
                 } else {
-                    builder = SparkDevice.newBuilder()
+                    builder = ParticleDevice.newBuilder()
                             .setDeviceId(simpleDevice.id)
                             .setIsConnected(simpleDevice.isConnected)
                             .setName(simpleDevice.name);
                 }
 
-                // FIXME: this is nasty.  go with the suggestion at the top of SparkDevice
+                // FIXME: this is nasty.  go with the suggestion at the top of ParticleDevice
                 // to resolve this crud.
-                SparkDevice oldDevice = deviceCache.get(simpleDevice.id);
+                ParticleDevice oldDevice = deviceCache.get(simpleDevice.id);
                 if (oldDevice != null) {
                     builder.setIsFlashing(oldDevice.isFlashing());
                 }
                 devices.add(builder
                         .setMainApi(mainApi)
-                        .setDeviceType(SparkDevice.SparkDeviceType.fromInt(simpleDevice.productId))
+                        .setDeviceType(ParticleDevice.ParticleDeviceType.fromInt(simpleDevice.productId))
                         .setBroadcastManager(broadcastManager)
-                        .setSparkCloud(this)
+                        .setParticleCloud(this)
                         .build());
             }
 
             // FIXME: remove test data
-//            devices.add(SparkDevice.newBuilder()
+//            devices.add(ParticleDevice.newBuilder()
 //                    .setName("Custom_FW")
-//                    .setDeviceType(SparkDevice.SparkDeviceType.CORE)
+//                    .setDeviceType(ParticleDevice.ParticleDeviceType.CORE)
 //                    .setDeviceId("74AF91816A364B338D38AFD3")
 //                    .setIsConnected(false)
 //                    .setBroadcastManager(broadcastManager)
-//                    .setSparkCloud(this)
+//                    .setParticleCloud(this)
 //                    .setMainApi(mainApi)
 //                    .build());
 
             // TODO: review this approach, is this the right way to ensure access to devices?
-            Map<String, SparkDevice> deviceMap = map();
-            for (SparkDevice d : devices) {
+            Map<String, ParticleDevice> deviceMap = map();
+            for (ParticleDevice d : devices) {
                 deviceMap.put(d.getID(), d);
             }
             deviceCache = deviceMap;
@@ -278,7 +278,7 @@ public class SparkCloud {
             return devices;
 
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
     }
 
@@ -288,29 +288,29 @@ public class SparkCloud {
      * @param deviceID required deviceID
      * @return the device instance on success
      */
-    public SparkDevice getDevice(String deviceID) throws SparkCloudException {
+    public ParticleDevice getDevice(String deviceID) throws ParticleCloudException {
         // FIXME: not a long term solution!  We shouldn't have a method call that
         // usually returns instantly and other times hits the network!
         if (deviceCache.containsKey(deviceID)) {
             return deviceCache.get(deviceID);
         }
 
-        SparkDevice.Builder deviceBuilder;
+        ParticleDevice.Builder deviceBuilder;
         try {
             deviceBuilder = mainApi.getDevice(deviceID);
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
 
         return deviceBuilder
                 .setMainApi(mainApi)
                 .setBroadcastManager(broadcastManager)
-                .setSparkCloud(this)
+                .setParticleCloud(this)
                 .build();
     }
 
     // Not available yet
-    private void publishEvent(String eventName, byte[] eventData) throws SparkCloudException {
+    private void publishEvent(String eventName, byte[] eventData) throws ParticleCloudException {
 
     }
 
@@ -319,11 +319,11 @@ public class SparkCloud {
      *
      * @param deviceID the deviceID
      */
-    public void claimDevice(String deviceID) throws SparkCloudException {
+    public void claimDevice(String deviceID) throws ParticleCloudException {
         try {
             mainApi.claimDevice(deviceID);
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
     }
 
@@ -334,21 +334,21 @@ public class SparkCloud {
      * @return a claim code string set on success (48 random bytes, base64 encoded
      * to 64 ASCII characters)
      */
-    public Responses.ClaimCodeResponse generateClaimCode() throws SparkCloudException {
+    public Responses.ClaimCodeResponse generateClaimCode() throws ParticleCloudException {
         try {
             // appease newer OkHttp versions with a blank POST body
             return mainApi.generateClaimCode("");
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
     }
 
     // TODO: check if any javadoc has been added for this method in the iOS SDK
-    public void requestPasswordReset(String email) throws SparkCloudException {
+    public void requestPasswordReset(String email) throws ParticleCloudException {
         try {
             identityApi.requestPasswordReset(email);
         } catch (RetrofitError error) {
-            throw new SparkCloudException(error);
+            throw new ParticleCloudException(error);
         }
     }
 
@@ -358,22 +358,22 @@ public class SparkCloud {
     // cache after all?
     public Set<String> getDeviceNames() {
         Set<String> deviceNames = set();
-        for (SparkDevice device : deviceCache.values()) {
+        for (ParticleDevice device : deviceCache.values()) {
             deviceNames.add(device.getName());
         }
         return deviceNames;
     }
 
-    private class TokenDelegate implements SparkAccessToken.SparkAccessTokenDelegate {
+    private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
 
         @Override
-        public void accessTokenExpiredAt(final SparkAccessToken accessToken, Date expirationDate) {
+        public void accessTokenExpiredAt(final ParticleAccessToken accessToken, Date expirationDate) {
             // handle auto-renewal of expired access tokens by internal timer event
             // If user is null, don't bother because we have no credentials.
             if (user != null) {
                 try {
                     logIn(user.getUser(), user.getPassword());
-                } catch (SparkCloudException e) {
+                } catch (ParticleCloudException e) {
                     log.e("Error while trying to log in: ", e);
                     token = null;
                 }

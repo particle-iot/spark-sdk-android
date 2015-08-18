@@ -12,7 +12,7 @@ import retrofit.RestAdapter.LogLevel;
 import retrofit.client.OkClient;
 
 /**
- * Constructs SparkCloud instances
+ * Constructs ParticleCloud instances
  */
 public class ApiFactory {
 

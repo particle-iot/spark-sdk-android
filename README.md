@@ -38,7 +38,8 @@ The Particle Android Cloud SDK enables Android apps to interact with Particle-po
 
 **Rebranding notice**
 
-Spark recently rebranded as Particle!  Classes like `SparkCloud` and `SparkDevice` this will soon be replaced with `ParticleCloud` and `ParticleDevice`, _et al._
+Spark recently rebranded as Particle!  In the most recent release of the SDK, classes like
+`ParticleCloud` and `ParticleDevice` have been replaced with `ParticleCloud` and `ParticleDevice`, _et al._
 
 
 **Beta notice**
@@ -64,8 +65,8 @@ To spare developers some of the awkwardness of making asynchronous calls and ret
 
 Cloud SDK usage mostly involves two main classes:
 
-1. `SparkCloud` is a singleton which enables all basic cloud operations such as: user authentication, retrieving a device list, claiming, and more.
-2. `SparkDevice` instances represent a claimed device.  Each instance enables device-specific operations: invoking functions, reading variables, and getting basic info about the device, such as name and version info.
+1. `ParticleCloud` is a singleton which enables all basic cloud operations such as: user authentication, retrieving a device list, claiming, and more.
+2. `ParticleDevice` instances represent a claimed device.  Each instance enables device-specific operations: invoking functions, reading variables, and getting basic info about the device, such as name and version info.
 
 ### Extras
 
@@ -81,10 +82,10 @@ Here are few examples for the most common use cases to get your started:
 #### Log in to the Particle cloud
 
 ```java
-Async.executeAsync(SparkCloud.get(myView.getContext()), new Async.ApiWork<SparkCloud, Void>() {
+Async.executeAsync(ParticleCloud.get(myView.getContext()), new Async.ApiWork<ParticleCloud, Void>() {
 
-        public void callApi(SparkCloud sparkCloud) throws SparkCloudException, IOException {
-            sparkCloud.logIn("ido@particle.io","l33tp4ssw0rd");
+        public void callApi(ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+            particleCloud.logIn("ido@particle.io","l33tp4ssw0rd");
         }
 
         @Override
@@ -94,7 +95,7 @@ Async.executeAsync(SparkCloud.get(myView.getContext()), new Async.ApiWork<SparkC
         }
 
         @Override
-        public void onFailure(SparkCloudException e) {
+        public void onFailure(ParticleCloudException e) {
             Log.e("SOME_TAG", e);
             Toaster.l(myActicity.this, "Wrong credentials or no internet connectivity, please try again");
         }
@@ -107,15 +108,15 @@ Async.executeAsync(SparkCloud.get(myView.getContext()), new Async.ApiWork<SparkC
 #### Get a list of all devices for the currently logged-in user
 
 ```java
-Async.executeAsync(sparkCloud, new Async.ApiWork<SparkCloud, List<SparkDevice>>() {
+Async.executeAsync(particleCloud, new Async.ApiWork<ParticleCloud, List<ParticleDevice>>() {
 
-        public List<SparkDevice> callApi(SparkCloud sparkCloud) throws SparkCloudException, IOException {
-            return sparkCloud.getDevices();
+        public List<ParticleDevice> callApi(ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+            return particleCloud.getDevices();
         }
 
         @Override
-        public void onSuccess(List<SparkDevice> devices) {
-            for (SparkDevice device : devices) {
+        public void onSuccess(List<ParticleDevice> devices) {
+            for (ParticleDevice device : devices) {
                 if (device.getName().equals("myDevice")) {
                     doSomethingWithMyDevice(device);
                     return;
@@ -124,7 +125,7 @@ Async.executeAsync(sparkCloud, new Async.ApiWork<SparkCloud, List<SparkDevice>>(
         }
 
         @Override
-        public void onFailure(SparkCloudException e) {
+        public void onFailure(ParticleCloudException e) {
             Log.e("SOME_TAG", e);
             Toaster.l(myActicity.this, "Wrong credentials or no internet connectivity, please try again");
         }
@@ -134,13 +135,13 @@ Async.executeAsync(sparkCloud, new Async.ApiWork<SparkCloud, List<SparkDevice>>(
 ---
 
 #### Read a variable from a Particle device (Core/Photon)
-This example assumes that `sparkDevice` is an active instance of `SparkDevice`, and the device it represents is claimed by the currently logged-in user.
+This example assumes that `particleDevice` is an active instance of `ParticleDevice`, and the device it represents is claimed by the currently logged-in user.
 
 ```java
-Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Integer>() {
+Async.executeAsync(particleDevice, new Async.ApiWork<ParticleDevice, Integer>() {
 
-        public Integer callApi(SparkDevice sparkDevice) throws SparkCloudException, IOException {
-            return sparkCloud.getVariable("myVariable");
+        public Integer callApi(ParticleDevice particleDevice) throws ParticleCloudException, IOException {
+            return particleCloud.getVariable("myVariable");
         }
 
         @Override
@@ -149,7 +150,7 @@ Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Integer>() {
         }
 
         @Override
-        public void onFailure(SparkCloudException e) {
+        public void onFailure(ParticleCloudException e) {
             Log.e("SOME_TAG", e);
             Toaster.l(MyActivity.this, "Wrong credentials or no internet connectivity, please try again");
         }
@@ -158,15 +159,15 @@ Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Integer>() {
 ---
 
 #### Call a function on a Particle device (Core/Photon)
-This example shows how to call a function on the device with a list of parameters.  The meaning of the value returned from `SparkDevice.callFunction()` depends on the function itself, e.g., in Tinker:
+This example shows how to call a function on the device with a list of parameters.  The meaning of the value returned from `ParticleDevice.callFunction()` depends on the function itself, e.g., in Tinker:
 * Using `digitalread`, this is the value read from the pin.
 * Using `digitalwrite`, this value is a _result code_, indicating if the write was successful.
 
 ```java
-Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Integer>() {
+Async.executeAsync(particleDevice, new Async.ApiWork<ParticleDevice, Integer>() {
 
-        public Integer callApi(SparkDevice sparkDevice) throws SparkCloudException, IOException {
-            return sparkCloud.callFunction("digitalwrite", list("D7", "1"));
+        public Integer callApi(ParticleDevice particleDevice) throws ParticleCloudException, IOException {
+            return particleCloud.callFunction("digitalwrite", list("D7", "1"));
         }
 
         @Override
@@ -175,7 +176,7 @@ Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Integer>() {
         }
 
         @Override
-        public void onFailure(SparkCloudException e) {
+        public void onFailure(ParticleCloudException e) {
             Log.e("SOME_TAG", e);
         }
 });
@@ -183,14 +184,14 @@ Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Integer>() {
 ---
 
 #### List device exposed functions and variables
-`SparkDevice.getFunctions()` returns a list of function names.  `SparkDevice.getVariables()` returns a map of variable names to types.
+`ParticleDevice.getFunctions()` returns a list of function names.  `ParticleDevice.getVariables()` returns a map of variable names to types.
 
 ```java
-for (String funcName : sparkDevice.getFunctions()) {
+for (String funcName : particleDevice.getFunctions()) {
     Log.i("SOME_TAG", "Device has function: " + funcName);
 }
 
-Map<String, Object> vars = sparkDevice.getVariables();
+Map<String, Object> vars = particleDevice.getVariables();
 for (String name : vars.keySet()) {
     Log.i("SOME_TAG", String.format("variable '%s' type is '%s'", name, vars.get(name)));
 }
@@ -201,19 +202,19 @@ for (String name : vars.keySet()) {
 #### Get a device instance by its ID
 
 ```java
-Async.executeAsync(sparkCloud, new Async.ApiWork<SparkCloud, SparkDevice>() {
+Async.executeAsync(particleCloud, new Async.ApiWork<ParticleCloud, ParticleDevice>() {
 
-        public SparkDevice callApi(SparkCloud sparkCloud) throws SparkCloudException, IOException {
-            return sparkCloud.getDevice("53fa73265066544b16208184");
+        public ParticleDevice callApi(ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+            return particleCloud.getDevice("53fa73265066544b16208184");
         }
 
         @Override
-        public void onSuccess(SparkDevice device) {
+        public void onSuccess(ParticleDevice device) {
             myDevice = device;
         }
 
         @Override
-        public void onFailure(SparkCloudException e) {
+        public void onFailure(ParticleCloudException e) {
             Log.e("SOME_TAG", e);
         }
 });
@@ -222,10 +223,10 @@ Async.executeAsync(sparkCloud, new Async.ApiWork<SparkCloud, SparkDevice>() {
 
 #### Rename a device
 ```java
-Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Void>() {
+Async.executeAsync(particleDevice, new Async.ApiWork<ParticleDevice, Void>() {
 
-        public Void callApi(SparkDevice sparkDevice) throws SparkCloudException, IOException {
-            sparkDevice.setName("rocket_bubble");
+        public Void callApi(ParticleDevice particleDevice) throws ParticleCloudException, IOException {
+            particleDevice.setName("rocket_bubble");
             return null; // return "Void"
         }
 
@@ -235,7 +236,7 @@ Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Void>() {
         }
 
         @Override
-        public void onFailure(SparkCloudException e) {
+        public void onFailure(ParticleCloudException e) {
             Log.e("SOME_TAG", "Rename failed", e);
         }
 });
@@ -247,12 +248,12 @@ Async.executeAsync(sparkDevice, new Async.ApiWork<SparkDevice, Void>() {
 This logs out the user, clearing the user's session and access token.
 
 ```java
-SparkCloud.get(someContext).logOut()
+ParticleCloud.get(someContext).logOut()
 ```
 ---
 
 ### Additional reference
-For more complete interface information, check out the [source code of SparkCloud](https://github.com/spark/spark-sdk-android/blob/master/cloudsdk/src/main/java/io/particle/android/sdk/cloud/SparkCloud.java) and [SparkDevice](https://github.com/spark/spark-sdk-android/blob/master/cloudsdk/src/main/java/io/particle/android/sdk/cloud/SparkDevice.java).
+For more complete interface information, check out the [source code of ParticleCloud](https://github.com/spark/spark-sdk-android/blob/master/cloudsdk/src/main/java/io/particle/android/sdk/cloud/ParticleCloud.java) and [ParticleDevice](https://github.com/spark/spark-sdk-android/blob/master/cloudsdk/src/main/java/io/particle/android/sdk/cloud/ParticleDevice.java).
 
 If you're working from Android Studio on OS X, you can get the Javadoc for each method or class by putting the cursor over it and hitting `F1`.
 

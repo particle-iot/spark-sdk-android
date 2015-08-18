@@ -37,7 +37,7 @@ public class Responses {
 
 
         /**
-         * Represents a single Spark device in the list returned
+         * Represents a single Particle device in the list returned
          * by a call to "GET /v1/devices"
          */
         public static class SimpleDevice {

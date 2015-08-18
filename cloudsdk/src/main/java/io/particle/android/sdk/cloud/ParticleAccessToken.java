@@ -13,17 +13,17 @@ import io.particle.android.sdk.utils.Py;
 import io.particle.android.sdk.utils.TLog;
 
 
-public class SparkAccessToken {
+public class ParticleAccessToken {
 
 
-    public interface SparkAccessTokenDelegate {
+    public interface ParticleAccessTokenDelegate {
 
-        void accessTokenExpiredAt(SparkAccessToken token, Date expirationDate);
+        void accessTokenExpiredAt(ParticleAccessToken token, Date expirationDate);
 
     }
 
 
-    public static synchronized SparkAccessToken fromNewSession(Responses.LogInResponse logInResponse) {
+    public static synchronized ParticleAccessToken fromNewSession(Responses.LogInResponse logInResponse) {
         if (logInResponse == null
                 || !Py.truthy(logInResponse.accessToken)
                 || !"bearer".equalsIgnoreCase(logInResponse.tokenType)) {
@@ -37,13 +37,13 @@ public class SparkAccessToken {
         sensitiveDataStorage.saveToken(logInResponse.accessToken);
         sensitiveDataStorage.saveTokenExpirationDate(expirationDate);
 
-        SparkAccessToken token = new SparkAccessToken(logInResponse.accessToken,
+        ParticleAccessToken token = new ParticleAccessToken(logInResponse.accessToken,
                 expirationDate, new Handler(Looper.getMainLooper()));
         token.scheduleExpiration();
         return token;
     }
 
-    public static synchronized SparkAccessToken fromSavedSession() {
+    public static synchronized ParticleAccessToken fromSavedSession() {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         String accessToken = sensitiveDataStorage.getToken();
         Date expirationDate = sensitiveDataStorage.getTokenExpirationDate();
@@ -53,7 +53,7 @@ public class SparkAccessToken {
             return null;
         }
 
-        SparkAccessToken token = new SparkAccessToken(accessToken, expirationDate,
+        ParticleAccessToken token = new ParticleAccessToken(accessToken, expirationDate,
                 new Handler(Looper.getMainLooper()));
         token.scheduleExpiration();
         return token;
@@ -68,7 +68,7 @@ public class SparkAccessToken {
         sensitiveDataStorage.resetTokenExpirationDate();
     }
 
-    private static final TLog log = TLog.get(SparkAccessToken.class);
+    private static final TLog log = TLog.get(ParticleAccessToken.class);
 
     // how many seconds before expiry date will a token be considered expired
     // (0 = expire on expiry date, 24*60*60 = expire a day before)
@@ -81,9 +81,9 @@ public class SparkAccessToken {
     private Date expiryDate;
 
     private volatile Runnable expirationRunnable;
-    private volatile SparkAccessTokenDelegate delegate;
+    private volatile ParticleAccessTokenDelegate delegate;
 
-    private SparkAccessToken(String accessToken, Date expiryDate, Handler handler) {
+    private ParticleAccessToken(String accessToken, Date expiryDate, Handler handler) {
         this.accessToken = accessToken;
         this.expiryDate = expiryDate;
         this.handler = handler;
@@ -104,14 +104,14 @@ public class SparkAccessToken {
     /**
      * Delegate to receive didExpireAt method call whenever a token is detected as expired
      */
-    public SparkAccessTokenDelegate getDelegate() {
+    public ParticleAccessTokenDelegate getDelegate() {
         return delegate;
     }
 
     /**
      * Set the delegate described in #getDelegate()
      */
-    public void setDelegate(SparkAccessTokenDelegate delegate) {
+    public void setDelegate(ParticleAccessTokenDelegate delegate) {
         this.delegate = delegate;
     }
 
@@ -132,7 +132,7 @@ public class SparkAccessToken {
         EZ.runAsync(new Runnable() {
             @Override
             public void run() {
-                delegate.accessTokenExpiredAt(SparkAccessToken.this, expiryDate);
+                delegate.accessTokenExpiredAt(ParticleAccessToken.this, expiryDate);
             }
         });
     }
@@ -160,9 +160,9 @@ public class SparkAccessToken {
 
     private static class ExpirationHandler implements Runnable {
 
-        final WeakReference<SparkAccessToken> tokenRef;
+        final WeakReference<ParticleAccessToken> tokenRef;
 
-        private ExpirationHandler(SparkAccessToken token) {
+        private ExpirationHandler(ParticleAccessToken token) {
             this.tokenRef = new WeakReference<>(token);
         }
 
@@ -170,7 +170,7 @@ public class SparkAccessToken {
         @Override
         public void run() {
             log.d("Running token expiration handler...");
-            SparkAccessToken token = tokenRef.get();
+            ParticleAccessToken token = tokenRef.get();
             if (token == null) {
                 log.d("...but the token was null, doing nothing.");
                 return;

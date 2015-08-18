@@ -22,12 +22,12 @@ import retrofit.mime.TypedOutput;
 
 
 /**
- * Spark cloud APIs, modelled for the Retrofit REST library
+ * Particle cloud REST APIs, modelled for the Retrofit library
  */
 public class ApiDefs {
 
     /**
-     * The main Spark cloud API
+     * The main Particle cloud API
      */
     public interface CloudApi {
 
@@ -35,7 +35,7 @@ public class ApiDefs {
         List<Models.SimpleDevice> getDevices();
 
         @GET("/v1/devices/{deviceID}")
-        SparkDevice.Builder getDevice(@Path("deviceID") String deviceID);
+        ParticleDevice.Builder getDevice(@Path("deviceID") String deviceID);
 
         // FIXME: put a real response type on this?
         @FormUrlEncoded

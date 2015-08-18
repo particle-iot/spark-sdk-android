@@ -22,11 +22,11 @@ import static io.particle.android.sdk.utils.Py.list;
 // Heavily inspired by RetrofitError, which we are mostly wrapping here, but
 // we're making our own exception to make it a checked exception, and to avoid
 // tying the API to a particular library used by the API's implementation
-public class SparkCloudException extends Exception {
+public class ParticleCloudException extends Exception {
 
-    private static final TLog log = TLog.get(SparkCloudException.class);
+    private static final TLog log = TLog.get(ParticleCloudException.class);
 
-    /** Identifies the event kind which triggered a {@link SparkCloudException}. */
+    /** Identifies the event kind which triggered a {@link ParticleCloudException}. */
     public enum Kind {
 
         /** An {@link java.io.IOException} occurred while communicating to the server. */
@@ -100,14 +100,14 @@ public class SparkCloudException extends Exception {
     private boolean checkedForServerErrorMsg = false;
     private String serverErrorMessage;
 
-    public SparkCloudException(Exception exception) {
+    public ParticleCloudException(Exception exception) {
         super(exception);
         // FIXME: ugly hack to get around even uglier bug.
         this.innerError = RetrofitError.unexpectedError("(URL UNKNOWN)", exception);
         this.responseData = null;
     }
 
-    SparkCloudException(RetrofitError innerError) {
+    ParticleCloudException(RetrofitError innerError) {
         this.innerError = innerError;
         this.responseData = buildResponseData(innerError);
     }

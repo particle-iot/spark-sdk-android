@@ -7,16 +7,16 @@ import io.particle.android.sdk.persistance.SensitiveDataStorage;
 import static io.particle.android.sdk.utils.Py.truthy;
 
 
-public class SparkUser {
+public class ParticleUser {
 
     /**
-     * Initialize SparkUser class with new credentials and store session in keychain
+     * Initialize ParticleUser class with new credentials and store session in keychain
      *
      * @param user     New username credential
      * @param password New password credential
-     * @return SparkUser instance
+     * @return ParticleUser instance
      */
-    public static synchronized SparkUser fromNewCredentials(String user, String password) {
+    public static synchronized ParticleUser fromNewCredentials(String user, String password) {
         Preconditions.checkArgument(truthy(user), "Username cannot be empty or null");
         Preconditions.checkArgument(truthy(password), "Password cannot be empty or null");
 
@@ -24,21 +24,21 @@ public class SparkUser {
         sensitiveDataStorage.saveUser(user);
         sensitiveDataStorage.savePassword(password);
 
-        return new SparkUser(user, password);
+        return new ParticleUser(user, password);
     }
 
     /**
-     * Try to initialize a SparkUser class with stored credentials
+     * Try to initialize a ParticleUser class with stored credentials
      *
-     * @return SparkUser instance if successfully retrieved session, else null
+     * @return ParticleUser instance if successfully retrieved session, else null
      */
-    public static synchronized SparkUser fromSavedSession() {
+    public static synchronized ParticleUser fromSavedSession() {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         String user = sensitiveDataStorage.getUser();
         String password = sensitiveDataStorage.getPassword();
 
         if (truthy(user) && truthy(password)) {
-            return new SparkUser(user, password);
+            return new ParticleUser(user, password);
         } else {
             return null;
         }
@@ -55,7 +55,7 @@ public class SparkUser {
     private final String password;
 
 
-    private SparkUser(String user, String password) {
+    private ParticleUser(String user, String password) {
         this.user = user;
         this.password = password;
     }

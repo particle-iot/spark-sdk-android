@@ -5,9 +5,9 @@ import android.os.AsyncTask;
 
 import java.io.IOException;
 
-import io.particle.android.sdk.cloud.SparkCloud;
-import io.particle.android.sdk.cloud.SparkCloudException;
-import io.particle.android.sdk.cloud.SparkDevice;
+import io.particle.android.sdk.cloud.ParticleCloud;
+import io.particle.android.sdk.cloud.ParticleCloudException;
+import io.particle.android.sdk.cloud.ParticleDevice;
 
 
 /**
@@ -20,11 +20,11 @@ public class Async {
 
     public abstract static class ApiWork<ApiCaller, Result> {
 
-        public abstract Result callApi(ApiCaller apiCaller) throws SparkCloudException, IOException;
+        public abstract Result callApi(ApiCaller apiCaller) throws ParticleCloudException, IOException;
 
         public abstract void onSuccess(Result result);
 
-        public abstract void onFailure(SparkCloudException exception);
+        public abstract void onFailure(ParticleCloudException exception);
 
         /**
          * Called at the end of the async task execution, before
@@ -53,16 +53,16 @@ public class Async {
     }
 
 
-    public static <T> AsyncApiWorker<SparkCloud, T> executeAsync(SparkCloud sparkCloud,
-                                                                 ApiWork<SparkCloud, T> work) {
-        return (AsyncApiWorker<SparkCloud, T>) new AsyncApiWorker<>(sparkCloud, work)
+    public static <T> AsyncApiWorker<ParticleCloud, T> executeAsync(ParticleCloud particleCloud,
+                                                                 ApiWork<ParticleCloud, T> work) {
+        return (AsyncApiWorker<ParticleCloud, T>) new AsyncApiWorker<>(particleCloud, work)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
-    public static <T> AsyncApiWorker<SparkDevice, T> executeAsync(SparkDevice sparkDevice,
-                                                                  ApiWork<SparkDevice, T> work) {
-        return (AsyncApiWorker<SparkDevice, T>) new AsyncApiWorker<>(sparkDevice, work)
+    public static <T> AsyncApiWorker<ParticleDevice, T> executeAsync(ParticleDevice particleDevice,
+                                                                  ApiWork<ParticleDevice, T> work) {
+        return (AsyncApiWorker<ParticleDevice, T>) new AsyncApiWorker<>(particleDevice, work)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -74,7 +74,7 @@ public class Async {
 
         private Activity activity;
 
-        private volatile SparkCloudException exception;
+        private volatile ParticleCloudException exception;
         // FIXME: this is Bad and Wrong, but this needs to SHIP, so I'm leaving it for now.
         public volatile IOException ioException;
 
@@ -102,7 +102,7 @@ public class Async {
         protected Result doInBackground(Void... voids) {
             try {
                 return work.callApi(caller);
-            } catch (SparkCloudException e) {
+            } catch (ParticleCloudException e) {
                 exception = e;
                 return null;
             } catch (IOException e) {
@@ -132,7 +132,7 @@ public class Async {
             } else {
                 // FIXME: this error handling isn't quite right; fix it.
                 if (exception == null) {
-                    exception = new SparkCloudException(ioException);
+                    exception = new ParticleCloudException(ioException);
                 }
                 log.e("Error calling API: " + exception.getBestMessage(), exception);
                 work.onFailure(exception);
