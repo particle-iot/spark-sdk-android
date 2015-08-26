@@ -3,6 +3,7 @@ package io.particle.android.sdk.cloud;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
@@ -30,17 +31,7 @@ public class ParticleAccessToken {
             throw new IllegalArgumentException("Invalid LogInResponse: " + logInResponse);
         }
 
-        long expirationMillis = logInResponse.expiresInSeconds * 1000;
-        Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
-
-        SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
-        sensitiveDataStorage.saveToken(logInResponse.accessToken);
-        sensitiveDataStorage.saveTokenExpirationDate(expirationDate);
-
-        ParticleAccessToken token = new ParticleAccessToken(logInResponse.accessToken,
-                expirationDate, new Handler(Looper.getMainLooper()));
-        token.scheduleExpiration();
-        return token;
+        return fromNewSessionData(logInResponse.expiresInSeconds, logInResponse.accessToken);
     }
 
     public static synchronized ParticleAccessToken fromSavedSession() {
@@ -58,6 +49,23 @@ public class ParticleAccessToken {
         token.scheduleExpiration();
         return token;
     }
+
+
+    private static synchronized ParticleAccessToken fromNewSessionData(long expiresInSeconds,
+                                                                       @NonNull String accessToken) {
+        long expirationMillis = expiresInSeconds * 1000;
+        Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
+
+        SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
+        sensitiveDataStorage.saveToken(accessToken);
+        sensitiveDataStorage.saveTokenExpirationDate(expirationDate);
+
+        ParticleAccessToken token = new ParticleAccessToken(accessToken, expirationDate,
+                new Handler(Looper.getMainLooper()));
+        token.scheduleExpiration();
+        return token;
+    }
+
 
     /**
      * Remove access token session data from keychain
@@ -151,6 +159,7 @@ public class ParticleAccessToken {
         }
     }
 
+    // FIXME: finalizers are a _last resort_.  Look for something better.
     @Override
     protected void finalize() throws Throwable {
         cancelExpiration();

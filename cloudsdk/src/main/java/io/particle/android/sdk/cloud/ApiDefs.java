@@ -66,8 +66,15 @@ public class ApiDefs {
          * Newer versions of OkHttp <em>require</em> a body for POSTs, but just pass in
          * a blank string for the body and all is well.
          */
+        @FormUrlEncoded
         @POST("/v1/device_claims")
-        ClaimCodeResponse generateClaimCode(@Body String blankBody);
+        ClaimCodeResponse generateClaimCode(@Field("blank") String blankBody);
+
+        @FormUrlEncoded
+        @POST("/v1/orgs/{orgSlug}/products/{productSlug}/device_claims")
+        ClaimCodeResponse generateClaimCodeForOrg(@Field("blank") String blankBody,
+                                                  @Path("orgSlug") String orgSlug,
+                                                  @Path("productSlug") String productSlug);
 
         @FormUrlEncoded
         @POST("/v1/devices")
@@ -79,11 +86,11 @@ public class ApiDefs {
 
     /**
      * APIs dealing with identity and authorization
-     * <p/>
+     * <p>
      * These are separated out from the main API, since they aren't
      * authenticated like the main API, and as such need different
      * headers.
-     * <p/>
+     * <p>
      * Also, the duplicated methods for orgs are unfortunate, but the best solution all around
      * in practice.  (This should be revisited in the unlikely case that endpoints for orgs and
      * non-orgs diverges further.)
@@ -95,12 +102,15 @@ public class ApiDefs {
         Response signUp(@Field("username") String username,
                         @Field("password") String password);
 
+
+        // NOTE: the `LogInResponse` used here is intentional.  It looks a little odd, but that's
+        // how this endpoint works.
         @FormUrlEncoded
-        @POST("/v1/orgs/{orgName}/customers")
-        Response signUpWithOrganizationalUser(@Field("email") String email,
-                                              @Field("password") String password,
-                                              @Field("activation_code") String inviteCode,
-                                              @Path("orgName") String orgName);
+        @POST("/v1/orgs/{orgSlug}/customers")
+        Responses.LogInResponse signUpAndLogInWithCustomer(@Field("grant_type") String grantType,
+                                                           @Field("email") String email,
+                                                           @Field("password") String password,
+                                                           @Path("orgSlug") String orgSlug);
 
         @FormUrlEncoded
         @POST("/oauth/token")

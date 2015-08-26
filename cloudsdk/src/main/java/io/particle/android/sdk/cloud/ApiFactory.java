@@ -2,6 +2,7 @@ package io.particle.android.sdk.cloud;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.StringRes;
 import android.util.Base64;
 
 import com.squareup.okhttp.OkHttpClient;
@@ -23,17 +24,36 @@ public class ApiFactory {
 
     }
 
+
+    public interface OauthBasicAuthCredentialsProvider {
+
+        String getClientId();
+
+        String getClientSecret();
+    }
+
+
     private final Context ctx;
     private final TokenGetterDelegate tokenDelegate;
     private final OkHttpClient okHttpClient;
+    private final OauthBasicAuthCredentialsProvider basicAuthCredentialsProvider;
 
     public ApiFactory(Context ctx, TokenGetterDelegate tokenGetterDelegate) {
+        this(ctx, tokenGetterDelegate,
+                new ResourceValueBasicAuthCredentialsProvider(
+                        ctx.getApplicationContext(),
+                        R.string.oauth_client_id,
+                        R.string.oauth_client_secret));
+    }
+
+    public ApiFactory(Context ctx, TokenGetterDelegate tokenGetterDelegate,
+                      OauthBasicAuthCredentialsProvider basicAuthProvider) {
         this.ctx = ctx.getApplicationContext();
         this.tokenDelegate = tokenGetterDelegate;
         this.okHttpClient = new OkHttpClient();
-        // FIXME: remove later
-//        this.okHttpClient.setReadTimeout(35 * 1000, TimeUnit.MILLISECONDS);
+        this.basicAuthCredentialsProvider = basicAuthProvider;
     }
+
 
     public ApiDefs.CloudApi buildCloudApi() {
         RestAdapter restAdapter = buildCommonRestAdapterBuilder()
@@ -66,11 +86,10 @@ public class ApiFactory {
     }
 
     private String getBasicAuthValue() {
-        final String clientId = ctx.getString(R.string.oauth_client_id);
-        final String clientSecret = ctx.getString(R.string.oauth_client_secret);
-        return "Basic " + Base64.encodeToString(
-                String.format("%s:%s", clientId, clientSecret).getBytes(),
-                Base64.NO_WRAP);
+        String authString = String.format("%s:%s",
+                basicAuthCredentialsProvider.getClientId(),
+                basicAuthCredentialsProvider.getClientSecret());
+        return "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
     }
 
     private RestAdapter.Builder buildCommonRestAdapterBuilder() {
@@ -78,6 +97,31 @@ public class ApiFactory {
                 .setClient(new OkClient(okHttpClient))
                 .setEndpoint(getApiUri().toString())
                 .setLogLevel(LogLevel.valueOf(ctx.getString(R.string.http_log_level)));
+    }
+
+
+    public static class ResourceValueBasicAuthCredentialsProvider
+            implements OauthBasicAuthCredentialsProvider {
+
+        private final String clientId;
+        private final String clientSecret;
+
+        public ResourceValueBasicAuthCredentialsProvider(
+                Context ctx, @StringRes int clientIdResId, @StringRes int clientSecretResId) {
+            this.clientId = ctx.getString(clientIdResId);
+            this.clientSecret = ctx.getString(clientSecretResId);
+        }
+
+
+        @Override
+        public String getClientId() {
+            return clientId;
+        }
+
+        @Override
+        public String getClientSecret() {
+            return clientSecret;
+        }
     }
 
 }

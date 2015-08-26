@@ -27,6 +27,7 @@ public class ParticleCloud {
     private static final TLog log = TLog.get(ParticleCloud.class);
 
     private static ParticleCloud instance;
+    private static ApiFactory.OauthBasicAuthCredentialsProvider oauthProviderInstance;
 
     /**
      * Singleton instance of ParticleCloud class
@@ -44,13 +45,32 @@ public class ParticleCloud {
         return instance;
     }
 
-    private static ParticleCloud buildInstance(Context context) {
+    /**
+     * Use this to provide Oauth credentials from something other than resource overrides.
+     *
+     * NOTE: this has been marked deprecated before it's even released because it's a bit of a
+     * hack to let us #SHIPIT quickly, but expect this to go away soon, replaced by something
+     * at least as simple, but more elegant.
+     */
+    @Deprecated
+    public static void setOauthProvider(ApiFactory.OauthBasicAuthCredentialsProvider oauthProvider) {
+        Preconditions.checkState(instance == null,
+                "Cannot set OAuth provider after initializing ParticleCloud!");
+        oauthProviderInstance = oauthProvider;
+    }
+
+    private static ParticleCloud buildInstance(@NonNull Context context) {
         Context appContext = context.getApplicationContext();
         SDKGlobals.init(appContext);
 
         // FIXME: see if this TokenGetterDelegate setter issue can be resolved reasonably
         TokenGetter tokenGetter = new TokenGetter();
-        ApiFactory factory = new ApiFactory(appContext, tokenGetter);
+        ApiFactory factory;
+        if (oauthProviderInstance == null) {
+            factory = new ApiFactory(appContext, tokenGetter);
+        } else {
+            factory = new ApiFactory(appContext, tokenGetter, oauthProviderInstance);
+        }
         ParticleCloud cloud = new ParticleCloud(
                 factory.buildCloudApi(),
                 factory.buildIdentityApi(),
@@ -123,6 +143,10 @@ public class ParticleCloud {
         return all(this.token, this.user) ? this.user.getUser() : null;
     }
 
+    public boolean isLoggedIn() {
+        return getLoggedInUsername() != null;
+    }
+
     /**
      * Login with existing account credentials to Particle cloud
      *
@@ -133,14 +157,10 @@ public class ParticleCloud {
     public void logIn(@NonNull String user, @NonNull String password) throws ParticleCloudException {
         try {
             Responses.LogInResponse response = identityApi.logIn("password", user, password);
-            this.token = ParticleAccessToken.fromNewSession(response);
-            this.token.setDelegate(tokenDelegate);
-            this.user = ParticleUser.fromNewCredentials(user, password);
-
+            onLogIn(response, user, password);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
-
     }
 
     /**
@@ -160,22 +180,25 @@ public class ParticleCloud {
     }
 
     /**
-     * Sign up with new account credentials to Particle cloud
+     * Create new customer account on the Particle cloud and log in
      *
-     * @param email      Required user name, must be a valid email address
-     * @param password   Required password
-     * @param inviteCode Optional invite code for opening an account
-     * @param orgName    Organization name to include in cloud API endpoint URL
+     * @param email    Required user name, must be a valid email address
+     * @param password Required password
+     * @param orgName  Organization slug to use
      */
-    public void signUpWithOrganization(String email, String password, String inviteCode,
-                                       String orgName) throws ParticleCloudException {
-        // TODO: review against spec
-        if (!truthy(orgName)) {
-            throw new IllegalArgumentException("Organization name not specified");
+    @WorkerThread
+    public void signUpAndLogInWithCustomer(@NonNull String email,
+                                           @NonNull String password,
+                                           @NonNull String orgSlug) throws ParticleCloudException {
+        if (!all(email, password, orgSlug)) {
+            throw new IllegalArgumentException(
+                    "Email, password, and organization must all be specified");
         }
 
         try {
-            identityApi.signUpWithOrganizationalUser(email, password, inviteCode, orgName);
+            Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(
+                    "client_credentials", email, password, orgSlug);
+            onLogIn(response, email, password);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -357,8 +380,22 @@ public class ParticleCloud {
     @WorkerThread
     public Responses.ClaimCodeResponse generateClaimCode() throws ParticleCloudException {
         try {
-            // appease newer OkHttp versions with a blank POST body
-            return mainApi.generateClaimCode("");
+            // Offer empty string to appease newer OkHttp versions which require a POST body,
+            // even if it's empty or (as far as the endpoint cares) nonsense
+            return mainApi.generateClaimCode("okhttp_appeasement");
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    @WorkerThread
+    public Responses.ClaimCodeResponse generateClaimCodeForOrg(@NonNull String orgSlug,
+                                                               @NonNull String productSlug)
+            throws ParticleCloudException {
+        try {
+            // Offer empty string to appease newer OkHttp versions which require a POST body,
+            // even if it's empty or (as far as the endpoint cares) nonsense
+            return mainApi.generateClaimCodeForOrg("okhttp_appeasement", orgSlug, productSlug);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -374,17 +411,13 @@ public class ParticleCloud {
         }
     }
 
-    // FIXME: reconsider?
-    // lame workaround for the fact that we need main-thread access to current
-    // device names for the rename feature.  Maybe we should just expose the device
-    // cache after all?
-    public Set<String> getDeviceNames() {
-        Set<String> deviceNames = set();
-        for (ParticleDevice device : deviceCache.values()) {
-            deviceNames.add(device.getName());
-        }
-        return deviceNames;
+
+    private void onLogIn(Responses.LogInResponse response, String user, String password) {
+        this.token = ParticleAccessToken.fromNewSession(response);
+        this.token.setDelegate(tokenDelegate);
+        this.user = ParticleUser.fromNewCredentials(user, password);
     }
+
 
     private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
 
