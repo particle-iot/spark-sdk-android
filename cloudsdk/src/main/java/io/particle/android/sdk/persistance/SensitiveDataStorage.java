@@ -4,6 +4,7 @@ package io.particle.android.sdk.persistance;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import java.util.Date;
 
@@ -20,7 +21,7 @@ public class SensitiveDataStorage {
     private final SharedPreferences sharedPrefs;
 
 
-    public SensitiveDataStorage(Context ctx) {
+    public SensitiveDataStorage(@NonNull Context ctx) {
         ctx = ctx.getApplicationContext();
         this.sharedPrefs = ctx.getSharedPreferences("spark_sdk_sensitive_data", Context.MODE_PRIVATE);
     }

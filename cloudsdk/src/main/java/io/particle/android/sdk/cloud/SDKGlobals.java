@@ -2,12 +2,12 @@ package io.particle.android.sdk.cloud;
 
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import io.particle.android.sdk.persistance.AppDataStorage;
 import io.particle.android.sdk.persistance.SensitiveDataStorage;
 
 
-// FIXME: Replace with Dagger?
 public class SDKGlobals {
 
     private static volatile SensitiveDataStorage sensitiveDataStorage;
@@ -16,7 +16,7 @@ public class SDKGlobals {
     private static boolean isInitialized = false;
 
 
-    public static synchronized void init(Context ctx) {
+    public static synchronized void init(@NonNull Context ctx) {
         ctx = ctx.getApplicationContext();
         if (isInitialized) {
             return;

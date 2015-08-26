@@ -2,6 +2,7 @@ package io.particle.android.sdk.persistance;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 /**
  * Storage for misc settings to be persisted which <strong>aren't</strong> related to
@@ -14,7 +15,7 @@ public class AppDataStorage {
     private final SharedPreferences sharedPrefs;
 
 
-    public AppDataStorage(Context ctx) {
+    public AppDataStorage(@NonNull Context ctx) {
         ctx = ctx.getApplicationContext();
         this.sharedPrefs = ctx.getSharedPreferences("spark_sdk_prefs", Context.MODE_PRIVATE);
     }

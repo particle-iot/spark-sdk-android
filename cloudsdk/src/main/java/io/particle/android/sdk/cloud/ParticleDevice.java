@@ -1,6 +1,9 @@
 package io.particle.android.sdk.cloud;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
 
@@ -12,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +32,7 @@ import static io.particle.android.sdk.utils.Py.set;
 
 
 // FIXME:
-// this should be just a proxy to ParticleCloud, and should hold NO STATE of its own!
+// this should be just a proxy to ParticleCloud, and should hold no state of its own,
 // create a separate DeviceState class or something to wrap up all this stuff, and use some
 // getters to expose the fields
 public class ParticleDevice {
@@ -52,29 +54,32 @@ public class ParticleDevice {
         }
     }
 
+
     public class FunctionDoesNotExistException extends Exception {
 
-        public FunctionDoesNotExistException(String functionName)
-        {
-            super("Function "+functionName+" does not exist on this device");
+        public FunctionDoesNotExistException(String functionName) {
+            super("Function " + functionName + " does not exist on this device");
         }
     }
+
 
     public class VariableDoesNotExistException extends Exception {
 
-        public VariableDoesNotExistException(String variableName)
-        {
-            super("Variable "+variableName+" does not exist on this device");
+        public VariableDoesNotExistException(String variableName) {
+            super("Variable " + variableName + " does not exist on this device");
         }
     }
+
 
     public enum KnownApp {
         TINKER("tinker");
 
         private final String appName;
+
         KnownApp(String appName) {
             this.appName = appName;
         }
+
         public String getAppName() {
             return appName;
         }
@@ -138,10 +143,8 @@ public class ParticleDevice {
 
     /**
      * Rename the device in the cloud. If renaming fails name will stay the same.
-     *
-     * @param newName the new name to use
      */
-    public void setName(String newName) throws ParticleCloudException {
+    public void setName(@NonNull String newName) throws ParticleCloudException {
         // FIXME: later on look into what iOS ends up doing here.
         String oldName = name;
         name = newName;
@@ -204,7 +207,9 @@ public class ParticleDevice {
      * @param variableName Variable name
      * @return result value
      */
-    public int getVariable(String variableName) throws ParticleCloudException, IOException, VariableDoesNotExistException {
+    @WorkerThread
+    public int getVariable(@NonNull String variableName)
+            throws ParticleCloudException, IOException, VariableDoesNotExistException {
         if (!variables.containsKey(variableName))
             throw new VariableDoesNotExistException(variableName);
 
@@ -232,10 +237,13 @@ public class ParticleDevice {
      *                     in length. If any arguments are longer, a runtime exception will be thrown.
      * @return value of 1 represents success
      */
-    public int callFunction(String functionName, List<String> args) throws ParticleCloudException, IOException, FunctionDoesNotExistException {
+    @WorkerThread
+    public int callFunction(@NonNull String functionName, @Nullable List<String> args)
+            throws ParticleCloudException, IOException, FunctionDoesNotExistException {
         // TODO: check response of calling a non-existent function
-        if (!functions.contains(functionName))
+        if (!functions.contains(functionName)) {
             throw new FunctionDoesNotExistException(functionName);
+        }
 
         // null is accepted here, but it won't be in the Retrofit API call later
         if (args == null) {
@@ -268,23 +276,26 @@ public class ParticleDevice {
      * @param functionName Function name
      * @return value of the function
      */
-    public int callFunction(String functionName) throws ParticleCloudException, IOException, FunctionDoesNotExistException {
-        return callFunction(functionName, new ArrayList<String>());
+    @WorkerThread
+    public int callFunction(@NonNull String functionName) throws ParticleCloudException, IOException,
+            FunctionDoesNotExistException {
+        return callFunction(functionName, null);
     }
 
     // FIXME: support event handling
     // FIXME: Also, stop taking "Object" here.  Bah.
-    public void addEventHandler(String eventName, Object eventHandler) {
+    private void addEventHandler(String eventName, Object eventHandler) {
 
     }
 
-    public void removeEventHandler(String eventName) {
+    private void removeEventHandler(String eventName) {
 
     }
 
     /**
      * Remove device from current logged in user account
      */
+    @WorkerThread
     public void unclaim() throws ParticleCloudException {
         try {
             mainApi.unclaimDevice(deviceId);
@@ -307,7 +318,8 @@ public class ParticleDevice {
         return isFlashing;
     }
 
-    public void flashKnownApp(final KnownApp knownApp) throws ParticleCloudException {
+    @WorkerThread
+    public void flashKnownApp(@NonNull final KnownApp knownApp) throws ParticleCloudException {
         performFlashingChange(new FlashingChange() {
             @Override
             public void executeFlashingChange() throws RetrofitError {
@@ -316,7 +328,8 @@ public class ParticleDevice {
         });
     }
 
-    public void flashBinaryFile(final File file) throws ParticleCloudException {
+    @WorkerThread
+    public void flashBinaryFile(@NonNull final File file) throws ParticleCloudException {
         performFlashingChange(new FlashingChange() {
             @Override
             public void executeFlashingChange() throws RetrofitError {
@@ -325,6 +338,7 @@ public class ParticleDevice {
         });
     }
 
+    @WorkerThread
     public void flashBinaryFile(final InputStream stream) throws ParticleCloudException, IOException {
         final byte[] bytes = Okio.buffer(Okio.source(stream)).readByteArray();
         performFlashingChange(new FlashingChange() {
@@ -334,6 +348,10 @@ public class ParticleDevice {
                 mainApi.flashFile(deviceId, new TypedFakeFile(bytes));
             }
         });
+    }
+
+    public ParticleCloud getCloud() {
+        return cloud;
     }
 
     private void resetFlashingState() {
@@ -347,10 +365,6 @@ public class ParticleDevice {
             e.printStackTrace();
         }
         broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
-    }
-
-    public ParticleCloud getCloud() {
-        return cloud;
     }
 
     private interface FlashingChange {

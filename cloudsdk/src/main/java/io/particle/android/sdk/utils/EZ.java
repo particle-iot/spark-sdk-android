@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
@@ -20,17 +22,17 @@ public class EZ {
     private static final TLog log = TLog.get(EZ.class);
 
 
-    public static void runOnMainThread(Runnable runnable) {
+    public static void runOnMainThread(@NonNull Runnable runnable) {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(runnable);
     }
 
-    public static void runOnMainThreadDelayed(long delayInMillis, Runnable runnable) {
+    public static void runOnMainThreadDelayed(long delayInMillis, @NonNull Runnable runnable) {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(runnable, delayInMillis);
     }
 
-    public static void runAsync(final Runnable runnable) {
+    public static void runAsync(@NonNull final Runnable runnable) {
         new AsyncTask<Void, Void, Void>() {
 
             @Override
@@ -59,7 +61,7 @@ public class EZ {
      * Inspired by: https://gist.github.com/keyboardr/5455206
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getCallbacksOrThrow(Fragment frag, Class<T> callbacks) {
+    public static <T> T getCallbacksOrThrow(@NonNull Fragment frag, @NonNull Class<T> callbacks) {
         Fragment parent = frag.getParentFragment();
 
         if (parent != null && callbacks.isInstance(parent)) {
@@ -91,10 +93,8 @@ public class EZ {
      * you don't care that closing a non-null buffer threw an exception, but
      * you still care enough that logging might be useful, like in a
      * "finally" block, after you've already returned to the caller.
-     *
-     * @param closeable
      */
-    public static void closeThisThingOrMaybeDont(Closeable closeable) {
+    public static void closeThisThingOrMaybeDont(@Nullable Closeable closeable) {
         if (closeable == null) {
             log.d("Can't close closable, arg was null.");
             return;
@@ -107,7 +107,8 @@ public class EZ {
         }
     }
 
-    private static String removeExtension(final String filename) {
+    @Nullable
+    private static String removeExtension(@Nullable String filename) {
         if (filename == null) {
             return null;
         }

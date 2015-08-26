@@ -1,12 +1,15 @@
 package io.particle.android.sdk.cloud;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
+
+import com.google.common.base.Preconditions;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.persistance.AppDataStorage;
@@ -16,7 +19,6 @@ import retrofit.RetrofitError;
 import static io.particle.android.sdk.utils.Py.all;
 import static io.particle.android.sdk.utils.Py.list;
 import static io.particle.android.sdk.utils.Py.map;
-import static io.particle.android.sdk.utils.Py.set;
 import static io.particle.android.sdk.utils.Py.truthy;
 
 
@@ -31,7 +33,7 @@ public class ParticleCloud {
      *
      * @return ParticleCloud
      */
-    public synchronized static ParticleCloud get(Context context) {
+    public synchronized static ParticleCloud get(@NonNull Context context) {
         // TODO: try to eliminate singleton, consider replacing with dependency
         // injection where initializer gets:
         // CloudConnection, CloudEndpoint (URL) to allow private cloud
@@ -71,27 +73,39 @@ public class ParticleCloud {
     }
 
 
+    @NonNull
     private final ApiDefs.CloudApi mainApi;
+    @NonNull
     private final ApiDefs.IdentityApi identityApi;
+    @NonNull
     private final AppDataStorage appDataStorage;
+    @NonNull
     private final TokenDelegate tokenDelegate = new TokenDelegate();
+    @NonNull
     private final LocalBroadcastManager broadcastManager;
 
+    // We should be able to mark these both @Nullable, but Android Studio is incorrectly
+    // inferring that these could be null, in spite of _directly following a null check_.
+    // Try again later after a few more releases, I guess...
+    // @Nullable
     private volatile ParticleAccessToken token;
+    // @Nullable
     private volatile ParticleUser user;
 
     private volatile Map<String, ParticleDevice> deviceCache = map();
 
-    private ParticleCloud(ApiDefs.CloudApi mainApi, ApiDefs.IdentityApi identityApi,
-                          AppDataStorage appDataStorage, LocalBroadcastManager broadcastManager) {
+    private ParticleCloud(@NonNull ApiDefs.CloudApi mainApi,
+                          @NonNull ApiDefs.IdentityApi identityApi,
+                          @NonNull AppDataStorage appDataStorage,
+                          @NonNull LocalBroadcastManager broadcastManager) {
         this.mainApi = mainApi;
         this.identityApi = identityApi;
         this.appDataStorage = appDataStorage;
         this.broadcastManager = broadcastManager;
         this.user = ParticleUser.fromSavedSession();
         this.token = ParticleAccessToken.fromSavedSession();
-        if (token != null) {
-            token.setDelegate(new TokenDelegate());
+        if (this.token != null) {
+            this.token.setDelegate(new TokenDelegate());
         }
     }
 
@@ -115,7 +129,8 @@ public class ParticleCloud {
      * @param user     User name, must be a valid email address
      * @param password Password
      */
-    public void logIn(String user, String password) throws ParticleCloudException {
+    @WorkerThread
+    public void logIn(@NonNull String user, @NonNull String password) throws ParticleCloudException {
         try {
             Responses.LogInResponse response = identityApi.logIn("password", user, password);
             this.token = ParticleAccessToken.fromNewSession(response);
@@ -134,7 +149,9 @@ public class ParticleCloud {
      * @param user     Required user name, must be a valid email address
      * @param password Required password
      */
-    public void signUpWithUser(String user, String password) throws ParticleCloudException {
+    @WorkerThread
+    public void signUpWithUser(@NonNull String user, @NonNull String password)
+            throws ParticleCloudException {
         try {
             identityApi.signUp(user, password);
         } catch (RetrofitError error) {
@@ -180,6 +197,7 @@ public class ParticleCloud {
     /**
      * Get an array of instances of all user's claimed devices
      */
+    @WorkerThread
     public List<ParticleDevice> getDevices() throws ParticleCloudException {
         List<Models.SimpleDevice> simpleDevices;
         try {
@@ -288,7 +306,8 @@ public class ParticleCloud {
      * @param deviceID required deviceID
      * @return the device instance on success
      */
-    public ParticleDevice getDevice(String deviceID) throws ParticleCloudException {
+    @WorkerThread
+    public ParticleDevice getDevice(@NonNull String deviceID) throws ParticleCloudException {
         // FIXME: not a long term solution!  We shouldn't have a method call that
         // usually returns instantly and other times hits the network!
         if (deviceCache.containsKey(deviceID)) {
@@ -319,7 +338,8 @@ public class ParticleCloud {
      *
      * @param deviceID the deviceID
      */
-    public void claimDevice(String deviceID) throws ParticleCloudException {
+    @WorkerThread
+    public void claimDevice(@NonNull String deviceID) throws ParticleCloudException {
         try {
             mainApi.claimDevice(deviceID);
         } catch (RetrofitError error) {
@@ -334,6 +354,7 @@ public class ParticleCloud {
      * @return a claim code string set on success (48 random bytes, base64 encoded
      * to 64 ASCII characters)
      */
+    @WorkerThread
     public Responses.ClaimCodeResponse generateClaimCode() throws ParticleCloudException {
         try {
             // appease newer OkHttp versions with a blank POST body
@@ -344,7 +365,8 @@ public class ParticleCloud {
     }
 
     // TODO: check if any javadoc has been added for this method in the iOS SDK
-    public void requestPasswordReset(String email) throws ParticleCloudException {
+    @WorkerThread
+    public void requestPasswordReset(@NonNull String email) throws ParticleCloudException {
         try {
             identityApi.requestPasswordReset(email);
         } catch (RetrofitError error) {
