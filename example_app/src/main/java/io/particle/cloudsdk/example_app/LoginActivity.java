@@ -10,9 +10,9 @@ import android.widget.EditText;
 
 import java.io.IOException;
 
-import io.particle.android.sdk.cloud.SparkCloud;
-import io.particle.android.sdk.cloud.SparkCloudException;
-import io.particle.android.sdk.cloud.SparkDevice;
+import io.particle.android.sdk.cloud.ParticleCloud;
+import io.particle.android.sdk.cloud.ParticleCloudException;
+import io.particle.android.sdk.cloud.ParticleDevice;
 import io.particle.android.sdk.utils.Async;
 import io.particle.android.sdk.utils.Toaster;
 
@@ -30,15 +30,14 @@ public class LoginActivity extends AppCompatActivity {
                         final String email = ((EditText) findViewById(R.id.email)).getText().toString();
                         final String password = ((EditText) findViewById(R.id.password)).getText().toString();
 
-                        // Don't do:
+                        // Don't:
                         AsyncTask task = new AsyncTask() {
                             @Override
                             protected Object doInBackground(Object[] params) {
                                 try {
-                                    SparkCloud.get(LoginActivity.this).logIn(email, password);
-                                }
-                                catch (final SparkCloudException e)
-                                {
+                                    ParticleCloud.get(LoginActivity.this).logIn(email, password);
+
+                                } catch (final ParticleCloudException e) {
                                     Runnable mainThread = new Runnable() {
                                         @Override
                                         public void run() {
@@ -60,21 +59,21 @@ public class LoginActivity extends AppCompatActivity {
 
                         //-------
 
-                        // Do:
-                        Async.executeAsync(SparkCloud.get(v.getContext()), new Async.ApiWork<SparkCloud, Integer>() {
-                            private SparkDevice mDevice;
+                        // DO!:
+                        Async.executeAsync(ParticleCloud.get(v.getContext()), new Async.ApiWork<ParticleCloud, Integer>() {
+
+                            private ParticleDevice mDevice;
+
                             @Override
-                            public Integer callApi(SparkCloud sparkCloud) throws SparkCloudException, IOException {
-                                sparkCloud.logIn(email,password);
+                            public Integer callApi(ParticleCloud sparkCloud) throws ParticleCloudException, IOException {
+                                sparkCloud.logIn(email, password);
                                 sparkCloud.getDevices();
                                 mDevice = sparkCloud.getDevice("1f0034000747343232361234");
                                 Integer variable;
                                 try {
                                     variable = mDevice.getVariable("analogvalue");
-                                }
-                                catch (SparkDevice.VariableDoesNotExistException e)
-                                {
-                                    Toaster.s(LoginActivity.this,"Error reading variable");
+                                } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                    Toaster.s(LoginActivity.this, "Error reading variable");
                                     variable = -1;
                                 }
                                 return variable;
@@ -83,13 +82,13 @@ public class LoginActivity extends AppCompatActivity {
 
                             @Override
                             public void onSuccess(Integer value) {
-                                Toaster.l(LoginActivity.this,"Logged in");
+                                Toaster.l(LoginActivity.this, "Logged in");
                                 Intent intent = ValueActivity.buildIntent(LoginActivity.this, value, mDevice.getID());
                                 startActivity(intent);
                             }
 
                             @Override
-                            public void onFailure(SparkCloudException e) {
+                            public void onFailure(ParticleCloudException e) {
                                 Toaster.l(LoginActivity.this, e.getBestMessage());
                                 e.printStackTrace();
                                 Log.d("info", e.getBestMessage());
@@ -102,6 +101,5 @@ public class LoginActivity extends AppCompatActivity {
 
         );
     }
-
 
 }
