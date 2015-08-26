@@ -22,7 +22,14 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'io.particle:cloudsdk:0.1.2'
+    // BY DEFAULT, BUILD APP AGAINST THE LOCAL SDK SOURCE
+    // (i.e.: make modifications to the SDK source in the local repo show up in this app
+    // just by rebuilding)
+    compile project(':cloudsdk')
+
+    // **OR** (not _and_!) UNCOMMENT THE FOLLOWING TO USE A PUBLISHED
+    // VERSION OF THE SDK
+//    compile 'io.particle:cloudsdk:0.1.2'
 
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'com.google.code.gson:gson:2.3.1'
