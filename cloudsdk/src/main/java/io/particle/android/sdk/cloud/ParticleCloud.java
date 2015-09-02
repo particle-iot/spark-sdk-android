@@ -231,47 +231,6 @@ public class ParticleCloud {
 //
             List<ParticleDevice> devices = list();
 
-            // FIXME: TEST DATA, REMOVE
-//            devices.add(ParticleDevice.newBuilder()
-//                            .setName("PhotonsSoldCounter")
-//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
-//                            .setDeviceId("ECB6F4DD1DE54700849DACA4")
-//                            .setIsConnected(false)
-//                            .setMainApi(mainApi)
-//                            .build()
-//            );
-//            devices.add(ParticleDevice.newBuilder()
-//                            .setName("test_core2")
-//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
-//                            .setDeviceId("408B061A70B746D18110BD6A")
-//                            .setIsConnected(false)
-//                            .setMainApi(mainApi)
-//                            .build()
-//            );
-//            devices.add(ParticleDevice.newBuilder()
-//                            .setName("CoreOnTheTable")
-//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
-//                            .setDeviceId("8DFDA5C4C8A1408DB1CA4677")
-//                            .setIsConnected(false)
-//                            .setMainApi(mainApi)
-//                            .build()
-//            );
-//            devices.add(ParticleDevice.newBuilder()
-//                            .setName("Custom_FW")
-//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
-//                            .setDeviceId("74AF91816D364B338D38ABD3")
-//                            .setIsConnected(true)
-//                            .setMainApi(mainApi)
-//                            .build()
-//            );
-//            devices.add(ParticleDevice.newBuilder()
-//                            .setName("zombie_pirate")
-//                            .setDeviceType(ParticleDevice.ParticleDeviceType.PHOTON)
-//                            .setDeviceId("824E7FBD7B194D9D982552A6")
-//                            .setIsConnected(true)
-//                            .setMainApi(mainApi)
-//                            .build()
-//            );
 
             for (Models.SimpleDevice simpleDevice : simpleDevices) {
                 ParticleDevice.Builder builder;
@@ -298,16 +257,6 @@ public class ParticleCloud {
                         .build());
             }
 
-            // FIXME: remove test data
-//            devices.add(ParticleDevice.newBuilder()
-//                    .setName("Custom_FW")
-//                    .setDeviceType(ParticleDevice.ParticleDeviceType.CORE)
-//                    .setDeviceId("74AF91816A364B338D38AFD3")
-//                    .setIsConnected(false)
-//                    .setBroadcastManager(broadcastManager)
-//                    .setParticleCloud(this)
-//                    .setMainApi(mainApi)
-//                    .build());
 
             // TODO: review this approach, is this the right way to ensure access to devices?
             Map<String, ParticleDevice> deviceMap = map();

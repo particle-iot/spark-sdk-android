@@ -90,10 +90,6 @@ public class ApiDefs {
      * These are separated out from the main API, since they aren't
      * authenticated like the main API, and as such need different
      * headers.
-     * <p>
-     * Also, the duplicated methods for orgs are unfortunate, but the best solution all around
-     * in practice.  (This should be revisited in the unlikely case that endpoints for orgs and
-     * non-orgs diverges further.)
      */
     public interface IdentityApi {
 
@@ -103,8 +99,8 @@ public class ApiDefs {
                         @Field("password") String password);
 
 
-        // NOTE: the `LogInResponse` used here is intentional.  It looks a little odd, but that's
-        // how this endpoint works.
+        // NOTE: the `LogInResponse` used here as a return type is intentional.  It looks
+        // a little odd, but that's how this endpoint works.
         @FormUrlEncoded
         @POST("/v1/orgs/{orgSlug}/customers")
         Responses.LogInResponse signUpAndLogInWithCustomer(@Field("grant_type") String grantType,

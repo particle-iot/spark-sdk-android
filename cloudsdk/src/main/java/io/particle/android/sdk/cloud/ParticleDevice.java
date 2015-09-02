@@ -31,10 +31,6 @@ import static io.particle.android.sdk.utils.Py.map;
 import static io.particle.android.sdk.utils.Py.set;
 
 
-// FIXME:
-// this should be just a proxy to ParticleCloud, and should hold no state of its own,
-// create a separate DeviceState class or something to wrap up all this stuff, and use some
-// getters to expose the fields
 public class ParticleDevice {
 
 
@@ -177,7 +173,11 @@ public class ParticleDevice {
     }
 
     /**
-     * Dictionary of exposed variables on device with their respective types.
+     * Get an immutable map of exposed variables on device with their respective types.
+     * <p>
+     * Note: apologies for the (hopefully temporary) <em>stringly typed</em> interface.  We're
+     * hoping to give this real types (e.g.: an enum) soon, but in the meantime, see the docs for
+     * the possible values: https://docs.particle.io/reference/firmware/photon/#data-types
      */
     public Map<String, Object> getVariables() {
         // defensive copy
@@ -585,7 +585,6 @@ public class ParticleDevice {
         /**
          * Constructs a new typed byte array.  Sets mimeType to {@code application/unknown} if absent.
          *
-         * @param bytes
          * @throws NullPointerException if bytes are null
          */
         public TypedFakeFile(byte[] bytes) {
