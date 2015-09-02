@@ -38,16 +38,8 @@ public class ApiFactory {
     private final OkHttpClient okHttpClient;
     private final OauthBasicAuthCredentialsProvider basicAuthCredentialsProvider;
 
-    public ApiFactory(Context ctx, TokenGetterDelegate tokenGetterDelegate) {
-        this(ctx, tokenGetterDelegate,
-                new ResourceValueBasicAuthCredentialsProvider(
-                        ctx.getApplicationContext(),
-                        R.string.oauth_client_id,
-                        R.string.oauth_client_secret));
-    }
-
-    public ApiFactory(Context ctx, TokenGetterDelegate tokenGetterDelegate,
-                      OauthBasicAuthCredentialsProvider basicAuthProvider) {
+    ApiFactory(Context ctx, TokenGetterDelegate tokenGetterDelegate,
+               OauthBasicAuthCredentialsProvider basicAuthProvider) {
         this.ctx = ctx.getApplicationContext();
         this.tokenDelegate = tokenGetterDelegate;
         this.okHttpClient = new OkHttpClient();

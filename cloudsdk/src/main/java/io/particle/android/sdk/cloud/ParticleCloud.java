@@ -26,72 +26,23 @@ public class ParticleCloud {
 
     private static final TLog log = TLog.get(ParticleCloud.class);
 
-    private static ParticleCloud instance;
-    private static ApiFactory.OauthBasicAuthCredentialsProvider oauthProviderInstance;
-
     /**
      * Singleton instance of ParticleCloud class
      *
      * @return ParticleCloud
-     */
-    public synchronized static ParticleCloud get(@NonNull Context context) {
-        // TODO: try to eliminate singleton, consider replacing with dependency
-        // injection where initializer gets:
-        // CloudConnection, CloudEndpoint (URL) to allow private cloud
-        if (instance == null) {
-            log.d("Initializing ParticleCloud instance");
-            instance = buildInstance(context);
-        }
-        return instance;
-    }
-
-    /**
-     * Use this to provide Oauth credentials from something other than resource overrides.
      *
-     * NOTE: this has been marked deprecated before it's even released because it's a bit of a
-     * hack to let us #SHIPIT quickly, but expect this to go away soon, replaced by something
-     * at least as simple, but more elegant.
+     * @deprecated use {@link ParticleCloudSDK#getCloud()} instead.  This interface will be removed
+     * some time before the 1.0 release.
      */
     @Deprecated
-    public static void setOauthProvider(ApiFactory.OauthBasicAuthCredentialsProvider oauthProvider) {
-        Preconditions.checkState(instance == null,
-                "Cannot set OAuth provider after initializing ParticleCloud!");
-        oauthProviderInstance = oauthProvider;
-    }
-
-    private static ParticleCloud buildInstance(@NonNull Context context) {
-        Context appContext = context.getApplicationContext();
-        SDKGlobals.init(appContext);
-
-        // FIXME: see if this TokenGetterDelegate setter issue can be resolved reasonably
-        TokenGetter tokenGetter = new TokenGetter();
-        ApiFactory factory;
-        if (oauthProviderInstance == null) {
-            factory = new ApiFactory(appContext, tokenGetter);
-        } else {
-            factory = new ApiFactory(appContext, tokenGetter, oauthProviderInstance);
+    public synchronized static ParticleCloud get(@NonNull Context context) {
+        log.w("ParticleCloud.get() is deprecated and will be removed before the 1.0 release. " +
+                "Use ParticleCloudSDK.getCloud() instead!");
+        if (!ParticleCloudSDK.isInitialized()) {
+            ParticleCloudSDK.init(context);
         }
-        ParticleCloud cloud = new ParticleCloud(
-                factory.buildCloudApi(),
-                factory.buildIdentityApi(),
-                SDKGlobals.getAppDataStorage(),
-                LocalBroadcastManager.getInstance(context));
-        tokenGetter.cloud = cloud;
-
-        return cloud;
+        return ParticleCloudSDK.getCloud();
     }
-
-
-    private static class TokenGetter implements ApiFactory.TokenGetterDelegate {
-
-        volatile ParticleCloud cloud;
-
-        @Override
-        public String getTokenValue() {
-            return cloud.getAccessToken();
-        }
-    }
-
 
     @NonNull
     private final ApiDefs.CloudApi mainApi;
@@ -114,10 +65,10 @@ public class ParticleCloud {
 
     private volatile Map<String, ParticleDevice> deviceCache = map();
 
-    private ParticleCloud(@NonNull ApiDefs.CloudApi mainApi,
-                          @NonNull ApiDefs.IdentityApi identityApi,
-                          @NonNull AppDataStorage appDataStorage,
-                          @NonNull LocalBroadcastManager broadcastManager) {
+    ParticleCloud(@NonNull ApiDefs.CloudApi mainApi,
+                  @NonNull ApiDefs.IdentityApi identityApi,
+                  @NonNull AppDataStorage appDataStorage,
+                  @NonNull LocalBroadcastManager broadcastManager) {
         this.mainApi = mainApi;
         this.identityApi = identityApi;
         this.appDataStorage = appDataStorage;
