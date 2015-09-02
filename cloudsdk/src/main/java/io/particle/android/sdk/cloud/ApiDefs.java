@@ -35,7 +35,7 @@ public class ApiDefs {
         List<Models.SimpleDevice> getDevices();
 
         @GET("/v1/devices/{deviceID}")
-        ParticleDevice.Builder getDevice(@Path("deviceID") String deviceID);
+        Models.CompleteDevice getDevice(@Path("deviceID") String deviceID);
 
         // FIXME: put a real response type on this?
         @FormUrlEncoded

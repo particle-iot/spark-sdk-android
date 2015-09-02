@@ -2,6 +2,9 @@ package io.particle.android.sdk.cloud;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * All API responses, collected together in one outer class for simplicity's sake.
  */
@@ -56,6 +59,47 @@ public class Responses {
                 this.productId = productId;
             }
         }
+
+        /**
+         * Represents a single Particle device as returned from the
+         * call to "GET /v1/devices/{device id}"
+         */
+        class CompleteDevice {
+            @SerializedName("id")
+            public final String deviceId;
+
+            public final String name;
+
+            @SerializedName("connected")
+            public final boolean isConnected;
+
+            public final Map<String, String> variables;
+
+            public final List<String> functions;
+
+            @SerializedName("cc3000_patch_version")
+            public final String version;
+
+            @SerializedName("product_id")
+            public final int productId;
+
+            @SerializedName("device_needs_update")
+            public final boolean requiresUpdate;
+
+            CompleteDevice(String deviceId, String name, boolean isConnected,
+                           Map<String, String> variables, List<String> functions, String version,
+                           int productId, boolean requiresUpdate) {
+                this.deviceId = deviceId;
+                this.name = name;
+                this.isConnected = isConnected;
+                this.variables = variables;
+                this.functions = functions;
+                this.version = version;
+                this.productId = productId;
+                this.requiresUpdate = requiresUpdate;
+            }
+        }
+
     }
 
 
