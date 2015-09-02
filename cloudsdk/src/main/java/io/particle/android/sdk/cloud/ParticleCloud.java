@@ -1,27 +1,36 @@
 package io.particle.android.sdk.cloud;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.ArrayMap;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import io.particle.android.sdk.cloud.ParticleDevice.ParticleDeviceType;
 import io.particle.android.sdk.cloud.Responses.Models;
+import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.persistance.AppDataStorage;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
 
 import static io.particle.android.sdk.utils.Py.all;
 import static io.particle.android.sdk.utils.Py.list;
-import static io.particle.android.sdk.utils.Py.map;
 import static io.particle.android.sdk.utils.Py.truthy;
 
 
+// FIXME: move device state management out to another class
 public class ParticleCloud {
 
     private static final TLog log = TLog.get(ParticleCloud.class);
@@ -80,6 +89,7 @@ public class ParticleCloud {
         }
     }
 
+    //region public API
     /**
      * Current session access token string.  Can be null.
      */
@@ -135,7 +145,7 @@ public class ParticleCloud {
      *
      * @param email    Required user name, must be a valid email address
      * @param password Required password
-     * @param orgName  Organization slug to use
+     * @param orgSlug  Organization slug to use
      */
     @WorkerThread
     public void signUpAndLogInWithCustomer(@NonNull String email,
@@ -266,7 +276,93 @@ public class ParticleCloud {
             throw new ParticleCloudException(error);
         }
     }
+    //endregion
 
+    //region package-only API
+    @WorkerThread
+    void unclaimDevice(@NonNull String deviceId) {
+        mainApi.unclaimDevice(deviceId);
+        synchronized (devices) {
+            devices.remove(deviceId);
+        }
+        sendUpdateBroadcast();
+    }
+
+    @WorkerThread
+    void changeDeviceName(@NonNull String deviceId, @NonNull String newName)
+            throws ParticleCloudException {
+        ParticleDevice particleDevice;
+        synchronized (devices) {
+            particleDevice = devices.get(deviceId);
+        }
+        DeviceState originalDeviceState = particleDevice.deviceState;
+
+        DeviceState stateWithNewName = DeviceState.withNewName(originalDeviceState, newName);
+        updateDeviceState(stateWithNewName, true);
+        try {
+            mainApi.nameDevice(originalDeviceState.deviceId, newName);
+        } catch (RetrofitError e) {
+            // oops, change the name back.
+            updateDeviceState(originalDeviceState, true);
+            throw new ParticleCloudException(e);
+        }
+    }
+
+    @WorkerThread
+    // Called when a cloud API call receives a result in which the "coreInfo.connected" is false
+    void onDeviceNotConnected(@NonNull DeviceState deviceState) {
+        DeviceState newState = DeviceState.withNewConnectedState(deviceState, false);
+        updateDeviceState(newState, true);
+    }
+
+    // FIXME: exposing this is weak, figure out something better
+    void notifyDeviceChanged() {
+        sendUpdateBroadcast();
+    }
+
+    // this is accessible at the package level for access from ParticleDevice's Parcelable impl
+    ParticleDevice getDeviceFromState(@NonNull DeviceState deviceState) {
+        synchronized (devices) {
+            if (devices.containsKey(deviceState.deviceId)) {
+                return devices.get(deviceState.deviceId);
+            } else {
+                ParticleDevice device = new ParticleDevice(mainApi, this, deviceState);
+                devices.put(deviceState.deviceId, device);
+                return device;
+            }
+        }
+    }
+    //endregion
+
+    //region private API
+    @WorkerThread
+    private ParticleDevice getDevice(String deviceID, boolean sendUpdate)
+            throws ParticleCloudException {
+        CompleteDevice deviceCloudModel;
+        try {
+            deviceCloudModel = mainApi.getDevice(deviceID);
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+
+        DeviceState newDeviceState = fromCompleteDevice(deviceCloudModel);
+        ParticleDevice device = getDeviceFromState(newDeviceState);
+        updateDeviceState(newDeviceState, sendUpdate);
+
+        return device;
+    }
+
+    private void updateDeviceState(DeviceState newState, boolean sendUpdateBroadcast) {
+        ParticleDevice device = getDeviceFromState(newState);
+        device.deviceState = newState;
+        if (sendUpdateBroadcast) {
+            sendUpdateBroadcast();
+        }
+    }
+
+    private void sendUpdateBroadcast() {
+        broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
+    }
 
     private void onLogIn(Responses.LogInResponse response, String user, String password) {
         this.token = ParticleAccessToken.fromNewSession(response);
@@ -340,5 +436,6 @@ public class ParticleCloud {
             }
         }
     }
+    //endregion
 
 }

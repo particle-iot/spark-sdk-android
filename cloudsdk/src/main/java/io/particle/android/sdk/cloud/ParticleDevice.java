@@ -1,14 +1,12 @@
 package io.particle.android.sdk.cloud;
 
-import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.util.ArrayMap;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,15 +18,13 @@ import java.util.Map;
 import java.util.Set;
 
 import io.particle.android.sdk.utils.EZ;
+import io.particle.android.sdk.utils.TLog;
 import okio.Okio;
 import retrofit.RetrofitError;
 import retrofit.mime.TypedByteArray;
 import retrofit.mime.TypedFile;
 
-import static io.particle.android.sdk.utils.Py.all;
 import static io.particle.android.sdk.utils.Py.list;
-import static io.particle.android.sdk.utils.Py.map;
-import static io.particle.android.sdk.utils.Py.set;
 
 
 public class ParticleDevice {
@@ -82,9 +78,10 @@ public class ParticleDevice {
     }
 
 
-
-
     private static final int MAX_PARTICLE_FUNCTION_ARG_LENGTH = 63;
+
+    private static final TLog log = TLog.get(ParticleDevice.class);
+
 
     @NonNull
     private final ApiDefs.CloudApi mainApi;
@@ -120,20 +117,7 @@ public class ParticleDevice {
      * Rename the device in the cloud. If renaming fails name will stay the same.
      */
     public void setName(@NonNull String newName) throws ParticleCloudException {
-        // FIXME: later on look into what iOS ends up doing here.
-        String oldName = name;
-        name = newName;
-        // update now, to immediately show the change in the UI
-        broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
-        try {
-            mainApi.nameDevice(deviceId, newName);
-            broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
-        } catch (RetrofitError e) {
-            // oops, change the name back.
-            name = oldName;
-            broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
-            throw new ParticleCloudException(e);
-        }
+        cloud.changeDeviceName(this.deviceState.deviceId, newName);
     }
 
     /**
@@ -193,6 +177,9 @@ public class ParticleDevice {
         }
 
         if (!reply.coreInfo.connected) {
+            // FIXME: we should be doing this "connected" check on _any_ reply that comes back
+            // with a "coreInfo" block.
+            cloud.onDeviceNotConnected(deviceState);
             throw new IOException("Device is not connected.");
         } else {
             return reply.result;
@@ -235,6 +222,7 @@ public class ParticleDevice {
         }
 
         if (!response.connected) {
+            cloud.onDeviceNotConnected(deviceState);
             throw new IOException("Device is not connected.");
         } else {
             return response.returnValue;
@@ -269,8 +257,7 @@ public class ParticleDevice {
     @WorkerThread
     public void unclaim() throws ParticleCloudException {
         try {
-            mainApi.unclaimDevice(deviceId);
-            broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
+            cloud.unclaimDevice(deviceState.deviceId);
         } catch (RetrofitError e) {
             throw new ParticleCloudException(e);
         }
@@ -326,39 +313,55 @@ public class ParticleDevice {
         return cloud;
     }
 
+    @WorkerThread
+    public void refresh() throws ParticleCloudException {
+        // just calling this get method will update everything as expected.
+        cloud.getDevice(deviceState.deviceId);
+    }
+
+    @WorkerThread
     private void resetFlashingState() {
         isFlashing = false;
-        // FIXME: ugh, this is another side effect of swapping out SparkDevices all the time.
-        // impl the suggesting at the top of this class to resolve.
         try {
-            ParticleDevice currentDevice = cloud.getDevice(deviceId);  // gets the current device
-            currentDevice.isFlashing = false;
+            this.refresh();  // reload our new state
         } catch (ParticleCloudException e) {
-            e.printStackTrace();
+            cloud.notifyDeviceChanged();
+            // not much else we can really do here...
+            log.w("Unable to reset flashing state for %s" + deviceState.deviceId, e);
         }
-        broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
     }
 
     private interface FlashingChange {
         void executeFlashingChange() throws RetrofitError;
     }
 
+    // FIXME: ugh.  these "cloud.notifyDeviceChanged();" calls are a hint that flashing maybe
+    // should just live in a class of its own, or that it should just be a delegate on
+    // ParticleCloud.  Review this later.
     private void performFlashingChange(FlashingChange flashingChange) throws ParticleCloudException {
         try {
             flashingChange.executeFlashingChange();
-            broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
             isFlashing = true;
+            cloud.notifyDeviceChanged();
+            // Gross.  We're using this "run delayed" hack just for the *scheduling* aspect
+            // of this, and then we're just telling the scheduled runnable to drop right back to a
+            // background thread so we don't call resetFlashingState() on the main thread.
+            // Still, I don't want to introduce a whole scheduled executor setup *just for this*,
+            // or write something that just sits in a Thread.sleep(), hogging a whole thread when
+            // more important work could be getting blocked.
             EZ.runOnMainThreadDelayed(30000, new Runnable() {
                 @Override
                 public void run() {
-                    resetFlashingState();
+                    EZ.runAsync(new Runnable() {
+                        @Override
+                        public void run() {
+                            resetFlashingState();
+                        }
+                    });
                 }
             });
         } catch (RetrofitError e) {
-            resetFlashingState();
             throw new ParticleCloudException(e);
-        } finally {
-            broadcastManager.sendBroadcast(new Intent(BroadcastContract.BROADCAST_DEVICES_UPDATED));
         }
     }
 
