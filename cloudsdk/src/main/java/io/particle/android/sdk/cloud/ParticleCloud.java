@@ -55,6 +55,8 @@ public class ParticleCloud {
     @NonNull
     private final LocalBroadcastManager broadcastManager;
 
+    private final Map<String, ParticleDevice> devices = new ArrayMap<>();
+
     // We should be able to mark these both @Nullable, but Android Studio is incorrectly
     // inferring that these could be null, in spite of _directly following a null check_.
     // Try again later after a few more releases, I guess...
@@ -62,8 +64,6 @@ public class ParticleCloud {
     private volatile ParticleAccessToken token;
     // @Nullable
     private volatile ParticleUser user;
-
-    private volatile Map<String, ParticleDevice> deviceCache = map();
 
     ParticleCloud(@NonNull ApiDefs.CloudApi mainApi,
                   @NonNull ApiDefs.IdentityApi identityApi,
@@ -180,43 +180,16 @@ public class ParticleCloud {
             appDataStorage.saveUserHasClaimedDevices(truthy(simpleDevices));
 //            appDataStorage.saveUserHasClaimedDevices(true);
 //
-            List<ParticleDevice> devices = list();
-
+            List<ParticleDevice> result = list();
 
             for (Models.SimpleDevice simpleDevice : simpleDevices) {
-                ParticleDevice.Builder builder;
-                if (simpleDevice.isConnected) {
-                    builder = mainApi.getDevice(simpleDevice.id);
-                } else {
-                    builder = ParticleDevice.newBuilder()
-                            .setDeviceId(simpleDevice.id)
-                            .setIsConnected(simpleDevice.isConnected)
-                            .setName(simpleDevice.name);
-                }
-
-                // FIXME: this is nasty.  go with the suggestion at the top of ParticleDevice
-                // to resolve this crud.
-                ParticleDevice oldDevice = deviceCache.get(simpleDevice.id);
-                if (oldDevice != null) {
-                    builder.setIsFlashing(oldDevice.isFlashing());
-                }
-                devices.add(builder
-                        .setMainApi(mainApi)
-                        .setDeviceType(ParticleDevice.ParticleDeviceType.fromInt(simpleDevice.productId))
-                        .setBroadcastManager(broadcastManager)
-                        .setParticleCloud(this)
-                        .build());
+                ParticleDevice device = getDevice(simpleDevice.id, false);
+                result.add(device);
             }
 
+            pruneDeviceMap(result);
 
-            // TODO: review this approach, is this the right way to ensure access to devices?
-            Map<String, ParticleDevice> deviceMap = map();
-            for (ParticleDevice d : devices) {
-                deviceMap.put(d.getID(), d);
-            }
-            deviceCache = deviceMap;
-
-            return devices;
+            return result;
 
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
@@ -231,24 +204,7 @@ public class ParticleCloud {
      */
     @WorkerThread
     public ParticleDevice getDevice(@NonNull String deviceID) throws ParticleCloudException {
-        // FIXME: not a long term solution!  We shouldn't have a method call that
-        // usually returns instantly and other times hits the network!
-        if (deviceCache.containsKey(deviceID)) {
-            return deviceCache.get(deviceID);
-        }
-
-        ParticleDevice.Builder deviceBuilder;
-        try {
-            deviceBuilder = mainApi.getDevice(deviceID);
-        } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
-        }
-
-        return deviceBuilder
-                .setMainApi(mainApi)
-                .setBroadcastManager(broadcastManager)
-                .setParticleCloud(this)
-                .build();
+        return getDevice(deviceID, true);
     }
 
     // Not available yet
@@ -317,6 +273,53 @@ public class ParticleCloud {
         this.token.setDelegate(tokenDelegate);
         this.user = ParticleUser.fromNewCredentials(user, password);
     }
+
+    private DeviceState fromCompleteDevice(CompleteDevice completeDevice) {
+        ImmutableSet<String> functions = completeDevice.functions == null
+                ? ImmutableSet.<String>of()
+                : ImmutableSet.copyOf(completeDevice.functions);
+        ImmutableMap<String, String> variables = completeDevice.variables == null
+                ? ImmutableMap.<String, String>of()
+                : ImmutableMap.copyOf(completeDevice.variables);
+        return new DeviceState(
+                completeDevice.deviceId,
+                completeDevice.name,
+                completeDevice.isConnected,
+                functions,
+                variables,
+                completeDevice.version,
+                ParticleDeviceType.fromInt(completeDevice.productId),
+                completeDevice.requiresUpdate
+        );
+    }
+
+    private void pruneDeviceMap(List<ParticleDevice> latestCloudDeviceList) {
+        synchronized (devices) {
+            // make a copy of the current keyset since we mutate `devices` below
+            Set<String> currentDeviceIds = Sets.newHashSet(devices.keySet());
+            Set<String> newDeviceIds = FluentIterable.from(latestCloudDeviceList)
+                    .transform(toDeviceId)
+                    .toSet();
+            // quoting the Sets docs for this next operation:
+            // "The returned set contains all elements that are contained by set1 and
+            //  not contained by set2"
+            // In short, this set is all the device IDs which we have in our devices map,
+            // but which we did not hear about in this latest update from the cloud
+            Set<String> toRemove = Sets.difference(currentDeviceIds, newDeviceIds);
+            for (String deviceId : toRemove) {
+                devices.remove(deviceId);
+            }
+        }
+    }
+
+
+    private static final Function<ParticleDevice, String> toDeviceId =
+            new Function<ParticleDevice, String>() {
+                @Override
+                public String apply(ParticleDevice input) {
+                    return input.deviceState.deviceId;
+                }
+            };
 
 
     private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
