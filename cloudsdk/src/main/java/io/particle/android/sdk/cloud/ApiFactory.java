@@ -55,7 +55,7 @@ public class ApiFactory {
     }
 
 
-    public ApiDefs.CloudApi buildCloudApi() {
+    ApiDefs.CloudApi buildNewCloudApi() {
         RestAdapter restAdapter = buildCommonRestAdapterBuilder()
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
@@ -67,7 +67,7 @@ public class ApiFactory {
         return restAdapter.create(ApiDefs.CloudApi.class);
     }
 
-    public ApiDefs.IdentityApi buildIdentityApi() {
+    ApiDefs.IdentityApi buildNewIdentityApi() {
         final String basicAuthValue = getBasicAuthValue();
 
         RestAdapter restAdapter = buildCommonRestAdapterBuilder()
@@ -81,7 +81,7 @@ public class ApiFactory {
         return restAdapter.create(ApiDefs.IdentityApi.class);
     }
 
-    public Uri getApiUri() {
+    private Uri getApiUri() {
         return Uri.parse(ctx.getString(R.string.api_base_uri));
     }
 
