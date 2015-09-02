@@ -27,8 +27,7 @@ import retrofit.mime.TypedFile;
 import static io.particle.android.sdk.utils.Py.list;
 
 
-public class ParticleDevice {
-
+public class ParticleDevice implements Parcelable {
 
     public enum ParticleDeviceType {
         CORE,
@@ -382,5 +381,33 @@ public class ParticleDevice {
             return "tinker_firmware.bin";
         }
     }
+
+
+    //region Parcelable
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(deviceState, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+
+    public static final Creator<ParticleDevice> CREATOR = new Creator<ParticleDevice>() {
+        @Override
+        public ParticleDevice createFromParcel(Parcel in) {
+            SDKProvider sdkProvider = ParticleCloudSDK.getSdkProvider();
+            DeviceState deviceState = in.readParcelable(DeviceState.class.getClassLoader());
+            return sdkProvider.getParticleCloud().getDeviceFromState(deviceState);
+        }
+
+        @Override
+        public ParticleDevice[] newArray(int size) {
+            return new ParticleDevice[size];
+        }
+    };
+    //endregion
 
 }
