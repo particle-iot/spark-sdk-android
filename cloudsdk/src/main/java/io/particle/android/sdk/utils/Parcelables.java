@@ -3,10 +3,10 @@ package io.particle.android.sdk.utils;
 
 import android.os.Bundle;
 import android.os.Parcel;
-import android.support.v4.util.ArrayMap;
 
 import com.google.common.collect.Lists;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class Parcelables {
 
 
     public static Map<String, String> readStringMap(Parcel parcel) {
-        Map<String, String> map = new ArrayMap<>();
+        Map<String, String> map = new HashMap<>();
         Bundle bundle = parcel.readBundle();
         for (String key : bundle.keySet()) {
             map.put(key, bundle.getString(key));

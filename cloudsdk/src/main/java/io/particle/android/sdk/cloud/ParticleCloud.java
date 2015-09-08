@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.util.ArrayMap;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -14,6 +13,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +64,7 @@ public class ParticleCloud {
     @NonNull
     private final LocalBroadcastManager broadcastManager;
 
-    private final Map<String, ParticleDevice> devices = new ArrayMap<>();
+    private final Map<String, ParticleDevice> devices = new HashMap<>();
 
     // We should be able to mark these both @Nullable, but Android Studio is incorrectly
     // inferring that these could be null, in spite of _directly following a null check_.
