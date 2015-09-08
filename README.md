@@ -38,8 +38,9 @@ The Particle Android Cloud SDK enables Android apps to interact with Particle-po
 
 **Rebranding notice**
 
-Spark recently rebranded as Particle!  In the most recent release of the SDK, classes like
-`ParticleCloud` and `ParticleDevice` have been replaced with `ParticleCloud` and `ParticleDevice`, _et al._
+Spark recently rebranded as Particle!  In the 0.2.0 release of the SDK, classes like
+`ParticleCloud` and `ParticleDevice` have been replaced with `ParticleCloud` and 
+`ParticleDevice`, _et al._
 
 
 **Beta notice**
@@ -50,7 +51,7 @@ This SDK is still under development and is currently in beta.  Although it is te
 ## Getting Started
 
 The SDK is available as a Gradle dependency via [JCenter](https://bintray.com/particle/android/cloud-sdk/).  See the [Installation](#android-cloud-sdk-installation) section for more details.
-**Spoiler**: just add `compile 'io.particle:cloudsdk:0.1.3'` to your `build.gradle`
+**Spoiler**: just add `compile 'io.particle:cloudsdk:0.2.0'` to your `build.gradle`
 
 You can also [download the SDK as a zip](https://github.com/spark/spark-sdk-android/archive/master.zip).
 
@@ -301,7 +302,7 @@ The SDK is available through [JCenter](https://bintray.com/particle/android/clou
 
 ```gradle
 dependencies {
-    compile 'io.particle:cloudsdk:0.1.3'
+    compile 'io.particle:cloudsdk:0.2.0'
 }
 ```
 
