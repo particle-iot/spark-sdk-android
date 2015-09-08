@@ -252,6 +252,33 @@ ParticleCloud.get(someContext).logOut()
 ```
 ---
 
+
+### OAuth client configuration
+
+If you're creating an app, you're required to provide the `ParticleCloudSDK` class with the OAuth clientId and secret. 
+These are used to identify users coming from your specific app to the Particle Cloud.
+Please follow the procedure decribed [in our guide](https://docs.particle.io/guide/how-to-build-a-product/web-app/#creating-an-oauth-client) to create those strings.
+Then in you can supply those credentials in one of two ways: 
+1. Set them as string resources, with the names `oauth_client_id` and `oauth_client_secret`, respectively.   These resources will be picked up by the SDK automatically.
+2. If you would prefer not to ship these OAuth strings as Android resources, you can 
+use an alternate SDK init method, `ParticleCloudSDK.initWithOauthCredentialsProvider()`.
+
+For this latter option, you'll need to create a custom OauthBasicAuthCredentialsProvider implementation.  This is as simple as it sounds, e.g.:
+
+```java
+    ParticleCloudSDK.initWithOauthCredentialsProvider(context, new OauthBasicAuthCredentialsProvider() {
+
+        public String getClientId() {
+            return <however you want to provide this string>
+        }
+
+        public String getClientSecret() {
+            return <however you want to provide this string>
+        }
+    });
+```
+
+
 ### Additional reference
 For more complete interface information, check out the [source code of ParticleCloud](https://github.com/spark/spark-sdk-android/blob/master/cloudsdk/src/main/java/io/particle/android/sdk/cloud/ParticleCloud.java) and [ParticleDevice](https://github.com/spark/spark-sdk-android/blob/master/cloudsdk/src/main/java/io/particle/android/sdk/cloud/ParticleDevice.java).
 
