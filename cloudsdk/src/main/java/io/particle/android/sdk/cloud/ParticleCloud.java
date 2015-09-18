@@ -188,12 +188,16 @@ public class ParticleCloud {
             simpleDevices = mainApi.getDevices();
 
             appDataStorage.saveUserHasClaimedDevices(truthy(simpleDevices));
-//            appDataStorage.saveUserHasClaimedDevices(true);
-//
+
             List<ParticleDevice> result = list();
 
             for (Models.SimpleDevice simpleDevice : simpleDevices) {
-                ParticleDevice device = getDevice(simpleDevice.id, false);
+                ParticleDevice device;
+                if (simpleDevice.isConnected) {
+                    device = getDevice(simpleDevice.id, false);
+                } else {
+                    device = getOfflineDevice(simpleDevice);
+                }
                 result.add(device);
             }
 
@@ -352,6 +356,13 @@ public class ParticleCloud {
         return device;
     }
 
+    private ParticleDevice getOfflineDevice(Models.SimpleDevice offlineDevice) {
+        DeviceState newDeviceState = fromSimpleDeviceModel(offlineDevice);
+        ParticleDevice device = getDeviceFromState(newDeviceState);
+        updateDeviceState(newDeviceState, false);
+        return device;
+    }
+
     private void updateDeviceState(DeviceState newState, boolean sendUpdateBroadcast) {
         ParticleDevice device = getDeviceFromState(newState);
         device.deviceState = newState;
@@ -388,6 +399,23 @@ public class ParticleCloud {
                 completeDevice.requiresUpdate
         );
     }
+
+    // for offline devices
+    private DeviceState fromSimpleDeviceModel(Models.SimpleDevice offlineDevice) {
+        ImmutableSet<String> functions = ImmutableSet.of();
+        ImmutableMap<String, String> variables = ImmutableMap.of();
+        return new DeviceState(
+                offlineDevice.id,
+                offlineDevice.name,
+                offlineDevice.isConnected,
+                functions,
+                variables,
+                "",  // gross, but what else are we going to do?
+                ParticleDeviceType.fromInt(offlineDevice.productId),
+                false
+        );
+    }
+
 
     private void pruneDeviceMap(List<ParticleDevice> latestCloudDeviceList) {
         synchronized (devices) {
