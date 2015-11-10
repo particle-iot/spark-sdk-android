@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.particle.android.sdk.cloud.Responses.ReadDoubleVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
 import io.particle.android.sdk.utils.EZ;
 import io.particle.android.sdk.utils.TLog;
 import okio.Okio;
@@ -46,7 +51,14 @@ public class ParticleDevice implements Parcelable {
     }
 
 
-    public class FunctionDoesNotExistException extends Exception {
+    public enum VariableType {
+        INT,
+        DOUBLE,
+        STRING
+    }
+
+
+    public static class FunctionDoesNotExistException extends Exception {
 
         public FunctionDoesNotExistException(String functionName) {
             super("Function " + functionName + " does not exist on this device");
@@ -54,7 +66,7 @@ public class ParticleDevice implements Parcelable {
     }
 
 
-    public class VariableDoesNotExistException extends Exception {
+    public static class VariableDoesNotExistException extends Exception {
 
         public VariableDoesNotExistException(String variableName) {
             super("Variable " + variableName + " does not exist on this device");
@@ -141,7 +153,7 @@ public class ParticleDevice implements Parcelable {
      * hoping to give this real types (e.g.: an enum) soon, but in the meantime, see the docs for
      * the possible values: https://docs.particle.io/reference/firmware/photon/#data-types
      */
-    public Map<String, String> getVariables() {
+    public Map<String, VariableType> getVariables() {
         // no need for a defensive copy, this is an immutable set
         return deviceState.variables;
     }
@@ -162,28 +174,65 @@ public class ParticleDevice implements Parcelable {
     }
 
     @WorkerThread
-    public int getVariable(@NonNull String variableName)
+    public Object getVariable(@NonNull String variableName)
             throws ParticleCloudException, IOException, VariableDoesNotExistException {
-        if (!deviceState.variables.containsKey(variableName)) {
-            throw new VariableDoesNotExistException(variableName);
-        }
 
-        Responses.ReadVariableResponse reply;
-        try {
-            reply = mainApi.getVariable(deviceState.deviceId, variableName);
-        } catch (RetrofitError e) {
-            throw new ParticleCloudException(e);
-        }
+        VariableRequester<Object, ReadObjectVariableResponse> requester =
+                new VariableRequester<Object, ReadObjectVariableResponse>(this) {
+            @Override
+            ReadObjectVariableResponse callApi(String variableName) {
+                return mainApi.getVariable(deviceState.deviceId, variableName);
+            }
+        };
 
-        if (!reply.coreInfo.connected) {
-            // FIXME: we should be doing this "connected" check on _any_ reply that comes back
-            // with a "coreInfo" block.
-            cloud.onDeviceNotConnected(deviceState);
-            throw new IOException("Device is not connected.");
-        } else {
-            return reply.result;
-        }
+        return requester.getVariable(variableName);
     }
+
+    @WorkerThread
+    public int getIntVariable(@NonNull String variableName) throws ParticleCloudException,
+            IOException, VariableDoesNotExistException, ClassCastException {
+
+        VariableRequester<Integer, ReadIntVariableResponse> requester =
+                new VariableRequester<Integer, ReadIntVariableResponse>(this) {
+                    @Override
+                    ReadIntVariableResponse callApi(String variableName) {
+                        return mainApi.getIntVariable(deviceState.deviceId, variableName);
+                    }
+                };
+
+        return requester.getVariable(variableName);
+    }
+
+    @WorkerThread
+    public String getStringVariable(@NonNull String variableName) throws ParticleCloudException,
+            IOException, VariableDoesNotExistException, ClassCastException {
+
+        VariableRequester<String, ReadStringVariableResponse> requester =
+                new VariableRequester<String, ReadStringVariableResponse>(this) {
+                    @Override
+                    ReadStringVariableResponse callApi(String variableName) {
+                        return mainApi.getStringVariable(deviceState.deviceId, variableName);
+                    }
+                };
+
+        return requester.getVariable(variableName);
+    }
+
+    @WorkerThread
+    public double getDoubleVariable(@NonNull String variableName) throws ParticleCloudException,
+            IOException, VariableDoesNotExistException, ClassCastException {
+
+        VariableRequester<Double, ReadDoubleVariableResponse> requester =
+                new VariableRequester<Double, ReadDoubleVariableResponse>(this) {
+                    @Override
+                    ReadDoubleVariableResponse callApi(String variableName) {
+                        return mainApi.getDoubleVariable(deviceState.deviceId, variableName);
+                    }
+                };
+
+        return requester.getVariable(variableName);
+    }
+
 
     /**
      * Call a function on the device
@@ -409,5 +458,46 @@ public class ParticleDevice implements Parcelable {
         }
     };
     //endregion
+
+
+    private static abstract class VariableRequester<T, R extends ReadVariableResponse<T>> {
+
+        @WorkerThread
+        abstract R callApi(String variableName);
+
+
+        private final ParticleDevice device;
+
+        VariableRequester(ParticleDevice device) {
+            this.device = device;
+        }
+
+
+        @WorkerThread
+        T getVariable(@NonNull String variableName)
+                throws ParticleCloudException, IOException, VariableDoesNotExistException {
+
+            if (!device.deviceState.variables.containsKey(variableName)) {
+                throw new VariableDoesNotExistException(variableName);
+            }
+
+            R reply;
+            try {
+                reply = callApi(variableName);
+            } catch (RetrofitError e) {
+                throw new ParticleCloudException(e);
+            }
+
+            if (!reply.coreInfo.connected) {
+                // FIXME: we should be doing this "connected" check on _any_ reply that comes back
+                // with a "coreInfo" block.
+                device.cloud.onDeviceNotConnected(device.deviceState);
+                throw new IOException("Device is not connected.");
+            } else {
+                return reply.result;
+            }
+        }
+
+    }
 
 }

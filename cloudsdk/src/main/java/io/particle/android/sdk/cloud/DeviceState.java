@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+
+import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.utils.Parcelables;
 
 
@@ -23,15 +25,14 @@ class DeviceState implements Parcelable {
     final String name;
     final boolean isConnected;
     final ImmutableSet<String> functions;
-    // FIXME: move away from being "stringly typed"
-    final ImmutableMap<String, String> variables;
+    final ImmutableMap<String, VariableType> variables;
     final String version;
     final ParticleDevice.ParticleDeviceType deviceType;
     final boolean requiresUpdate;
 
     DeviceState(String deviceId, String name, boolean isConnected, ImmutableSet<String> functions,
-                ImmutableMap<String, String> variables, @Nullable String version,
                 ParticleDevice.ParticleDeviceType deviceType, boolean requiresUpdate) {
+                ImmutableMap<String, VariableType> variables, @Nullable String version,
         this.deviceId = deviceId;
         this.name = name;
         this.isConnected = isConnected;
@@ -82,7 +83,7 @@ class DeviceState implements Parcelable {
         name = in.readString();
         isConnected = Parcelables.readBoolean(in);
         functions = ImmutableSet.copyOf(Parcelables.readStringList(in));
-        variables = ImmutableMap.copyOf(Parcelables.readStringMap(in));
+        variables = ImmutableMap.copyOf(Parcelables.<VariableType>readSerializableMap(in));
         version = in.readString();
         deviceType = ParticleDevice.ParticleDeviceType.valueOf(in.readString());
         requiresUpdate = Parcelables.readBoolean(in);
@@ -94,7 +95,7 @@ class DeviceState implements Parcelable {
         dest.writeString(name);
         Parcelables.writeBoolean(dest, isConnected);
         dest.writeStringList(functions.asList());
-        Parcelables.writeStringMap(dest, variables);
+        Parcelables.writeSerializableMap(dest, variables);
         dest.writeString(version);
         dest.writeString(deviceType.name());
         Parcelables.writeBoolean(dest, requiresUpdate);

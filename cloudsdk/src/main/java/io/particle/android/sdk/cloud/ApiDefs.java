@@ -5,7 +5,10 @@ import java.util.List;
 import io.particle.android.sdk.cloud.Responses.CallFunctionResponse;
 import io.particle.android.sdk.cloud.Responses.ClaimCodeResponse;
 import io.particle.android.sdk.cloud.Responses.Models;
-import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadDoubleVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
+import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.SimpleResponse;
 import retrofit.client.Response;
 import retrofit.http.Body;
@@ -53,14 +56,27 @@ public class ApiDefs {
         Response flashFile(@Path("deviceID") String deviceID,
                            @Part("file") TypedOutput file);
 
-        @GET("/v1/devices/{deviceID}/{variable}")
-        ReadVariableResponse getVariable(@Path("deviceID") String deviceID,
-                                         @Path("variable") String variable);
-
         @POST("/v1/devices/{deviceID}/{function}")
         CallFunctionResponse callFunction(@Path("deviceID") String deviceID,
                                           @Path("function") String function,
                                           @Body FunctionArgs args);
+
+        @GET("/v1/devices/{deviceID}/{variable}")
+        ReadObjectVariableResponse getVariable(@Path("deviceID") String deviceID,
+                                               @Path("variable") String variable);
+
+        @GET("/v1/devices/{deviceID}/{variable}")
+        ReadIntVariableResponse getIntVariable(@Path("deviceID") String deviceID,
+                                               @Path("variable") String variable);
+
+        @GET("/v1/devices/{deviceID}/{variable}")
+        ReadStringVariableResponse getStringVariable(@Path("deviceID") String deviceID,
+                                                     @Path("variable") String variable);
+
+        @GET("/v1/devices/{deviceID}/{variable}")
+        ReadDoubleVariableResponse getDoubleVariable(@Path("deviceID") String deviceID,
+                                                     @Path("variable") String variable);
+
 
         /**
          * Newer versions of OkHttp <em>require</em> a body for POSTs, but just pass in

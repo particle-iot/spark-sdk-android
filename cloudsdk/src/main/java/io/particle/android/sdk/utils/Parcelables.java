@@ -3,9 +3,11 @@ package io.particle.android.sdk.utils;
 
 import android.os.Bundle;
 import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,6 @@ public class Parcelables {
         return map;
     }
 
-
     public static void writeStringMap(Parcel parcel, Map<String, String> stringMap) {
         Bundle b = new Bundle();
         for (Map.Entry<String, String> entry : stringMap.entrySet()) {
@@ -47,5 +48,42 @@ public class Parcelables {
         parcel.writeBundle(b);
     }
 
+    public static <T extends Parcelable> Map<String, T> readParcelableMap(Parcel parcel) {
+        Map<String, T> map = new HashMap<>();
+        Bundle bundle = parcel.readBundle();
+        for (String key : bundle.keySet()) {
+            T parcelable = bundle.getParcelable(key);
+            map.put(key, parcelable);
+        }
+        return map;
+    }
+
+    public static <T extends Parcelable> void writeParcelableMap(Parcel parcel, Map<String, T> map) {
+        Bundle b = new Bundle();
+        for (Map.Entry<String, T> entry : map.entrySet()) {
+            b.putParcelable(entry.getKey(), entry.getValue());
+        }
+        parcel.writeBundle(b);
+    }
+
+
+    public static <T extends Serializable> Map<String, T> readSerializableMap(Parcel parcel) {
+        Map<String, T> map = new HashMap<>();
+        Bundle bundle = parcel.readBundle();
+        for (String key : bundle.keySet()) {
+            @SuppressWarnings("unchecked")
+            T serializable = (T) bundle.getSerializable(key);
+            map.put(key, serializable);
+        }
+        return map;
+    }
+
+    public static <T extends Serializable> void writeSerializableMap(Parcel parcel, Map<String, T> map) {
+        Bundle b = new Bundle();
+        for (Map.Entry<String, T> entry : map.entrySet()) {
+            b.putSerializable(entry.getKey(), entry.getValue());
+        }
+        parcel.writeBundle(b);
+    }
 
 }

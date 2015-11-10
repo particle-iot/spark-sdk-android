@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 import java.util.Map;
 
+import io.particle.android.sdk.cloud.Responses.Models.CoreInfo;
+
 /**
  * All API responses, collected together in one outer class for simplicity's sake.
  */
@@ -46,9 +48,12 @@ public class Responses {
         public static class SimpleDevice {
 
             public final String id;
+
             public final String name;
+
             @SerializedName("connected")
             public final boolean isConnected;
+
             @SerializedName("product_id")
             public final int productId;
 
@@ -126,7 +131,8 @@ public class Responses {
         @SerializedName("return_value")
         public final int returnValue;
 
-        public CallFunctionResponse(String deviceId, String deviceName, boolean connected, int returnValue) {
+        public CallFunctionResponse(String deviceId, String deviceName, boolean connected,
+                                    int returnValue) {
             this.deviceId = deviceId;
             this.deviceName = deviceName;
             this.connected = connected;
@@ -186,7 +192,7 @@ public class Responses {
     }
 
 
-    public static class ReadVariableResponse {
+    public abstract static class ReadVariableResponse<T> {
 
         @SerializedName("cmd")
         public final String commandName;
@@ -194,15 +200,53 @@ public class Responses {
         @SerializedName("name")
         public final String variableName;
 
-        public final int result;
+        public final T result;
 
         public final Models.CoreInfo coreInfo;
 
-        public ReadVariableResponse(String commandName, String variableName, int result, Models.CoreInfo coreInfo) {
+        public ReadVariableResponse(String commandName, String variableName,
+                                    Models.CoreInfo coreInfo, T result) {
             this.commandName = commandName;
             this.variableName = variableName;
             this.result = result;
             this.coreInfo = coreInfo;
         }
     }
+
+
+    public static class ReadIntVariableResponse extends ReadVariableResponse<Integer> {
+
+        public ReadIntVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
+                                       Integer result) {
+            super(commandName, variableName, coreInfo, result);
+        }
+    }
+
+
+    public static class ReadDoubleVariableResponse extends ReadVariableResponse<Double> {
+
+        public ReadDoubleVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
+                                       Double result) {
+            super(commandName, variableName, coreInfo, result);
+        }
+    }
+
+
+    public static class ReadStringVariableResponse extends ReadVariableResponse<String> {
+
+        public ReadStringVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
+                                          String result) {
+            super(commandName, variableName, coreInfo, result);
+        }
+    }
+
+
+    public static class ReadObjectVariableResponse extends ReadVariableResponse<Object> {
+
+        public ReadObjectVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
+                                       Object result) {
+            super(commandName, variableName, coreInfo, result);
+        }
+    }
+
 }

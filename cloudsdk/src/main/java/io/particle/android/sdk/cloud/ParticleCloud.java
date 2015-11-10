@@ -10,6 +10,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Maps.EntryTransformer;
 import com.google.common.collect.Sets;
 
 import java.util.Date;
@@ -19,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.particle.android.sdk.cloud.ParticleDevice.ParticleDeviceType;
+import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.persistance.AppDataStorage;
@@ -385,9 +388,11 @@ public class ParticleCloud {
         ImmutableSet<String> functions = completeDevice.functions == null
                 ? ImmutableSet.<String>of()
                 : ImmutableSet.copyOf(completeDevice.functions);
-        ImmutableMap<String, String> variables = completeDevice.variables == null
-                ? ImmutableMap.<String, String>of()
-                : ImmutableMap.copyOf(completeDevice.variables);
+        ImmutableMap<String, VariableType> variables = ImmutableMap.of();
+        if (completeDevice.variables != null ) {
+            variables = ImmutableMap.copyOf(Maps.transformEntries(
+                    completeDevice.variables, sMapTransformer));
+        }
         return new DeviceState(
                 completeDevice.deviceId,
                 completeDevice.name,
@@ -403,7 +408,7 @@ public class ParticleCloud {
     // for offline devices
     private DeviceState fromSimpleDeviceModel(Models.SimpleDevice offlineDevice) {
         ImmutableSet<String> functions = ImmutableSet.of();
-        ImmutableMap<String, String> variables = ImmutableMap.of();
+        ImmutableMap<String, VariableType> variables = ImmutableMap.of();
         return new DeviceState(
                 offlineDevice.id,
                 offlineDevice.name,
@@ -465,5 +470,23 @@ public class ParticleCloud {
         }
     }
     //endregion
+
+
+    private static Maps.EntryTransformer<String, String, VariableType> sMapTransformer =
+            new EntryTransformer<String, String, VariableType>() {
+        @Override
+        public VariableType transformEntry(String key, String value) {
+            switch (value) {
+                case "int32":
+                    return VariableType.INT;
+                case "double":
+                    return VariableType.DOUBLE;
+                case "string":
+                    return VariableType.STRING;
+                default:
+                    return null;
+            }
+        }
+    };
 
 }
