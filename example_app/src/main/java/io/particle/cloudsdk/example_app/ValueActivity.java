@@ -34,11 +34,11 @@ public class ValueActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //...
                 // Do network work on background thread
-                Async.executeAsync(ParticleCloud.get(ValueActivity.this), new Async.ApiWork<ParticleCloud, Integer>() {
+                Async.executeAsync(ParticleCloud.get(ValueActivity.this), new Async.ApiWork<ParticleCloud, Object>() {
                     @Override
-                    public Integer callApi(ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
+                    public Object callApi(ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
                         ParticleDevice device = ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
-                        Integer variable;
+                        Object variable;
                         try {
                             variable = device.getVariable("analogvalue");
                         } catch (ParticleDevice.VariableDoesNotExistException e) {
@@ -49,8 +49,7 @@ public class ValueActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onSuccess(Integer i) // this goes on the main thread
-                    {
+                    public void onSuccess(Object i) { // this goes on the main thread
                         tv.setText(i.toString());
                     }
 

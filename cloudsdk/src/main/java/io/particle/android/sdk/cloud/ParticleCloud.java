@@ -401,7 +401,8 @@ public class ParticleCloud {
                 variables,
                 completeDevice.version,
                 ParticleDeviceType.fromInt(completeDevice.productId),
-                completeDevice.requiresUpdate
+                completeDevice.requiresUpdate,
+                completeDevice.lastHeard
         );
     }
 
@@ -417,7 +418,8 @@ public class ParticleCloud {
                 variables,
                 "",  // gross, but what else are we going to do?
                 ParticleDeviceType.fromInt(offlineDevice.productId),
-                false
+                false,
+                offlineDevice.lastHeard
         );
     }
 

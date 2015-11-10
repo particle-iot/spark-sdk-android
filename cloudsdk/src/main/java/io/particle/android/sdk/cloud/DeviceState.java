@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import java.util.Date;
 
 import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.utils.Parcelables;
@@ -29,10 +30,11 @@ class DeviceState implements Parcelable {
     final String version;
     final ParticleDevice.ParticleDeviceType deviceType;
     final boolean requiresUpdate;
+    final Date lastHeard;
 
     DeviceState(String deviceId, String name, boolean isConnected, ImmutableSet<String> functions,
-                ParticleDevice.ParticleDeviceType deviceType, boolean requiresUpdate) {
                 ImmutableMap<String, VariableType> variables, @Nullable String version,
+                ParticleDevice.ParticleDeviceType deviceType, boolean requiresUpdate, Date lastHeard) {
         this.deviceId = deviceId;
         this.name = name;
         this.isConnected = isConnected;
@@ -41,6 +43,7 @@ class DeviceState implements Parcelable {
         this.version = version == null ? "" : version;
         this.deviceType = deviceType;
         this.requiresUpdate = requiresUpdate;
+        this.lastHeard = lastHeard;
     }
 
     //region ImmutabilityPhun
@@ -57,7 +60,8 @@ class DeviceState implements Parcelable {
                 other.variables,
                 other.version,
                 other.deviceType,
-                other.requiresUpdate
+                other.requiresUpdate,
+                other.lastHeard
         );
     }
 
@@ -72,7 +76,8 @@ class DeviceState implements Parcelable {
                 other.variables,
                 other.version,
                 other.deviceType,
-                other.requiresUpdate
+                other.requiresUpdate,
+                other.lastHeard
         );
     }
     //endregion
@@ -87,6 +92,7 @@ class DeviceState implements Parcelable {
         version = in.readString();
         deviceType = ParticleDevice.ParticleDeviceType.valueOf(in.readString());
         requiresUpdate = Parcelables.readBoolean(in);
+        lastHeard = new Date(in.readLong());
     }
 
     @Override
@@ -99,6 +105,7 @@ class DeviceState implements Parcelable {
         dest.writeString(version);
         dest.writeString(deviceType.name());
         Parcelables.writeBoolean(dest, requiresUpdate);
+        dest.writeLong(lastHeard.getTime());
     }
 
     public static final Creator<DeviceState> CREATOR = new Creator<DeviceState>() {

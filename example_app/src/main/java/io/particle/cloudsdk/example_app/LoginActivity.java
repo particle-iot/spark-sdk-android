@@ -60,30 +60,54 @@ public class LoginActivity extends AppCompatActivity {
                         //-------
 
                         // DO!:
-                        Async.executeAsync(ParticleCloud.get(v.getContext()), new Async.ApiWork<ParticleCloud, Integer>() {
+                        Async.executeAsync(ParticleCloud.get(v.getContext()), new Async.ApiWork<ParticleCloud, Object>() {
 
                             private ParticleDevice mDevice;
 
                             @Override
-                            public Integer callApi(ParticleCloud sparkCloud) throws ParticleCloudException, IOException {
+                            public Object callApi(ParticleCloud sparkCloud) throws ParticleCloudException, IOException {
                                 sparkCloud.logIn(email, password);
                                 sparkCloud.getDevices();
                                 mDevice = sparkCloud.getDevice("1f0034000747343232361234");
-                                Integer variable;
+                                Object obj;
+
                                 try {
-                                    variable = mDevice.getVariable("analogvalue");
+                                    obj = mDevice.getVariable("analogvalue");
+                                    Log.d("BANANA", "analogvalue: " + obj);
                                 } catch (ParticleDevice.VariableDoesNotExistException e) {
                                     Toaster.s(LoginActivity.this, "Error reading variable");
-                                    variable = -1;
+                                    obj = -1;
                                 }
-                                return variable;
+
+                                try {
+                                    String strVariable = mDevice.getStringVariable("stringvalue");
+                                    Log.d("BANANA", "stringvalue: " + strVariable);
+                                } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                    Toaster.s(LoginActivity.this, "Error reading variable");
+                                }
+
+                                try {
+                                    double dVariable = mDevice.getDoubleVariable("doublevalue");
+                                    Log.d("BANANA", "doublevalue: " + dVariable);
+                                } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                    Toaster.s(LoginActivity.this, "Error reading variable");
+                                }
+
+                                try {
+                                    int intVariable = mDevice.getIntVariable("analogvalue");
+                                    Log.d("BANANA", "int analogvalue: " + intVariable);
+                                } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                    Toaster.s(LoginActivity.this, "Error reading variable");
+                                }
+
+                                return -1;
 
                             }
 
                             @Override
-                            public void onSuccess(Integer value) {
+                            public void onSuccess(Object value) {
                                 Toaster.l(LoginActivity.this, "Logged in");
-                                Intent intent = ValueActivity.buildIntent(LoginActivity.this, value, mDevice.getID());
+                                Intent intent = ValueActivity.buildIntent(LoginActivity.this, 123, mDevice.getID());
                                 startActivity(intent);
                             }
 

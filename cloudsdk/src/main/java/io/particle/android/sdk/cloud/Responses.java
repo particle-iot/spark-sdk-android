@@ -2,6 +2,7 @@ package io.particle.android.sdk.cloud;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,13 +27,13 @@ public class Responses {
             public final String lastApp;
 
             @SerializedName("last_heard")
-            public final String lastHeard;
+            public final Date lastHeard;
 
             public final boolean connected;
 
             public final String deviceId;
 
-            public CoreInfo(String lastApp, String lastHeard, boolean connected, String deviceId) {
+            public CoreInfo(String lastApp, Date lastHeard, boolean connected, String deviceId) {
                 this.lastApp = lastApp;
                 this.lastHeard = lastHeard;
                 this.connected = connected;
@@ -57,11 +58,16 @@ public class Responses {
             @SerializedName("product_id")
             public final int productId;
 
-            public SimpleDevice(String id, String name, boolean isConnected, int productId) {
+            @SerializedName("last_heard")
+            public final Date lastHeard;
+
+            public SimpleDevice(String id, String name, boolean isConnected, int productId,
+                                Date lastHeard) {
                 this.id = id;
                 this.name = name;
                 this.isConnected = isConnected;
                 this.productId = productId;
+                this.lastHeard = lastHeard;
             }
         }
 
@@ -91,9 +97,12 @@ public class Responses {
             @SerializedName("device_needs_update")
             public final boolean requiresUpdate;
 
+            @SerializedName("last_heard")
+            public final Date lastHeard;
+
             CompleteDevice(String deviceId, String name, boolean isConnected,
                            Map<String, String> variables, List<String> functions, String version,
-                           int productId, boolean requiresUpdate) {
+                           int productId, boolean requiresUpdate, Date lastHeard) {
                 this.deviceId = deviceId;
                 this.name = name;
                 this.isConnected = isConnected;
@@ -102,6 +111,7 @@ public class Responses {
                 this.version = version;
                 this.productId = productId;
                 this.requiresUpdate = requiresUpdate;
+                this.lastHeard = lastHeard;
             }
         }
 

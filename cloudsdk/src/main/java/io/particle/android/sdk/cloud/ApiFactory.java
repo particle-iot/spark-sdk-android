@@ -5,12 +5,24 @@ import android.net.Uri;
 import android.support.annotation.StringRes;
 import android.util.Base64;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.squareup.okhttp.OkHttpClient;
+
+import org.joda.time.DateTime;
+
+import java.lang.reflect.Type;
+import java.util.Date;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
 import retrofit.client.OkClient;
+import retrofit.converter.GsonConverter;
 
 /**
  * Constructs ParticleCloud instances
@@ -37,6 +49,7 @@ public class ApiFactory {
     private final TokenGetterDelegate tokenDelegate;
     private final OkHttpClient okHttpClient;
     private final OauthBasicAuthCredentialsProvider basicAuthCredentialsProvider;
+    private final Gson gson;
 
     ApiFactory(Context ctx, TokenGetterDelegate tokenGetterDelegate,
                OauthBasicAuthCredentialsProvider basicAuthProvider) {
@@ -44,11 +57,12 @@ public class ApiFactory {
         this.tokenDelegate = tokenGetterDelegate;
         this.okHttpClient = new OkHttpClient();
         this.basicAuthCredentialsProvider = basicAuthProvider;
+        this.gson = buildGsonInstance();
     }
 
 
     ApiDefs.CloudApi buildNewCloudApi() {
-        RestAdapter restAdapter = buildCommonRestAdapterBuilder()
+        RestAdapter restAdapter = buildCommonRestAdapterBuilder(gson)
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
                     public void intercept(RequestFacade request) {
@@ -62,7 +76,7 @@ public class ApiFactory {
     ApiDefs.IdentityApi buildNewIdentityApi() {
         final String basicAuthValue = getBasicAuthValue();
 
-        RestAdapter restAdapter = buildCommonRestAdapterBuilder()
+        RestAdapter restAdapter = buildCommonRestAdapterBuilder(gson)
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
                     public void intercept(RequestFacade request) {
@@ -84,9 +98,16 @@ public class ApiFactory {
         return "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
     }
 
-    private RestAdapter.Builder buildCommonRestAdapterBuilder() {
+    private Gson buildGsonInstance() {
+        return new GsonBuilder()
+                .registerTypeAdapter(Date.class, new StringlyTypedDateAdapter())
+                .create();
+    }
+
+    private RestAdapter.Builder buildCommonRestAdapterBuilder(Gson gson) {
         return new RestAdapter.Builder()
                 .setClient(new OkClient(okHttpClient))
+                .setConverter(new GsonConverter(gson))
                 .setEndpoint(getApiUri().toString())
                 .setLogLevel(LogLevel.valueOf(ctx.getString(R.string.http_log_level)));
     }
@@ -113,6 +134,17 @@ public class ApiFactory {
         @Override
         public String getClientSecret() {
             return clientSecret;
+        }
+    }
+
+
+    private static class StringlyTypedDateAdapter implements JsonDeserializer<Date> {
+
+        @Override
+        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
+            String asStr = json.getAsString();
+            return new DateTime(asStr).toDate();
         }
     }
 

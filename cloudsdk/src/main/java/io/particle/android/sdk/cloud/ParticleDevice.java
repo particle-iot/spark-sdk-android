@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -171,6 +172,10 @@ public class ParticleDevice implements Parcelable {
 
     public ParticleDeviceType getDeviceType() {
         return deviceState.deviceType;
+    }
+
+    public Date getLastHeard() {
+        return deviceState.lastHeard;
     }
 
     @WorkerThread

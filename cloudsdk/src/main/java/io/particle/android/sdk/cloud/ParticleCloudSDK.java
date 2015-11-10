@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import io.particle.android.sdk.cloud.ApiFactory.OauthBasicAuthCredentialsProvider;
 import io.particle.android.sdk.utils.TLog;
 
@@ -25,6 +27,7 @@ public class ParticleCloudSDK {
     public static void initWithOauthCredentialsProvider(
             @NonNull Context ctx, @Nullable OauthBasicAuthCredentialsProvider oauthProvider) {
         Context appContext = ctx.getApplicationContext();
+        JodaTimeAndroid.init(appContext);
         SDKProvider sdkProvider = new SDKProvider(appContext, oauthProvider);
         initWithSdkProvider(sdkProvider);
     }
@@ -41,6 +44,7 @@ public class ParticleCloudSDK {
             log.w("Calling ParticleCloudSDK.init() more than once does not re-initialize the SDK.");
             return;
         }
+
         instance = new ParticleCloudSDK(sdkProvider);
     }
 
