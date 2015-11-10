@@ -34,6 +34,7 @@ import static io.particle.android.sdk.utils.Py.truthy;
 
 
 // FIXME: move device state management out to another class
+// FIXME: move some of the type conversion junk out of this into another class, too
 public class ParticleCloud {
 
     private static final TLog log = TLog.get(ParticleCloud.class);
@@ -98,6 +99,12 @@ public class ParticleCloud {
      */
     public String getAccessToken() {
         return (this.token == null) ? null : this.token.getAccessToken();
+    }
+
+    public void setAccessToken(@NonNull String tokenString, @NonNull Date expirationDate) {
+        ParticleAccessToken.removeSession();
+        this.token = ParticleAccessToken.fromTokenData(expirationDate, tokenString);
+        this.token.setDelegate(tokenDelegate);
     }
 
     /**
@@ -379,6 +386,7 @@ public class ParticleCloud {
     }
 
     private void onLogIn(Responses.LogInResponse response, String user, String password) {
+        ParticleAccessToken.removeSession();
         this.token = ParticleAccessToken.fromNewSession(response);
         this.token.setDelegate(tokenDelegate);
         this.user = ParticleUser.fromNewCredentials(user, password);
@@ -462,13 +470,15 @@ public class ParticleCloud {
             if (user != null) {
                 try {
                     logIn(user.getUser(), user.getPassword());
+                    return;
+
                 } catch (ParticleCloudException e) {
                     log.e("Error while trying to log in: ", e);
-                    token = null;
                 }
-            } else {
-                token = null;
             }
+
+            ParticleAccessToken.removeSession();
+            token = null;
         }
     }
     //endregion

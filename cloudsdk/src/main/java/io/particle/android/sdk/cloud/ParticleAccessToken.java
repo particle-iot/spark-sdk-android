@@ -31,8 +31,11 @@ public class ParticleAccessToken {
             throw new IllegalArgumentException("Invalid LogInResponse: " + logInResponse);
         }
 
-        return fromNewSessionData(logInResponse.expiresInSeconds, logInResponse.accessToken);
+        long expirationMillis = logInResponse.expiresInSeconds * 1000;
+        Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
+        return fromTokenData(expirationDate, logInResponse.accessToken);
     }
+
 
     public static synchronized ParticleAccessToken fromSavedSession() {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
@@ -51,11 +54,8 @@ public class ParticleAccessToken {
     }
 
 
-    private static synchronized ParticleAccessToken fromNewSessionData(long expiresInSeconds,
-                                                                       @NonNull String accessToken) {
-        long expirationMillis = expiresInSeconds * 1000;
-        Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
-
+    public static synchronized ParticleAccessToken fromTokenData(@NonNull Date expirationDate,
+                                                                 @NonNull String accessToken) {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         sensitiveDataStorage.saveToken(accessToken);
         sensitiveDataStorage.saveTokenExpirationDate(expirationDate);
