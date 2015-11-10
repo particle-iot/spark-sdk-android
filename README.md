@@ -51,7 +51,7 @@ This SDK is still under development and is currently in beta.  Although it is te
 ## Getting Started
 
 The SDK is available as a Gradle dependency via [JCenter](https://bintray.com/particle/android/cloud-sdk/).  See the [Installation](#android-cloud-sdk-installation) section for more details.
-**Spoiler**: just add `compile 'io.particle:cloudsdk:0.2.1'` to your `build.gradle`
+**Spoiler**: just add `compile 'io.particle:cloudsdk:0.2.2'` to your `build.gradle`
 
 You can also [download the SDK as a zip](https://github.com/spark/spark-sdk-android/archive/master.zip).
 
@@ -302,7 +302,7 @@ The SDK is available through [JCenter](https://bintray.com/particle/android/clou
 
 ```gradle
 dependencies {
-    compile 'io.particle:cloudsdk:0.2.1'
+    compile 'io.particle:cloudsdk:0.2.2'
 }
 ```
 

@@ -1,0 +1,5 @@
+0.2.2
+======
+* Fix `getVariable()` call by adding type-safe methods for getting variables of each supported type
+* Expose the "last heard" info for `ParticleDevice`s
+
