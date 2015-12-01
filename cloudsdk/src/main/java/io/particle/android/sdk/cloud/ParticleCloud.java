@@ -35,6 +35,9 @@ import static io.particle.android.sdk.utils.Py.truthy;
 
 // FIXME: move device state management out to another class
 // FIXME: move some of the type conversion junk out of this into another class, too
+
+// don't warn about public APIs not being referenced inside this module
+@SuppressWarnings({"UnusedDeclaration"})
 public class ParticleCloud {
 
     private static final TLog log = TLog.get(ParticleCloud.class);
