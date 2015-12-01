@@ -57,15 +57,10 @@ public class ParticleCloud {
         return ParticleCloudSDK.getCloud();
     }
 
-    @NonNull
     private final ApiDefs.CloudApi mainApi;
-    @NonNull
     private final ApiDefs.IdentityApi identityApi;
-    @NonNull
     private final AppDataStorage appDataStorage;
-    @NonNull
     private final TokenDelegate tokenDelegate = new TokenDelegate();
-    @NonNull
     private final LocalBroadcastManager broadcastManager;
 
     private final Map<String, ParticleDevice> devices = new HashMap<>();
