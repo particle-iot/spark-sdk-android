@@ -35,7 +35,7 @@ ext {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         minSdkVersion 15
@@ -70,7 +70,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'net.danlew:android.joda:2.9.0'
 
-    compile 'com.android.support:support-v4:23.1.0'
+    compile 'com.android.support:support-v4:23.1.1'
 }
 
 apply from: '../pom_generator_v1.gradle'
