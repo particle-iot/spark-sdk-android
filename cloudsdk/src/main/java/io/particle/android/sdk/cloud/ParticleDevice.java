@@ -418,25 +418,6 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
-
-    static class TypedFakeFile extends TypedByteArray {
-
-        /**
-         * Constructs a new typed byte array.  Sets mimeType to {@code application/unknown} if absent.
-         *
-         * @throws NullPointerException if bytes are null
-         */
-        public TypedFakeFile(byte[] bytes) {
-            super("application/octet-stream", bytes);
-        }
-
-        @Override
-        public String fileName() {
-            return "tinker_firmware.bin";
-        }
-    }
-
-
     //region Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -463,6 +444,24 @@ public class ParticleDevice implements Parcelable {
         }
     };
     //endregion
+
+
+    private static class TypedFakeFile extends TypedByteArray {
+
+        /**
+         * Constructs a new typed byte array.  Sets mimeType to {@code application/unknown} if absent.
+         *
+         * @throws NullPointerException if bytes are null
+         */
+        public TypedFakeFile(byte[] bytes) {
+            super("application/octet-stream", bytes);
+        }
+
+        @Override
+        public String fileName() {
+            return "tinker_firmware.bin";
+        }
+    }
 
 
     private static abstract class VariableRequester<T, R extends ReadVariableResponse<T>> {
