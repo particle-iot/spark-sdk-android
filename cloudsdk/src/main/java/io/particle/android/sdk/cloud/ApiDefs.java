@@ -78,6 +78,12 @@ public class ApiDefs {
         ReadDoubleVariableResponse getDoubleVariable(@Path("deviceID") String deviceID,
                                                      @Path("variable") String variable);
 
+        @FormUrlEncoded
+        @POST("/v1/devices/events")
+        SimpleResponse publishEvent(@Field("name") String eventName,
+                                    @Field("data") String eventData,
+                                    @Field("private") boolean isPrivate,
+                                    @Field("ttl") int timeToLive);
 
         /**
          * Newer versions of OkHttp <em>require</em> a body for POSTs, but just pass in
@@ -99,6 +105,7 @@ public class ApiDefs {
 
         @DELETE("/v1/devices/{deviceID}")
         SimpleResponse unclaimDevice(@Path("deviceID") String deviceID);
+
     }
 
     /**
