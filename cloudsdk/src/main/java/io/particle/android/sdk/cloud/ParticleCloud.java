@@ -300,8 +300,24 @@ public class ParticleCloud {
 
     //region Events pub/sub methods
 
-    // FIXME: improve all these docs.
-
+    /**
+     * Subscribe to events from one specific device. If the API user has the device claimed, then
+     * she will receive all events, public and private, published by that device.  If the API user
+     * does not own the device she will only receive public events.
+     *
+     * @param eventName       The name for the event
+     * @param event           A JSON-formatted string to use as the event payload
+     * @param eventVisibility An IntDef "enum" determining the visibility of the event
+     * @param ttl             TTL, or Time To Live: a piece of event metadata representing the
+     *                        number of seconds that the event data is still considered relevant.
+     *                        After the TTL has passed, event listeners should consider the
+     *                        information stale or out of date.
+     *                        e.g.: an outdoor temperature reading might have a TTL of somewhere
+     *                        between 600 (10 minutes) and 1800 (30 minutes).  The geolocation of a
+     *                        large piece of farm equipment which remains stationary most of the
+     *                        time but may be moved to a different field once in a while might
+     *                        have a TTL of 86400 (24 hours).
+     */
     @WorkerThread
     public void publishEvent(@NonNull String eventName, @NonNull String event,
                              @ParticleEventVisibility int eventVisibility, int timeToLive)
@@ -309,6 +325,16 @@ public class ParticleCloud {
         eventsDelegate.publishEvent(eventName, event, eventVisibility, timeToLive);
     }
 
+    /**
+     * Subscribe to the <em>firehose</em> of public events, plus all private events published by
+     * the devices the API user owns.
+     *
+     * @param eventNamePrefix A string to filter on for events.  If null, all events will be matched.
+     * @param handler         The ParticleEventHandler to receive the events
+     *
+     * @return a unique subscription ID for the eventListener that's been registered.  This ID is
+     * used to unsubscribe this event listener later.
+     */
     @WorkerThread
     public long subscribeToAllEvents(@Nullable String eventNamePrefix,
                                      @NonNull ParticleEventHandler handler)
@@ -316,6 +342,12 @@ public class ParticleCloud {
         return eventsDelegate.subscribeToAllEvents(eventNamePrefix, handler);
     }
 
+    /**
+     * Subscribe to all events, public and private, published by devices owned by the logged-in account.
+     *
+     * see {@link #subscribeToAllEvents(String, ParticleEventHandler)} for info on the
+     * arguments and return value.
+     */
     @WorkerThread
     public long subscribeToMyDevicesEvents(@Nullable String eventNamePrefix,
                                            @NonNull ParticleEventHandler handler)
@@ -323,6 +355,18 @@ public class ParticleCloud {
         return eventsDelegate.subscribeToMyDevicesEvents(eventNamePrefix, handler);
     }
 
+    /**
+     * Subscribe to events from a specific device.
+     *
+     * If the API user has claimed the device, then she will receive all events, public and private,
+     * published by this device.  If the API user does <em>not</em> own the device, she will only
+     * receive public events.
+     *
+     * @param deviceID the device to listen to events from
+     *
+     * see {@link #subscribeToAllEvents(String, ParticleEventHandler)} for info on the
+     * arguments and return value.
+     */
     @WorkerThread
     public long subscribeToDeviceEvents(@Nullable String eventNamePrefix, @NonNull String deviceID,
                                         @NonNull ParticleEventHandler eventHandler)
@@ -330,6 +374,11 @@ public class ParticleCloud {
         return eventsDelegate.subscribeToDeviceEvents(eventNamePrefix, deviceID, eventHandler);
     }
 
+    /**
+     * Unsubscribe event listener from events.
+     *
+     * @param eventListenerID The ID of the event listener you want to unsubscribe from events
+     */
     @WorkerThread
     public void unsubscribeFromEventWithID(long eventListenerID) throws ParticleCloudException {
         eventsDelegate.unsubscribeFromEventWithID(eventListenerID);

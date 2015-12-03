@@ -150,10 +150,6 @@ public class ParticleDevice implements Parcelable {
 
     /**
      * Get an immutable map of exposed variables on device with their respective types.
-     * <p>
-     * Note: apologies for the (hopefully temporary) <em>stringly typed</em> interface.  We're
-     * hoping to give this real types (e.g.: an enum) soon, but in the meantime, see the docs for
-     * the possible values: https://docs.particle.io/reference/firmware/photon/#data-types
      */
     public Map<String, VariableType> getVariables() {
         // no need for a defensive copy, this is an immutable set
@@ -273,7 +269,7 @@ public class ParticleDevice implements Parcelable {
      * @param args         Array of arguments to pass to the function on the device.
      *                     Arguments must not be more than MAX_PARTICLE_FUNCTION_ARG_LENGTH chars
      *                     in length. If any arguments are longer, a runtime exception will be thrown.
-     * @return value of 1 represents success
+     * @return result code: a value of 1 indicates success
      */
     @WorkerThread
     public int callFunction(@NonNull String functionName, @Nullable List<String> args)
@@ -313,6 +309,7 @@ public class ParticleDevice implements Parcelable {
      * Call a function on the device
      *
      * @param functionName Function name
+     *
      * @return value of the function
      */
     @WorkerThread
@@ -321,12 +318,29 @@ public class ParticleDevice implements Parcelable {
         return callFunction(functionName, null);
     }
 
-    public long subscribeToEvents(@NonNull String eventNamePrefix,
+    /**
+     * Subscribe to events from this device
+     *
+     * @param eventNamePrefix (optional, may be null) a filter to match against for events.  If
+     *                        null or an empty string, all device events will be received by the handler
+     *                        trigger eventHandler
+     * @param handler    The handler for the events received for this subscription.
+     *
+     * @return the subscription ID
+     * (see {@link ParticleCloud#subscribeToAllEvents(String, ParticleEventHandler)} for more info
+     */
+    public long subscribeToEvents(@Nullable String eventNamePrefix,
                                   @NonNull ParticleEventHandler handler)
             throws IOException {
         return cloud.subscribeToDeviceEvents(eventNamePrefix, deviceState.deviceId, handler);
     }
 
+    /**
+     * Unsubscribe from events.
+     *
+     * @param eventListenerID The ID of the subscription to be cancelled. (returned from
+     *                        {@link #subscribeToEvents(String, ParticleEventHandler)}
+     */
     public void unsubscribeFromEvents(long eventListenerID) throws ParticleCloudException {
         cloud.unsubscribeFromEventWithID(eventListenerID);
     }
