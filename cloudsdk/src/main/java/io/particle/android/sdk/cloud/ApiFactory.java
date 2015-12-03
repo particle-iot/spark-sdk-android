@@ -57,7 +57,9 @@ public class ApiFactory {
         this.tokenDelegate = tokenGetterDelegate;
         this.okHttpClient = new OkHttpClient();
         this.basicAuthCredentialsProvider = basicAuthProvider;
-        this.gson = buildGsonInstance();
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, new StringlyTypedDateAdapter())
+                .create();
     }
 
 
@@ -96,12 +98,6 @@ public class ApiFactory {
                 basicAuthCredentialsProvider.getClientId(),
                 basicAuthCredentialsProvider.getClientSecret());
         return "Basic " + Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
-    }
-
-    private Gson buildGsonInstance() {
-        return new GsonBuilder()
-                .registerTypeAdapter(Date.class, new StringlyTypedDateAdapter())
-                .create();
     }
 
     private RestAdapter.Builder buildCommonRestAdapterBuilder(Gson gson) {

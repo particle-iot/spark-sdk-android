@@ -32,7 +32,8 @@ import retrofit.mime.TypedFile;
 
 import static io.particle.android.sdk.utils.Py.list;
 
-
+// don't warn about public APIs not being referenced inside this module
+@SuppressWarnings({"UnusedDeclaration"})
 public class ParticleDevice implements Parcelable {
 
     public enum ParticleDeviceType {
@@ -178,6 +179,14 @@ public class ParticleDevice implements Parcelable {
         return deviceState.lastHeard;
     }
 
+    /**
+     * Return the value for <code>variableName</code> on this Particle device.
+     *
+     * Unless you specifically require generic handling, it is recommended that you use the
+     * <code>get(type)Variable</code> methods instead, e.g.:  <code>getIntVariable()</code>.
+     * These type-specific methods don't require extra casting or type checking on your part, and
+     * they more clearly and succinctly express your intent.
+     */
     @WorkerThread
     public Object getVariable(@NonNull String variableName)
             throws ParticleCloudException, IOException, VariableDoesNotExistException {
@@ -193,6 +202,12 @@ public class ParticleDevice implements Parcelable {
         return requester.getVariable(variableName);
     }
 
+    /**
+     * Return the value for <code>variableName</code> as an int.
+     *
+     * Where practical, this method is recommended over the generic {@link #getVariable(String)}.
+     * See the javadoc on that method for details.
+     */
     @WorkerThread
     public int getIntVariable(@NonNull String variableName) throws ParticleCloudException,
             IOException, VariableDoesNotExistException, ClassCastException {
@@ -208,6 +223,12 @@ public class ParticleDevice implements Parcelable {
         return requester.getVariable(variableName);
     }
 
+    /**
+     * Return the value for <code>variableName</code> as a String.
+     *
+     * Where practical, this method is recommended over the generic {@link #getVariable(String)}.
+     * See the javadoc on that method for details.
+     */
     @WorkerThread
     public String getStringVariable(@NonNull String variableName) throws ParticleCloudException,
             IOException, VariableDoesNotExistException, ClassCastException {
@@ -223,6 +244,12 @@ public class ParticleDevice implements Parcelable {
         return requester.getVariable(variableName);
     }
 
+    /**
+     * Return the value for <code>variableName</code> as a double.
+     *
+     * Where practical, this method is recommended over the generic {@link #getVariable(String)}.
+     * See the javadoc on that method for details.
+     */
     @WorkerThread
     public double getDoubleVariable(@NonNull String variableName) throws ParticleCloudException,
             IOException, VariableDoesNotExistException, ClassCastException {
@@ -383,6 +410,7 @@ public class ParticleDevice implements Parcelable {
             log.w("Unable to reset flashing state for %s" + deviceState.deviceId, e);
         }
     }
+
 
     private interface FlashingChange {
         void executeFlashingChange() throws RetrofitError;

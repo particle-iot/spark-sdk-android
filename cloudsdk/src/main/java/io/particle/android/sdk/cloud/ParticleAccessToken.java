@@ -4,6 +4,7 @@ package io.particle.android.sdk.cloud;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
@@ -37,6 +38,7 @@ public class ParticleAccessToken {
     }
 
 
+    @Nullable
     public static synchronized ParticleAccessToken fromSavedSession() {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         String accessToken = sensitiveDataStorage.getToken();

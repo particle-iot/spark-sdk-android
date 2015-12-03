@@ -3,8 +3,10 @@ package io.particle.android.sdk.cloud;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.ArrayMap;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -13,9 +15,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Maps.EntryTransformer;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,14 +68,14 @@ public class ParticleCloud {
     private final TokenDelegate tokenDelegate = new TokenDelegate();
     private final LocalBroadcastManager broadcastManager;
 
-    private final Map<String, ParticleDevice> devices = new HashMap<>();
+    private final Map<String, ParticleDevice> devices = new ArrayMap<>();
 
-    // We should be able to mark these both @Nullable, but Android Studio is incorrectly
-    // inferring that these could be null, in spite of _directly following a null check_.
+    // We should be able to mark these both @Nullable, but Android Studio has been incorrectly
+    // inferring that these could be null in code blocks which _directly follow a null check_.
     // Try again later after a few more releases, I guess...
-    // @Nullable
+//    @Nullable
     private volatile ParticleAccessToken token;
-    // @Nullable
+//    @Nullable
     private volatile ParticleUser user;
 
     ParticleCloud(@NonNull ApiDefs.CloudApi mainApi,
@@ -95,6 +97,7 @@ public class ParticleCloud {
     /**
      * Current session access token string.  Can be null.
      */
+    @Nullable
     public String getAccessToken() {
         return (this.token == null) ? null : this.token.getAccessToken();
     }
@@ -108,6 +111,7 @@ public class ParticleCloud {
     /**
      * Currently logged in user name, or null if no session exists
      */
+    @Nullable
     public String getLoggedInUsername() {
         return all(this.token, this.user) ? this.user.getUser() : null;
     }
@@ -227,11 +231,6 @@ public class ParticleCloud {
     @WorkerThread
     public ParticleDevice getDevice(@NonNull String deviceID) throws ParticleCloudException {
         return getDevice(deviceID, true);
-    }
-
-    // Not available yet
-    private void publishEvent(String eventName, byte[] eventData) throws ParticleCloudException {
-
     }
 
     /**
