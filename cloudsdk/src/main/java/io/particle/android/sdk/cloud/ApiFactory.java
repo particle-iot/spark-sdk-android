@@ -89,8 +89,12 @@ public class ApiFactory {
         return restAdapter.create(ApiDefs.IdentityApi.class);
     }
 
-    private Uri getApiUri() {
+    Uri getApiUri() {
         return Uri.parse(ctx.getString(R.string.api_base_uri));
+    }
+
+    Gson getGsonInstance() {
+        return gson;
     }
 
     private String getBasicAuthValue() {

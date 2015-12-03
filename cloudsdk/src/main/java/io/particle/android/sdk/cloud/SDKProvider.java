@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
+import java.util.concurrent.Executors;
+
 import io.particle.android.sdk.cloud.ApiDefs.CloudApi;
 import io.particle.android.sdk.cloud.ApiDefs.IdentityApi;
 import io.particle.android.sdk.cloud.ApiFactory.OauthBasicAuthCredentialsProvider;
@@ -36,7 +38,7 @@ class SDKProvider {
         ApiFactory apiFactory = new ApiFactory(ctx, tokenGetter, oAuthCredentialsProvider);
         cloudApi = apiFactory.buildNewCloudApi();
         identityApi = apiFactory.buildNewIdentityApi();
-        particleCloud = buildCloud();
+        particleCloud = buildCloud(apiFactory);
     }
 
 
@@ -53,12 +55,13 @@ class SDKProvider {
     }
 
 
-    private ParticleCloud buildCloud() {
+    private ParticleCloud buildCloud(ApiFactory apiFactory) {
         SDKGlobals.init(ctx);
 
         // FIXME: see if this TokenGetterDelegate setter issue can be resolved reasonably
-        ParticleCloud cloud = new ParticleCloud(cloudApi, identityApi,
-                SDKGlobals.getAppDataStorage(), LocalBroadcastManager.getInstance(ctx));
+        ParticleCloud cloud = new ParticleCloud(apiFactory.getApiUri(), cloudApi, identityApi,
+                SDKGlobals.getAppDataStorage(), LocalBroadcastManager.getInstance(ctx),
+                apiFactory.getGsonInstance(), Executors.newCachedThreadPool());
         // FIXME: gross circular dependency
         tokenGetter.cloud = cloud;
 

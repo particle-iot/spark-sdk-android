@@ -321,14 +321,14 @@ public class ParticleDevice implements Parcelable {
         return callFunction(functionName, null);
     }
 
-    // FIXME: support event handling
-    // FIXME: Also, stop taking "Object" here.  Bah.
-    private void addEventHandler(String eventName, Object eventHandler) {
-
+    public long subscribeToEvents(@NonNull String eventNamePrefix,
+                                  @NonNull ParticleEventHandler handler)
+            throws IOException {
+        return cloud.subscribeToDeviceEvents(eventNamePrefix, deviceState.deviceId, handler);
     }
 
-    private void removeEventHandler(String eventName) {
-
+    public void unsubscribeFromEvents(long eventListenerID) throws ParticleCloudException {
+        cloud.unsubscribeFromEventWithID(eventListenerID);
     }
 
     /**

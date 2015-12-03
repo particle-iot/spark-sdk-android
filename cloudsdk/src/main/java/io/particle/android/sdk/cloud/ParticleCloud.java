@@ -2,6 +2,7 @@ package io.particle.android.sdk.cloud;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -17,10 +18,12 @@ import com.google.common.collect.Maps.EntryTransformer;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import io.particle.android.sdk.cloud.ParticleDevice.ParticleDeviceType;
 import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
@@ -67,6 +70,7 @@ public class ParticleCloud {
     private final AppDataStorage appDataStorage;
     private final TokenDelegate tokenDelegate = new TokenDelegate();
     private final LocalBroadcastManager broadcastManager;
+    private final EventsDelegate eventsDelegate;
 
     private final Map<String, ParticleDevice> devices = new ArrayMap<>();
 
@@ -78,10 +82,13 @@ public class ParticleCloud {
 //    @Nullable
     private volatile ParticleUser user;
 
-    ParticleCloud(@NonNull ApiDefs.CloudApi mainApi,
+    ParticleCloud(@NonNull Uri schemeAndHostname,
+                  @NonNull ApiDefs.CloudApi mainApi,
                   @NonNull ApiDefs.IdentityApi identityApi,
                   @NonNull AppDataStorage appDataStorage,
-                  @NonNull LocalBroadcastManager broadcastManager) {
+                  @NonNull LocalBroadcastManager broadcastManager,
+                  @NonNull Gson gson,
+                  @NonNull ExecutorService executor) {
         this.mainApi = mainApi;
         this.identityApi = identityApi;
         this.appDataStorage = appDataStorage;
@@ -91,9 +98,10 @@ public class ParticleCloud {
         if (this.token != null) {
             this.token.setDelegate(new TokenDelegate());
         }
+        this.eventsDelegate = new EventsDelegate(mainApi, schemeAndHostname, gson, executor, this);
     }
 
-    //region public API
+    //region general public API
     /**
      * Current session access token string.  Can be null.
      */
@@ -289,6 +297,46 @@ public class ParticleCloud {
     }
     //endregion
 
+
+    //region Events pub/sub methods
+
+    // FIXME: improve all these docs.
+
+    @WorkerThread
+    public void publishEvent(@NonNull String eventName, @NonNull String event,
+                             @ParticleEventVisibility int eventVisibility, int timeToLive)
+            throws ParticleCloudException {
+        eventsDelegate.publishEvent(eventName, event, eventVisibility, timeToLive);
+    }
+
+    @WorkerThread
+    public long subscribeToAllEvents(@Nullable String eventNamePrefix,
+                                     @NonNull ParticleEventHandler handler)
+            throws IOException {
+        return eventsDelegate.subscribeToAllEvents(eventNamePrefix, handler);
+    }
+
+    @WorkerThread
+    public long subscribeToMyDevicesEvents(@Nullable String eventNamePrefix,
+                                           @NonNull ParticleEventHandler handler)
+            throws IOException {
+        return eventsDelegate.subscribeToMyDevicesEvents(eventNamePrefix, handler);
+    }
+
+    @WorkerThread
+    public long subscribeToDeviceEvents(@Nullable String eventNamePrefix, @NonNull String deviceID,
+                                        @NonNull ParticleEventHandler eventHandler)
+            throws IOException {
+        return eventsDelegate.subscribeToDeviceEvents(eventNamePrefix, deviceID, eventHandler);
+    }
+
+    @WorkerThread
+    public void unsubscribeFromEventWithID(long eventListenerID) throws ParticleCloudException {
+        eventsDelegate.unsubscribeFromEventWithID(eventListenerID);
+    }
+    //endregion
+
+
     //region package-only API
     @WorkerThread
     void unclaimDevice(@NonNull String deviceId) {
@@ -344,6 +392,7 @@ public class ParticleCloud {
         }
     }
     //endregion
+
 
     //region private API
     @WorkerThread
