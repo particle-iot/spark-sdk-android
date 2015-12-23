@@ -1,3 +1,9 @@
+0.3.1
+=====
+* Workaround for lame 3rd party packaging problems
+* Update GSON dependency
+
+
 0.3.0
 ======
 * At last, event pub/sub support!
