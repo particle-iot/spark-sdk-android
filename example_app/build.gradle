@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -21,10 +22,6 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/maven/org.kaazing/gateway.client.java.transport/pom.xml'
-        exclude 'META-INF/maven/org.kaazing/gateway.client.java.transport/pom.properties'
-        exclude 'META-INF/maven/org.kaazing/net.api/pom.xml'
-        exclude 'META-INF/maven/org.kaazing/net.api/pom.properties'
     }
 
 }
@@ -42,13 +39,6 @@ dependencies {
     // comment out the above, and
     // UNCOMMENT THE FOLLOWING TO USE A PUBLISHED VERSION OF THE SDK:
     //    compile 'io.particle:cloudsdk:0.1.2'
-
-    compile 'org.apache.commons:commons-lang3:3.3.2'
-    compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.google.guava:guava:18.0'
-    compile 'com.squareup.okhttp:okhttp:2.5.0'
-    compile 'com.squareup.okio:okio:1.6.0'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
 
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:support-v4:23.1.1'
