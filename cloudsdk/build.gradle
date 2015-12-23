@@ -69,7 +69,6 @@ dependencies {
     compile 'com.squareup.okio:okio:1.6.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'net.danlew:android.joda:2.9.0'
-    compile 'org.kaazing:gateway.client.java:5.1.0.4'
 
     compile 'com.android.support:support-v4:23.1.1'
 }
