@@ -317,9 +317,6 @@ public class Py {
          * because until Java 1.7's SafeVarargs annotation, there was no way to
          * call a varargs method using generic collections without getting a
          * (bogus) type safety error.
-         *
-         * @param other
-         * @return
          */
         public PySet<T> getIntersection(Collection<T> other) {
             PySet<T> newCopy = set(this);
