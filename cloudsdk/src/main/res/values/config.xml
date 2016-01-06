@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="api_base_uri">https://api.spark.io</string>
+    <string name="api_base_uri">https://api.particle.io</string>
 
     <!-- This value should match one of the members of Retrofit's LogLevel class:
     NONE, BASIC, HEADERS, HEADERS_AND_ARGS, or FULL
