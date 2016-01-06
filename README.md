@@ -18,7 +18,7 @@ The Particle Android Cloud SDK is an easy-to-use wrapper for the Particle REST A
 - Managing access tokens for the Particle Cloud
 
 
-## Getting atarted, getting help, and everything else
+## Getting started, getting help, and everything else
 
 Full documentation, including a getting started guide, lots of API examples, support & feedback links, and more are all available from our documentation page: https://docs.particle.io/reference/android/
 
