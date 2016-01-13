@@ -1,3 +1,10 @@
+0.3.2
+=====
+* Electron support!
+* Use SharedPreferences.apply() instead of .commit() for an easy perf boost
+* Code cleanups, including switching to @ParametersAreNonnullByDefault
+
+
 0.3.1
 =====
 * Workaround for lame 3rd party packaging problems
