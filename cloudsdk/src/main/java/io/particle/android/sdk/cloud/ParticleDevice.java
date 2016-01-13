@@ -40,12 +40,15 @@ public class ParticleDevice implements Parcelable {
 
     public enum ParticleDeviceType {
         CORE,
-        PHOTON;
+        PHOTON,
+        ELECTRON;
 
         public static ParticleDeviceType fromInt(int intValue) {
             switch (intValue) {
                 case 0:
                     return CORE;
+                case 10:
+                    return ELECTRON;
                 case 5:
                 case 6:
                 default:
