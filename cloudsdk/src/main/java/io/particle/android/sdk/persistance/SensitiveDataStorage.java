@@ -1,7 +1,6 @@
 package io.particle.android.sdk.persistance;
 
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -11,7 +10,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 
 // FIXME: crib the code from the Vault example to do crypto for all these values.
-@SuppressLint("CommitPrefEdits")  // we need immediate commits of changes in this prefs file
 @ParametersAreNonnullByDefault
 public class SensitiveDataStorage {
 
@@ -31,7 +29,7 @@ public class SensitiveDataStorage {
     public void saveUser(String user) {
         sharedPrefs.edit()
                 .putString(KEY_USERNAME, user)
-                .commit();
+                .apply();
     }
 
     public String getUser() {
@@ -41,13 +39,13 @@ public class SensitiveDataStorage {
     public void resetUser() {
         sharedPrefs.edit()
                 .remove(KEY_USERNAME)
-                .commit();
+                .apply();
     }
 
     public void savePassword(String password) {
         sharedPrefs.edit()
                 .putString(KEY_PASSWORD, password)
-                .commit();
+                .apply();
     }
 
     public String getPassword() {
@@ -57,13 +55,13 @@ public class SensitiveDataStorage {
     public void resetPassword() {
         sharedPrefs.edit()
                 .remove(KEY_PASSWORD)
-                .commit();
+                .apply();
     }
 
     public void saveToken(String token) {
         sharedPrefs.edit()
                 .putString(KEY_TOKEN, token)
-                .commit();
+                .apply();
     }
 
     public String getToken() {
@@ -73,13 +71,13 @@ public class SensitiveDataStorage {
     public void resetToken() {
         sharedPrefs.edit()
                 .remove(KEY_TOKEN)
-                .commit();
+                .apply();
     }
 
     public void saveTokenExpirationDate(Date expirationDate) {
         sharedPrefs.edit()
                 .putLong(KEY_TOKEN_EXPIRATION_DATE, expirationDate.getTime())
-                .commit();
+                .apply();
     }
 
     public Date getTokenExpirationDate() {
@@ -90,7 +88,7 @@ public class SensitiveDataStorage {
     public void resetTokenExpirationDate() {
         sharedPrefs.edit()
                 .remove(KEY_TOKEN_EXPIRATION_DATE)
-                .commit();
+                .apply();
     }
 
 }
