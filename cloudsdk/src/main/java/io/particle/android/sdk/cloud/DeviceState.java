@@ -2,13 +2,14 @@ package io.particle.android.sdk.cloud;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Date;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.utils.Parcelables;
@@ -20,6 +21,7 @@ import io.particle.android.sdk.utils.Parcelables;
 // class to whatever class ends up doing the device state management; *everything* else only ever
 // gets to see IDeviceState objects.  (This might interfere with using Parcelable though.)
 // FIXME: is device "state" really the right naming here?
+@ParametersAreNonnullByDefault
 class DeviceState implements Parcelable {
 
     final String deviceId;
@@ -50,7 +52,7 @@ class DeviceState implements Parcelable {
     // The following static builder methods are awkward and a little absurd, but they still seem
     // better than the alternatives.  If we have to add another couple mutable fields though, it
     // might be time to reconsider this...
-    static DeviceState withNewName(@NonNull DeviceState other, String newName) {
+    static DeviceState withNewName(DeviceState other, String newName) {
         return new DeviceState(
                 other.deviceId,
                 // NEW STATE:
@@ -66,7 +68,7 @@ class DeviceState implements Parcelable {
     }
 
 
-    static DeviceState withNewConnectedState(@NonNull DeviceState other, boolean newConnectedState) {
+    static DeviceState withNewConnectedState(DeviceState other, boolean newConnectedState) {
         return new DeviceState(
                 other.deviceId,
                 other.name,

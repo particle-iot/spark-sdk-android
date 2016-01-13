@@ -2,7 +2,6 @@ package io.particle.android.sdk.cloud;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
@@ -17,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.cloud.Responses.ReadDoubleVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
@@ -34,6 +35,7 @@ import static io.particle.android.sdk.utils.Py.list;
 
 // don't warn about public APIs not being referenced inside this module
 @SuppressWarnings({"UnusedDeclaration"})
+@ParametersAreNonnullByDefault
 public class ParticleDevice implements Parcelable {
 
     public enum ParticleDeviceType {
@@ -96,17 +98,14 @@ public class ParticleDevice implements Parcelable {
     private static final TLog log = TLog.get(ParticleDevice.class);
 
 
-    @NonNull
     private final ApiDefs.CloudApi mainApi;
-    @NonNull
     private final ParticleCloud cloud;
 
-    @NonNull
     volatile DeviceState deviceState;
+
     private volatile boolean isFlashing = false;
 
-    ParticleDevice(@NonNull ApiDefs.CloudApi mainApi,  @NonNull ParticleCloud cloud,
-                   @NonNull DeviceState deviceState) {
+    ParticleDevice(ApiDefs.CloudApi mainApi, ParticleCloud cloud, DeviceState deviceState) {
         this.mainApi = mainApi;
         this.cloud = cloud;
         this.deviceState = deviceState;
@@ -129,7 +128,7 @@ public class ParticleDevice implements Parcelable {
     /**
      * Rename the device in the cloud. If renaming fails name will stay the same.
      */
-    public void setName(@NonNull String newName) throws ParticleCloudException {
+    public void setName(String newName) throws ParticleCloudException {
         cloud.changeDeviceName(this.deviceState.deviceId, newName);
     }
 
@@ -184,7 +183,7 @@ public class ParticleDevice implements Parcelable {
      * they more clearly and succinctly express your intent.
      */
     @WorkerThread
-    public Object getVariable(@NonNull String variableName)
+    public Object getVariable(String variableName)
             throws ParticleCloudException, IOException, VariableDoesNotExistException {
 
         VariableRequester<Object, ReadObjectVariableResponse> requester =
@@ -205,7 +204,7 @@ public class ParticleDevice implements Parcelable {
      * See the javadoc on that method for details.
      */
     @WorkerThread
-    public int getIntVariable(@NonNull String variableName) throws ParticleCloudException,
+    public int getIntVariable(String variableName) throws ParticleCloudException,
             IOException, VariableDoesNotExistException, ClassCastException {
 
         VariableRequester<Integer, ReadIntVariableResponse> requester =
@@ -226,7 +225,7 @@ public class ParticleDevice implements Parcelable {
      * See the javadoc on that method for details.
      */
     @WorkerThread
-    public String getStringVariable(@NonNull String variableName) throws ParticleCloudException,
+    public String getStringVariable(String variableName) throws ParticleCloudException,
             IOException, VariableDoesNotExistException, ClassCastException {
 
         VariableRequester<String, ReadStringVariableResponse> requester =
@@ -247,7 +246,7 @@ public class ParticleDevice implements Parcelable {
      * See the javadoc on that method for details.
      */
     @WorkerThread
-    public double getDoubleVariable(@NonNull String variableName) throws ParticleCloudException,
+    public double getDoubleVariable(String variableName) throws ParticleCloudException,
             IOException, VariableDoesNotExistException, ClassCastException {
 
         VariableRequester<Double, ReadDoubleVariableResponse> requester =
@@ -272,7 +271,7 @@ public class ParticleDevice implements Parcelable {
      * @return result code: a value of 1 indicates success
      */
     @WorkerThread
-    public int callFunction(@NonNull String functionName, @Nullable List<String> args)
+    public int callFunction(String functionName, @Nullable List<String> args)
             throws ParticleCloudException, IOException, FunctionDoesNotExistException {
         // TODO: check response of calling a non-existent function
         if (!deviceState.functions.contains(functionName)) {
@@ -313,7 +312,7 @@ public class ParticleDevice implements Parcelable {
      * @return value of the function
      */
     @WorkerThread
-    public int callFunction(@NonNull String functionName) throws ParticleCloudException, IOException,
+    public int callFunction(String functionName) throws ParticleCloudException, IOException,
             FunctionDoesNotExistException {
         return callFunction(functionName, null);
     }
@@ -330,7 +329,7 @@ public class ParticleDevice implements Parcelable {
      * (see {@link ParticleCloud#subscribeToAllEvents(String, ParticleEventHandler)} for more info
      */
     public long subscribeToEvents(@Nullable String eventNamePrefix,
-                                  @NonNull ParticleEventHandler handler)
+                                  ParticleEventHandler handler)
             throws IOException {
         return cloud.subscribeToDeviceEvents(eventNamePrefix, deviceState.deviceId, handler);
     }
@@ -371,7 +370,7 @@ public class ParticleDevice implements Parcelable {
     }
 
     @WorkerThread
-    public void flashKnownApp(@NonNull final KnownApp knownApp) throws ParticleCloudException {
+    public void flashKnownApp(final KnownApp knownApp) throws ParticleCloudException {
         performFlashingChange(new FlashingChange() {
             @Override
             public void executeFlashingChange() throws RetrofitError {
@@ -381,7 +380,7 @@ public class ParticleDevice implements Parcelable {
     }
 
     @WorkerThread
-    public void flashBinaryFile(@NonNull final File file) throws ParticleCloudException {
+    public void flashBinaryFile(final File file) throws ParticleCloudException {
         performFlashingChange(new FlashingChange() {
             @Override
             public void executeFlashingChange() throws RetrofitError {
@@ -392,7 +391,7 @@ public class ParticleDevice implements Parcelable {
     }
 
     @WorkerThread
-    public void flashBinaryFile(final InputStream stream) throws ParticleCloudException, IOException {
+    public void flashBinaryFile(InputStream stream) throws ParticleCloudException, IOException {
         final byte[] bytes = Okio.buffer(Okio.source(stream)).readByteArray();
         performFlashingChange(new FlashingChange() {
             @Override
@@ -402,7 +401,6 @@ public class ParticleDevice implements Parcelable {
         });
     }
 
-    @NonNull
     public ParticleCloud getCloud() {
         return cloud;
     }
@@ -520,7 +518,7 @@ public class ParticleDevice implements Parcelable {
 
 
         @WorkerThread
-        T getVariable(@NonNull String variableName)
+        T getVariable(String variableName)
                 throws ParticleCloudException, IOException, VariableDoesNotExistException {
 
             if (!device.deviceState.variables.containsKey(variableName)) {

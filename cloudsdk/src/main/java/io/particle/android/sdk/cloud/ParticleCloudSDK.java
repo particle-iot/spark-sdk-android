@@ -1,10 +1,11 @@
 package io.particle.android.sdk.cloud;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import net.danlew.android.joda.JodaTimeAndroid;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.cloud.ApiFactory.OauthBasicAuthCredentialsProvider;
 import io.particle.android.sdk.utils.TLog;
@@ -12,6 +13,7 @@ import io.particle.android.sdk.utils.TLog;
 /**
  * Entry point for the Particle Cloud SDK.
  */
+@ParametersAreNonnullByDefault
 public class ParticleCloudSDK {
     // NOTE: pay attention to the interface, try to ignore the implementation, it's going to change.
 
@@ -20,12 +22,13 @@ public class ParticleCloudSDK {
      *
      * (or anywhere else before your first Activity.onCreate() is called)
      */
-    public static void init(@NonNull Context ctx) {
+    public static void init(Context ctx) {
         initWithOauthCredentialsProvider(ctx, null);
     }
 
     public static void initWithOauthCredentialsProvider(
-            @NonNull Context ctx, @Nullable OauthBasicAuthCredentialsProvider oauthProvider) {
+            Context ctx, @Nullable OauthBasicAuthCredentialsProvider oauthProvider) {
+
         Context appContext = ctx.getApplicationContext();
         JodaTimeAndroid.init(appContext);
         SDKProvider sdkProvider = new SDKProvider(appContext, oauthProvider);

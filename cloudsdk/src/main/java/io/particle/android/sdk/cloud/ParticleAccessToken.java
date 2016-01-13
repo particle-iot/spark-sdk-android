@@ -3,11 +3,12 @@ package io.particle.android.sdk.cloud;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.persistance.SensitiveDataStorage;
 import io.particle.android.sdk.utils.EZ;
@@ -15,6 +16,7 @@ import io.particle.android.sdk.utils.Py;
 import io.particle.android.sdk.utils.TLog;
 
 
+@ParametersAreNonnullByDefault
 public class ParticleAccessToken {
 
 
@@ -56,8 +58,7 @@ public class ParticleAccessToken {
     }
 
 
-    public static synchronized ParticleAccessToken fromTokenData(@NonNull Date expirationDate,
-                                                                 @NonNull String accessToken) {
+    public static synchronized ParticleAccessToken fromTokenData(Date expirationDate, String accessToken) {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         sensitiveDataStorage.saveToken(accessToken);
         sensitiveDataStorage.saveTokenExpirationDate(expirationDate);

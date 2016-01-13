@@ -2,12 +2,14 @@ package io.particle.android.sdk.persistance;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Storage for misc settings to be persisted which <strong>aren't</strong> related to
  * identity, authorization, or any other sensitive data.
  */
+@ParametersAreNonnullByDefault
 public class AppDataStorage {
 
     private static final String KEY_USER_HAS_CLAIMED_DEVICES = "KEY_USER_HAS_CLAIMED_DEVICES";
@@ -15,7 +17,7 @@ public class AppDataStorage {
     private final SharedPreferences sharedPrefs;
 
 
-    public AppDataStorage(@NonNull Context ctx) {
+    public AppDataStorage(Context ctx) {
         ctx = ctx.getApplicationContext();
         this.sharedPrefs = ctx.getSharedPreferences("spark_sdk_prefs", Context.MODE_PRIVATE);
     }

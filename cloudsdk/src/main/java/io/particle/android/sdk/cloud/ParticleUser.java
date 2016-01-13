@@ -1,21 +1,21 @@
 package io.particle.android.sdk.cloud;
 
-import android.support.annotation.NonNull;
-
 import com.google.common.base.Preconditions;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.persistance.SensitiveDataStorage;
 
 import static io.particle.android.sdk.utils.Py.truthy;
 
 
+@ParametersAreNonnullByDefault
 public class ParticleUser {
 
     /**
      * Initialize ParticleUser class with new credentials and store session in keychain
      */
-    public static synchronized ParticleUser fromNewCredentials(
-            @NonNull String user, @NonNull String password) {
+    public static synchronized ParticleUser fromNewCredentials(String user, String password) {
         Preconditions.checkArgument(truthy(user), "Username cannot be empty or null");
         Preconditions.checkArgument(truthy(password), "Password cannot be empty or null");
 
@@ -50,23 +50,19 @@ public class ParticleUser {
     }
 
 
-    @NonNull
     private final String user;
-    @NonNull
     private final String password;
 
 
-    private ParticleUser(@NonNull String user, @NonNull String password) {
+    private ParticleUser(String user, String password) {
         this.user = user;
         this.password = password;
     }
 
-    @NonNull
     public String getPassword() {
         return password;
     }
 
-    @NonNull
     public String getUser() {
         return user;
     }

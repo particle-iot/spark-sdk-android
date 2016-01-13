@@ -3,7 +3,6 @@ package io.particle.android.sdk.cloud;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
@@ -25,6 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import io.particle.android.sdk.cloud.ParticleDevice.ParticleDeviceType;
 import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.cloud.Responses.Models;
@@ -43,6 +44,7 @@ import static io.particle.android.sdk.utils.Py.truthy;
 
 // don't warn about public APIs not being referenced inside this module
 @SuppressWarnings({"UnusedDeclaration"})
+@ParametersAreNonnullByDefault
 public class ParticleCloud {
 
     private static final TLog log = TLog.get(ParticleCloud.class);
@@ -51,12 +53,11 @@ public class ParticleCloud {
      * Singleton instance of ParticleCloud class
      *
      * @return ParticleCloud
-     *
      * @deprecated use {@link ParticleCloudSDK#getCloud()} instead.  This interface will be removed
      * some time before the 1.0 release.
      */
     @Deprecated
-    public synchronized static ParticleCloud get(@NonNull Context context) {
+    public synchronized static ParticleCloud get(Context context) {
         log.w("ParticleCloud.get() is deprecated and will be removed before the 1.0 release. " +
                 "Use ParticleCloudSDK.getCloud() instead!");
         if (!ParticleCloudSDK.isInitialized()) {
@@ -79,16 +80,13 @@ public class ParticleCloud {
     // Try again later after a few more releases, I guess...
 //    @Nullable
     private volatile ParticleAccessToken token;
-//    @Nullable
+    //    @Nullable
     private volatile ParticleUser user;
 
-    ParticleCloud(@NonNull Uri schemeAndHostname,
-                  @NonNull ApiDefs.CloudApi mainApi,
-                  @NonNull ApiDefs.IdentityApi identityApi,
-                  @NonNull AppDataStorage appDataStorage,
-                  @NonNull LocalBroadcastManager broadcastManager,
-                  @NonNull Gson gson,
-                  @NonNull ExecutorService executor) {
+    ParticleCloud(Uri schemeAndHostname,
+                  ApiDefs.CloudApi mainApi, ApiDefs.IdentityApi identityApi,
+                  AppDataStorage appDataStorage, LocalBroadcastManager broadcastManager,
+                  Gson gson, ExecutorService executor) {
         this.mainApi = mainApi;
         this.identityApi = identityApi;
         this.appDataStorage = appDataStorage;
@@ -102,6 +100,7 @@ public class ParticleCloud {
     }
 
     //region general public API
+
     /**
      * Current session access token string.  Can be null.
      */
@@ -110,7 +109,7 @@ public class ParticleCloud {
         return (this.token == null) ? null : this.token.getAccessToken();
     }
 
-    public void setAccessToken(@NonNull String tokenString, @NonNull Date expirationDate) {
+    public void setAccessToken(String tokenString, Date expirationDate) {
         ParticleAccessToken.removeSession();
         this.token = ParticleAccessToken.fromTokenData(expirationDate, tokenString);
         this.token.setDelegate(tokenDelegate);
@@ -135,7 +134,7 @@ public class ParticleCloud {
      * @param password Password
      */
     @WorkerThread
-    public void logIn(@NonNull String user, @NonNull String password) throws ParticleCloudException {
+    public void logIn(String user, String password) throws ParticleCloudException {
         try {
             Responses.LogInResponse response = identityApi.logIn("password", user, password);
             onLogIn(response, user, password);
@@ -151,8 +150,7 @@ public class ParticleCloud {
      * @param password Required password
      */
     @WorkerThread
-    public void signUpWithUser(@NonNull String user, @NonNull String password)
-            throws ParticleCloudException {
+    public void signUpWithUser(String user, String password) throws ParticleCloudException {
         try {
             identityApi.signUp(user, password);
         } catch (RetrofitError error) {
@@ -168,9 +166,8 @@ public class ParticleCloud {
      * @param orgSlug  Organization slug to use
      */
     @WorkerThread
-    public void signUpAndLogInWithCustomer(@NonNull String email,
-                                           @NonNull String password,
-                                           @NonNull String orgSlug) throws ParticleCloudException {
+    public void signUpAndLogInWithCustomer(String email, String password, String orgSlug)
+            throws ParticleCloudException {
         if (!all(email, password, orgSlug)) {
             throw new IllegalArgumentException(
                     "Email, password, and organization must all be specified");
@@ -237,7 +234,7 @@ public class ParticleCloud {
      * @return the device instance on success
      */
     @WorkerThread
-    public ParticleDevice getDevice(@NonNull String deviceID) throws ParticleCloudException {
+    public ParticleDevice getDevice(String deviceID) throws ParticleCloudException {
         return getDevice(deviceID, true);
     }
 
@@ -247,7 +244,7 @@ public class ParticleCloud {
      * @param deviceID the deviceID
      */
     @WorkerThread
-    public void claimDevice(@NonNull String deviceID) throws ParticleCloudException {
+    public void claimDevice(String deviceID) throws ParticleCloudException {
         try {
             mainApi.claimDevice(deviceID);
         } catch (RetrofitError error) {
@@ -274,8 +271,7 @@ public class ParticleCloud {
     }
 
     @WorkerThread
-    public Responses.ClaimCodeResponse generateClaimCodeForOrg(@NonNull String orgSlug,
-                                                               @NonNull String productSlug)
+    public Responses.ClaimCodeResponse generateClaimCodeForOrg(String orgSlug, String productSlug)
             throws ParticleCloudException {
         try {
             // Offer empty string to appease newer OkHttp versions which require a POST body,
@@ -288,7 +284,7 @@ public class ParticleCloud {
 
     // TODO: check if any javadoc has been added for this method in the iOS SDK
     @WorkerThread
-    public void requestPasswordReset(@NonNull String email) throws ParticleCloudException {
+    public void requestPasswordReset(String email) throws ParticleCloudException {
         try {
             identityApi.requestPasswordReset(email);
         } catch (RetrofitError error) {
@@ -319,7 +315,7 @@ public class ParticleCloud {
      *                        have a TTL of 86400 (24 hours).
      */
     @WorkerThread
-    public void publishEvent(@NonNull String eventName, @NonNull String event,
+    public void publishEvent(String eventName, String event,
                              @ParticleEventVisibility int eventVisibility, int timeToLive)
             throws ParticleCloudException {
         eventsDelegate.publishEvent(eventName, event, eventVisibility, timeToLive);
@@ -331,45 +327,43 @@ public class ParticleCloud {
      *
      * @param eventNamePrefix A string to filter on for events.  If null, all events will be matched.
      * @param handler         The ParticleEventHandler to receive the events
-     *
      * @return a unique subscription ID for the eventListener that's been registered.  This ID is
      * used to unsubscribe this event listener later.
      */
     @WorkerThread
-    public long subscribeToAllEvents(@Nullable String eventNamePrefix,
-                                     @NonNull ParticleEventHandler handler)
+    public long subscribeToAllEvents(@Nullable String eventNamePrefix, ParticleEventHandler handler)
             throws IOException {
         return eventsDelegate.subscribeToAllEvents(eventNamePrefix, handler);
     }
 
     /**
      * Subscribe to all events, public and private, published by devices owned by the logged-in account.
-     *
+     * <p>
      * see {@link #subscribeToAllEvents(String, ParticleEventHandler)} for info on the
      * arguments and return value.
      */
     @WorkerThread
     public long subscribeToMyDevicesEvents(@Nullable String eventNamePrefix,
-                                           @NonNull ParticleEventHandler handler)
+                                           ParticleEventHandler handler)
             throws IOException {
         return eventsDelegate.subscribeToMyDevicesEvents(eventNamePrefix, handler);
     }
 
     /**
      * Subscribe to events from a specific device.
-     *
+     * <p>
      * If the API user has claimed the device, then she will receive all events, public and private,
      * published by this device.  If the API user does <em>not</em> own the device, she will only
      * receive public events.
      *
      * @param deviceID the device to listen to events from
-     *
-     * see {@link #subscribeToAllEvents(String, ParticleEventHandler)} for info on the
-     * arguments and return value.
+     *                 <p>
+     *                 see {@link #subscribeToAllEvents(String, ParticleEventHandler)} for info on the
+     *                 arguments and return value.
      */
     @WorkerThread
-    public long subscribeToDeviceEvents(@Nullable String eventNamePrefix, @NonNull String deviceID,
-                                        @NonNull ParticleEventHandler eventHandler)
+    public long subscribeToDeviceEvents(@Nullable String eventNamePrefix, String deviceID,
+                                        ParticleEventHandler eventHandler)
             throws IOException {
         return eventsDelegate.subscribeToDeviceEvents(eventNamePrefix, deviceID, eventHandler);
     }
@@ -388,7 +382,7 @@ public class ParticleCloud {
 
     //region package-only API
     @WorkerThread
-    void unclaimDevice(@NonNull String deviceId) {
+    void unclaimDevice(String deviceId) {
         mainApi.unclaimDevice(deviceId);
         synchronized (devices) {
             devices.remove(deviceId);
@@ -397,8 +391,7 @@ public class ParticleCloud {
     }
 
     @WorkerThread
-    void changeDeviceName(@NonNull String deviceId, @NonNull String newName)
-            throws ParticleCloudException {
+    void changeDeviceName(String deviceId, String newName) throws ParticleCloudException {
         ParticleDevice particleDevice;
         synchronized (devices) {
             particleDevice = devices.get(deviceId);
@@ -417,8 +410,8 @@ public class ParticleCloud {
     }
 
     @WorkerThread
-    // Called when a cloud API call receives a result in which the "coreInfo.connected" is false
-    void onDeviceNotConnected(@NonNull DeviceState deviceState) {
+        // Called when a cloud API call receives a result in which the "coreInfo.connected" is false
+    void onDeviceNotConnected(DeviceState deviceState) {
         DeviceState newState = DeviceState.withNewConnectedState(deviceState, false);
         updateDeviceState(newState, true);
     }
@@ -429,7 +422,7 @@ public class ParticleCloud {
     }
 
     // this is accessible at the package level for access from ParticleDevice's Parcelable impl
-    ParticleDevice getDeviceFromState(@NonNull DeviceState deviceState) {
+    ParticleDevice getDeviceFromState(DeviceState deviceState) {
         synchronized (devices) {
             if (devices.containsKey(deviceState.deviceId)) {
                 return devices.get(deviceState.deviceId);
@@ -492,7 +485,7 @@ public class ParticleCloud {
                 ? ImmutableSet.<String>of()
                 : ImmutableSet.copyOf(completeDevice.functions);
         ImmutableMap<String, VariableType> variables = ImmutableMap.of();
-        if (completeDevice.variables != null ) {
+        if (completeDevice.variables != null) {
             variables = ImmutableMap.copyOf(Maps.transformEntries(
                     completeDevice.variables, sMapTransformer));
         }
@@ -581,19 +574,19 @@ public class ParticleCloud {
 
     private static Maps.EntryTransformer<String, String, VariableType> sMapTransformer =
             new EntryTransformer<String, String, VariableType>() {
-        @Override
-        public VariableType transformEntry(String key, String value) {
-            switch (value) {
-                case "int32":
-                    return VariableType.INT;
-                case "double":
-                    return VariableType.DOUBLE;
-                case "string":
-                    return VariableType.STRING;
-                default:
-                    return null;
-            }
-        }
-    };
+                @Override
+                public VariableType transformEntry(@Nullable String key, @Nullable String value) {
+                    switch (value) {
+                        case "int32":
+                            return VariableType.INT;
+                        case "double":
+                            return VariableType.DOUBLE;
+                        case "string":
+                            return VariableType.STRING;
+                        default:
+                            return null;
+                    }
+                }
+            };
 
 }

@@ -2,9 +2,10 @@ package io.particle.android.sdk.utils;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 
 import java.io.IOException;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
@@ -14,6 +15,7 @@ import io.particle.android.sdk.cloud.ParticleDevice;
 /**
  * Analgesic AsyncTask wrapper for making Particle cloud API calls
  */
+@ParametersAreNonnullByDefault
 public class Async {
 
     private static final TLog log = TLog.get(Async.class);
@@ -21,7 +23,7 @@ public class Async {
 
     public abstract static class ApiWork<ApiCaller, Result> {
 
-        public abstract Result callApi(@NonNull ApiCaller apiCaller) throws ParticleCloudException, IOException;
+        public abstract Result callApi(ApiCaller apiCaller) throws ParticleCloudException, IOException;
 
         public abstract void onSuccess(Result result);
 
@@ -54,15 +56,15 @@ public class Async {
     }
 
 
-    public static <T> AsyncApiWorker<ParticleCloud, T> executeAsync(
-            @NonNull ParticleCloud particleCloud, @NonNull ApiWork<ParticleCloud, T> work) {
+    public static <T> AsyncApiWorker<ParticleCloud, T> executeAsync(ParticleCloud particleCloud,
+                                                                    ApiWork<ParticleCloud, T> work) {
         return (AsyncApiWorker<ParticleCloud, T>) new AsyncApiWorker<>(particleCloud, work)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
-    public static <T> AsyncApiWorker<ParticleDevice, T> executeAsync(
-            @NonNull ParticleDevice particleDevice, @NonNull ApiWork<ParticleDevice, T> work) {
+    public static <T> AsyncApiWorker<ParticleDevice, T> executeAsync(ParticleDevice particleDevice,
+                                                                     ApiWork<ParticleDevice, T> work) {
         return (AsyncApiWorker<ParticleDevice, T>) new AsyncApiWorker<>(particleDevice, work)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

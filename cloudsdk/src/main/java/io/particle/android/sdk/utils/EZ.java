@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,25 +13,32 @@ import android.support.v4.app.FragmentActivity;
 import java.io.Closeable;
 import java.io.IOException;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * Analgesic shortcuts for Android dev't.
  */
+@ParametersAreNonnullByDefault
 public class EZ {
 
     private static final TLog log = TLog.get(EZ.class);
 
 
-    public static void runOnMainThread(@NonNull Runnable runnable) {
+    public static void runOnMainThread(Runnable runnable) {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(runnable);
     }
 
-    public static void runOnMainThreadDelayed(long delayInMillis, @NonNull Runnable runnable) {
+    public static void runOnMainThreadDelayed(long delayInMillis, Runnable runnable) {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(runnable, delayInMillis);
     }
 
-    public static void runAsync(@NonNull final Runnable runnable) {
+    public static boolean isThisTheMainThread() {
+        return Looper.getMainLooper() == Looper.myLooper();
+    }
+
+    public static void runAsync(final Runnable runnable) {
         new AsyncTask<Void, Void, Void>() {
 
             @Override
@@ -61,7 +67,7 @@ public class EZ {
      * Inspired by: https://gist.github.com/keyboardr/5455206
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getCallbacksOrThrow(@NonNull Fragment frag, @NonNull Class<T> callbacks) {
+    public static <T> T getCallbacksOrThrow(Fragment frag, Class<T> callbacks) {
         Fragment parent = frag.getParentFragment();
 
         if (parent != null && callbacks.isInstance(parent)) {
@@ -90,7 +96,7 @@ public class EZ {
 
     /**
      * For when you don't care if the Closeable you're closing is null, and
-     * you don't care that closing a non-null buffer threw an exception, but
+     * you don't care that closing a buffer threw an exception, but
      * you still care enough that logging might be useful, like in a
      * "finally" block, after you've already returned to the caller.
      */

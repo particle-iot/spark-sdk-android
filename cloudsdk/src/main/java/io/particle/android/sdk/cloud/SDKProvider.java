@@ -6,6 +6,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.concurrent.Executors;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import io.particle.android.sdk.cloud.ApiDefs.CloudApi;
 import io.particle.android.sdk.cloud.ApiDefs.IdentityApi;
 import io.particle.android.sdk.cloud.ApiFactory.OauthBasicAuthCredentialsProvider;
@@ -15,6 +17,7 @@ import io.particle.android.sdk.cloud.ApiFactory.TokenGetterDelegate;
 
 // FIXME: there are a lot of details lacking in this class, but it's not public API, and the
 // structure makes it easy enough to do something better later on.
+@ParametersAreNonnullByDefault
 class SDKProvider {
 
     private final Context ctx;
