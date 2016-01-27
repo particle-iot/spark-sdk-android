@@ -37,10 +37,10 @@ public class Toaster {
             }
         };
 
-        if (EZ.isThisTheMainThread()) {
-            toastRunnable.run();
-        } else {
+//        if (EZ.isThisTheMainThread()) { // FIXME: 1/26/16 isThisTheMainThread() does not exist?
+//            toastRunnable.run();
+//        } else {
             EZ.runOnMainThread(toastRunnable);
-        }
+//        }
     }
 }

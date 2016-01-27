@@ -14,6 +14,13 @@
             <option value="$PROJECT_DIR$/example_app" />
           </set>
         </option>
+        <option name="myModules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/cloudsdk" />
+            <option value="$PROJECT_DIR$/example_app" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
