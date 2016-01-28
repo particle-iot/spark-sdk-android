@@ -1,3 +1,9 @@
+0.3.3
+=====
+* Fix for #7 to make subscribing to events for individual devices work again; thanks 
+  to reddigfabian for the PR.
+
+
 0.3.2
 =====
 * Electron support!
