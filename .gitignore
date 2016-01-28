@@ -42,7 +42,6 @@ proguard/
 # mighty ban hammer of .gitignore.
 *.iml
 
-
 # OS X noise
 .DS_Store
 
