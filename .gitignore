@@ -17,6 +17,7 @@ gen/
 build/
 /*/build/
 
+
 # Local configuration file (sdk path, etc)
 local.properties
 # no longer used, but we don't want this file to leak(!)
@@ -35,6 +36,12 @@ proguard/
 # IntelliJ project files that shouldn't be checked in
 /.idea/workspace.xml
 /.idea/libraries
+# Android Studio doesn't put these in .gitignore by default, but I can't see that they 
+# do anything useful as shared resources, they just create a lot of committ clutter, 
+# and they get automatically regenerated constantly.  Thus, they're receiving the 
+# mighty ban hammer of .gitignore.
+*.iml
+
 
 # OS X noise
 .DS_Store

@@ -213,7 +213,7 @@ class EventsDelegate {
         }
 
         Uri buildSingleDeviceEventUri(@Nullable String eventNamePrefix, String deviceId) {
-            Builder builder = devicesBaseUri.buildUpon().appendPath(deviceId);
+            Builder builder = devicesBaseUri.buildUpon().appendPath(deviceId).appendPath(EVENTS);
             if (truthy(eventNamePrefix)) {
                 builder.appendPath(eventNamePrefix);
             }
