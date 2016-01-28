@@ -12,7 +12,7 @@ public class Toaster {
 
     /**
      * Shows a toast message for a short time.
-     *
+     * <p/>
      * This is safe to call from background/worker threads.
      */
     public static void s(final Activity activity, @Nullable final String msg) {
@@ -21,7 +21,7 @@ public class Toaster {
 
     /**
      * Shows a toast message for a longer time than {@link #s(Activity, String)}.
-     *
+     * <p/>
      * This is safe to call from background/worker threads.
      */
     public static void l(final Activity activity, @Nullable final String msg) {
@@ -29,7 +29,8 @@ public class Toaster {
     }
 
 
-    private static void showToast(final Activity activity, @Nullable final String msg, final int length) {
+    private static void showToast(final Activity activity, @Nullable final String msg,
+                                  final int length) {
         Runnable toastRunnable = new Runnable() {
             @Override
             public void run() {
@@ -37,10 +38,10 @@ public class Toaster {
             }
         };
 
-//        if (EZ.isThisTheMainThread()) { // FIXME: 1/26/16 isThisTheMainThread() does not exist?
-//            toastRunnable.run();
-//        } else {
+        if (EZ.isThisTheMainThread()) {
+            toastRunnable.run();
+        } else {
             EZ.runOnMainThread(toastRunnable);
-//        }
+        }
     }
 }
