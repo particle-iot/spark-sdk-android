@@ -307,7 +307,7 @@ public class ParticleCloud {
      * @param eventName       The name for the event
      * @param event           A JSON-formatted string to use as the event payload
      * @param eventVisibility An IntDef "enum" determining the visibility of the event
-     * @param ttl             TTL, or Time To Live: a piece of event metadata representing the
+     * @param timeToLive      TTL, or Time To Live: a piece of event metadata representing the
      *                        number of seconds that the event data is still considered relevant.
      *                        After the TTL has passed, event listeners should consider the
      *                        information stale or out of date.
