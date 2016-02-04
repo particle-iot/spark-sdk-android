@@ -126,6 +126,10 @@ public class ParticleCloud {
     public boolean isLoggedIn() {
         return getLoggedInUsername() != null;
     }
+    
+    public void setUser(ParticleUser user) {
+        this.user = user;
+    }
 
     /**
      * Login with existing account credentials to Particle cloud
