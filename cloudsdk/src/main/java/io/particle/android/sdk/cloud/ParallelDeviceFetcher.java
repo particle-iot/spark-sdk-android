@@ -80,12 +80,12 @@ class ParallelDeviceFetcher {
 
 
         // Submit callables, receive list of Futures.  invokeAll() will block until they finish.
-        List<Future<DeviceFetchResult>> futures;
+        List<Future<DeviceFetchResult>> futures = list();
         try {
             long timeout = perDeviceTimeoutInSeconds * simpleDevices.size();
             futures = executor.invokeAll(callables, timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            // FIXME: think about what to do in this implausible scenario, or how to avoid it.
+            // FIXME: think about what to do in this implausible(?) scenario, or how to avoid it.
             e.printStackTrace();
         }
 
