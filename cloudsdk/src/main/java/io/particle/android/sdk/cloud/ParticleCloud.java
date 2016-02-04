@@ -29,10 +29,13 @@ import java.util.concurrent.ExecutorService;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import io.particle.android.sdk.cloud.ApiDefs.CloudApi;
+import io.particle.android.sdk.cloud.ParallelDeviceFetcher.DeviceFetchResult;
 import io.particle.android.sdk.cloud.ParticleDevice.ParticleDeviceType;
 import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
+import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
 import io.particle.android.sdk.persistance.AppDataStorage;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
@@ -71,10 +74,13 @@ public class ParticleCloud {
 
     private final ApiDefs.CloudApi mainApi;
     private final ApiDefs.IdentityApi identityApi;
+    // FIXME: document why this exists (and try to make it not exist...)
+    private final ApiDefs.CloudApi deviceFastTimeoutApi;
     private final AppDataStorage appDataStorage;
     private final TokenDelegate tokenDelegate = new TokenDelegate();
     private final LocalBroadcastManager broadcastManager;
     private final EventsDelegate eventsDelegate;
+    private final ParallelDeviceFetcher parallelDeviceFetcher;
 
     private final Map<String, ParticleDevice> devices = new ArrayMap<>();
 
@@ -87,11 +93,14 @@ public class ParticleCloud {
     private volatile ParticleUser user;
 
     ParticleCloud(Uri schemeAndHostname,
-                  ApiDefs.CloudApi mainApi, ApiDefs.IdentityApi identityApi,
+                  ApiDefs.CloudApi mainApi,
+                  ApiDefs.IdentityApi identityApi,
+                  ApiDefs.CloudApi perDeviceFastTimeoutApi,
                   AppDataStorage appDataStorage, LocalBroadcastManager broadcastManager,
                   Gson gson, ExecutorService executor) {
         this.mainApi = mainApi;
         this.identityApi = identityApi;
+        this.deviceFastTimeoutApi = perDeviceFastTimeoutApi;
         this.appDataStorage = appDataStorage;
         this.broadcastManager = broadcastManager;
         this.user = ParticleUser.fromSavedSession();
@@ -100,6 +109,7 @@ public class ParticleCloud {
             this.token.setDelegate(new TokenDelegate());
         }
         this.eventsDelegate = new EventsDelegate(mainApi, schemeAndHostname, gson, executor, this);
+        this.parallelDeviceFetcher = ParallelDeviceFetcher.newFetcherUsingExecutor(executor);
     }
 
     //region general public API
@@ -221,7 +231,74 @@ public class ParticleCloud {
                 result.add(device);
             }
 
-            pruneDeviceMap(result);
+            pruneDeviceMap(simpleDevices);
+
+            return result;
+
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    // FIXME: devise a less temporary way to expose this method
+    // FIXME: stop the duplication that's happening here
+    // FIXME: ...think harder about this whole thing.  This is unique in that it's the only
+    // operation that could _partially_ succeed.
+    @WorkerThread
+    List<ParticleDevice> getDevicesParallel(boolean useShortTimeout)
+            throws PartialDeviceListResultException, ParticleCloudException {
+        List<Models.SimpleDevice> simpleDevices;
+        try {
+            simpleDevices = mainApi.getDevices();
+            appDataStorage.saveUserHasClaimedDevices(truthy(simpleDevices));
+
+
+            // divide up into online and offline
+            List<Models.SimpleDevice> offlineDevices = list();
+            List<Models.SimpleDevice> onlineDevices = list();
+
+            for (Models.SimpleDevice simpleDevice : simpleDevices) {
+                List<Models.SimpleDevice> targetList = (simpleDevice.isConnected)
+                        ? onlineDevices
+                        : offlineDevices;
+                targetList.add(simpleDevice);
+            }
+
+
+            List<ParticleDevice> result = list();
+
+            // handle the offline devices
+            for (SimpleDevice offlineDevice : offlineDevices) {
+                result.add(getOfflineDevice(offlineDevice));
+            }
+
+
+            // handle the online devices
+            CloudApi apiToUse = (useShortTimeout)
+                    ? deviceFastTimeoutApi
+                    : mainApi;
+            // FIXME: don't hardcode this here
+            int timeoutInSecs = useShortTimeout ? 5 : 35;
+            Collection<DeviceFetchResult> results = parallelDeviceFetcher.fetchDevicesInParallel(
+                    onlineDevices, apiToUse, timeoutInSecs);
+
+            // FIXME: make this logic more elegant
+            boolean shouldThrowIncompleteException = false;
+            for (DeviceFetchResult fetchResult : results) {
+                // fetchResult shouldn't be null, but...
+                // FIXME: eliminate this ambiguity ^^^, it's either possible that it's null, or it isn't.
+                if (fetchResult == null || fetchResult.fetchedDevice == null) {
+                    shouldThrowIncompleteException = true;
+                } else {
+                    result.add(getDevice(fetchResult.fetchedDevice, false));
+                }
+            }
+
+            pruneDeviceMap(simpleDevices);
+
+            if (shouldThrowIncompleteException) {
+                throw new PartialDeviceListResultException(result);
+            }
 
             return result;
 
@@ -450,10 +527,13 @@ public class ParticleCloud {
             throw new ParticleCloudException(error);
         }
 
-        DeviceState newDeviceState = fromCompleteDevice(deviceCloudModel);
+        return getDevice(deviceCloudModel, sendUpdate);
+    }
+
+    private ParticleDevice getDevice(CompleteDevice deviceModel, boolean sendUpdate) {
+        DeviceState newDeviceState = fromCompleteDevice(deviceModel);
         ParticleDevice device = getDeviceFromState(newDeviceState);
         updateDeviceState(newDeviceState, sendUpdate);
-
         return device;
     }
 
@@ -531,7 +611,7 @@ public class ParticleCloud {
     }
 
 
-    private void pruneDeviceMap(List<ParticleDevice> latestCloudDeviceList) {
+    private void pruneDeviceMap(List<SimpleDevice> latestCloudDeviceList) {
         synchronized (devices) {
             // make a copy of the current keyset since we mutate `devices` below
             Set<String> currentDeviceIds = Sets.newHashSet(devices.keySet());
@@ -551,13 +631,14 @@ public class ParticleCloud {
     }
 
 
-    private static final Function<ParticleDevice, String> toDeviceId =
-            new Function<ParticleDevice, String>() {
+    private static final Function<SimpleDevice, String> toDeviceId =
+            new Function<SimpleDevice, String>() {
                 @Override
-                public String apply(ParticleDevice input) {
-                    return input.deviceState.deviceId;
+                public String apply(SimpleDevice input) {
+                    return input.id;
                 }
             };
+
 
 
     private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
@@ -587,6 +668,10 @@ public class ParticleCloud {
             new EntryTransformer<String, String, VariableType>() {
                 @Override
                 public VariableType transformEntry(@Nullable String key, @Nullable String value) {
+                    if (value == null) {
+                        return null;
+                    }
+
                     switch (value) {
                         case "int32":
                             return VariableType.INT;
@@ -599,5 +684,27 @@ public class ParticleCloud {
                     }
                 }
             };
+
+
+    // FIXME: this class seems like a good idea, but it needs review and polish
+    public class PartialDeviceListResultException extends Exception {
+
+        final List<ParticleDevice> devices;
+
+        public PartialDeviceListResultException(List<ParticleDevice> devices, Exception cause) {
+            super(cause);
+            this.devices = devices;
+        }
+
+        public PartialDeviceListResultException(List<ParticleDevice> devices, RetrofitError error) {
+            super(error);
+            this.devices = devices;
+        }
+
+        public PartialDeviceListResultException(List<ParticleDevice> devices) {
+            super("Undefined error while fetching devices");
+            this.devices = devices;
+        }
+    }
 
 }

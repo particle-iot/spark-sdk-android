@@ -4,9 +4,13 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.squareup.okhttp.OkHttpClient;
-
-import java.util.concurrent.Executors;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -24,13 +28,13 @@ class SDKProvider {
 
     private final Context ctx;
     private final CloudApi cloudApi;
+    private final CloudApi fastTimeoutCloudApi;
     private final IdentityApi identityApi;
     private final ParticleCloud particleCloud;
     private final TokenGetterDelegateImpl tokenGetter;
 
     SDKProvider(Context context,
-                @Nullable OauthBasicAuthCredentialsProvider oAuthCredentialsProvider,
-                @Nullable OkHttpClient okHttpClient) {
+                @Nullable OauthBasicAuthCredentialsProvider oAuthCredentialsProvider) {
 
         this.ctx = context.getApplicationContext();
 
@@ -41,10 +45,10 @@ class SDKProvider {
 
         tokenGetter = new TokenGetterDelegateImpl();
 
-        ApiFactory apiFactory = new ApiFactory(
-                ctx, tokenGetter, oAuthCredentialsProvider, okHttpClient);
+        ApiFactory apiFactory = new ApiFactory(ctx, tokenGetter, oAuthCredentialsProvider);
         cloudApi = apiFactory.buildNewCloudApi();
         identityApi = apiFactory.buildNewIdentityApi();
+        fastTimeoutCloudApi = apiFactory.buildNewFastTimeoutCloudApi();
         particleCloud = buildCloud(apiFactory);
     }
 
@@ -66,7 +70,8 @@ class SDKProvider {
         SDKGlobals.init(ctx);
 
         // FIXME: see if this TokenGetterDelegate setter issue can be resolved reasonably
-        ParticleCloud cloud = new ParticleCloud(apiFactory.getApiUri(), cloudApi, identityApi,
+        ParticleCloud cloud = new ParticleCloud(
+                apiFactory.getApiUri(), cloudApi, identityApi, fastTimeoutCloudApi,
                 SDKGlobals.getAppDataStorage(), LocalBroadcastManager.getInstance(ctx),
                 apiFactory.getGsonInstance(), buildExecutor());
         // FIXME: gross circular dependency
