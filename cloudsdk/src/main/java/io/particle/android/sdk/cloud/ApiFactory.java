@@ -2,6 +2,7 @@ package io.particle.android.sdk.cloud;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.util.Base64;
 
@@ -55,10 +56,11 @@ public class ApiFactory {
     private final Gson gson;
 
     ApiFactory(Context ctx, TokenGetterDelegate tokenGetterDelegate,
-               OauthBasicAuthCredentialsProvider basicAuthProvider) {
+               OauthBasicAuthCredentialsProvider basicAuthProvider,
+               @Nullable OkHttpClient okHttpClient) {
         this.ctx = ctx.getApplicationContext();
         this.tokenDelegate = tokenGetterDelegate;
-        this.okHttpClient = new OkHttpClient();
+        this.okHttpClient = (okHttpClient != null) ? okHttpClient : new OkHttpClient();
         this.basicAuthCredentialsProvider = basicAuthProvider;
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(Date.class, new StringlyTypedDateAdapter())

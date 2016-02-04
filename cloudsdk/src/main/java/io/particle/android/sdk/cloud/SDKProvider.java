@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.squareup.okhttp.OkHttpClient;
+
 import java.util.concurrent.Executors;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -27,7 +29,8 @@ class SDKProvider {
     private final TokenGetterDelegateImpl tokenGetter;
 
     SDKProvider(Context context,
-                @Nullable OauthBasicAuthCredentialsProvider oAuthCredentialsProvider) {
+                @Nullable OauthBasicAuthCredentialsProvider oAuthCredentialsProvider,
+                @Nullable OkHttpClient okHttpClient) {
 
         this.ctx = context.getApplicationContext();
 
@@ -38,7 +41,8 @@ class SDKProvider {
 
         tokenGetter = new TokenGetterDelegateImpl();
 
-        ApiFactory apiFactory = new ApiFactory(ctx, tokenGetter, oAuthCredentialsProvider);
+        ApiFactory apiFactory = new ApiFactory(
+                ctx, tokenGetter, oAuthCredentialsProvider, okHttpClient);
         cloudApi = apiFactory.buildNewCloudApi();
         identityApi = apiFactory.buildNewIdentityApi();
         particleCloud = buildCloud(apiFactory);
