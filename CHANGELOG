@@ -1,3 +1,10 @@
+0.3.4
+=====
+* fix an uncommon crasher bug
+* Use a much smarter config for building internal executor
+* Add (non-public, "preview") API for fetching ParticleDevices in parallel
+
+
 0.3.3
 =====
 * Fix for #7 to make subscribing to events for individual devices work again; thanks 
