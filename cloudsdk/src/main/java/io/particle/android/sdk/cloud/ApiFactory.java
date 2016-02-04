@@ -18,6 +18,8 @@ import org.joda.time.DateTime;
 import java.lang.reflect.Type;
 import java.util.Date;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
@@ -27,6 +29,7 @@ import retrofit.converter.GsonConverter;
 /**
  * Constructs ParticleCloud instances
  */
+@ParametersAreNonnullByDefault
 public class ApiFactory {
 
     // FIXME: this feels kind of lame... but maybe it's OK in practice. Need to think more about it.

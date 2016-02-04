@@ -29,7 +29,7 @@ import retrofit.mime.TypedOutput;
  */
 public class ApiDefs {
 
-    // FIXME: turn some of these common strings into constants
+    // FIXME: turn some of these common strings into constants?
     /**
      * The main Particle cloud API
      */
