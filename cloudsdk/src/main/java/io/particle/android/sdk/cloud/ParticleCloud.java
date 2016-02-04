@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -18,6 +19,8 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -481,9 +484,17 @@ public class ParticleCloud {
     }
 
     private DeviceState fromCompleteDevice(CompleteDevice completeDevice) {
-        ImmutableSet<String> functions = completeDevice.functions == null
-                ? ImmutableSet.<String>of()
-                : ImmutableSet.copyOf(completeDevice.functions);
+        // FIXME: we're sometimes getting back nulls in the list of functions...  WUT?
+        // Once analytics are in place, look into adding something here so we know where
+        // this is coming from.
+        // In the meantime, filter out nulls from this list, since that's obviously doubleplusungood.
+        List<String> unfilteredFuncs = (completeDevice.functions == null)
+                ? Collections.<String>emptyList()
+                : completeDevice.functions;
+        ImmutableSet<String> functions = FluentIterable.from(unfilteredFuncs)
+                .filter(Predicates.notNull())
+                .toSet();
+
         ImmutableMap<String, VariableType> variables = ImmutableMap.of();
         if (completeDevice.variables != null) {
             variables = ImmutableMap.copyOf(Maps.transformEntries(
