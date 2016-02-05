@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import io.particle.android.sdk.cloud.ApiDefs.CloudApi;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
@@ -30,6 +32,7 @@ import static io.particle.android.sdk.utils.Py.truthy;
 
 
 // See javadoc on ParticleCloud for the intended behavior of these methods
+@ParametersAreNonnullByDefault
 class EventsDelegate {
 
     private static final TLog log = TLog.get(EventsDelegate.class);
@@ -213,7 +216,9 @@ class EventsDelegate {
         }
 
         Uri buildSingleDeviceEventUri(@Nullable String eventNamePrefix, String deviceId) {
-            Builder builder = devicesBaseUri.buildUpon().appendPath(deviceId).appendPath(EVENTS);
+            Builder builder = devicesBaseUri.buildUpon()
+                    .appendPath(deviceId)
+                    .appendPath(EVENTS);
             if (truthy(eventNamePrefix)) {
                 builder.appendPath(eventNamePrefix);
             }

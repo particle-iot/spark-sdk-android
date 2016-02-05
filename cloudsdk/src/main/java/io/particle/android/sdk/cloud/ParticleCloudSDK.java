@@ -23,16 +23,12 @@ public class ParticleCloudSDK {
      * (or anywhere else before your first Activity.onCreate() is called)
      */
     public static void init(Context ctx) {
-        initWithOauthCredentialsProvider(ctx, null);
+        initWithParams(ctx, null);
     }
 
     public static void initWithOauthCredentialsProvider(
             Context ctx, @Nullable OauthBasicAuthCredentialsProvider oauthProvider) {
-
-        Context appContext = ctx.getApplicationContext();
-        JodaTimeAndroid.init(appContext);
-        SDKProvider sdkProvider = new SDKProvider(appContext, oauthProvider);
-        initWithSdkProvider(sdkProvider);
+        initWithParams(ctx, oauthProvider);
     }
 
     public static ParticleCloud getCloud() {
@@ -42,12 +38,16 @@ public class ParticleCloudSDK {
 
 
     // NOTE: This is closer to the interface I'd like to provide eventually
-    static void initWithSdkProvider(SDKProvider sdkProvider) {
+    static void initWithParams(Context ctx,
+                               @Nullable OauthBasicAuthCredentialsProvider oauthProvider) {
         if (instance != null) {
             log.w("Calling ParticleCloudSDK.init() more than once does not re-initialize the SDK.");
             return;
         }
 
+        Context appContext = ctx.getApplicationContext();
+        JodaTimeAndroid.init(appContext);
+        SDKProvider sdkProvider = new SDKProvider(appContext, oauthProvider);
         instance = new ParticleCloudSDK(sdkProvider);
     }
 

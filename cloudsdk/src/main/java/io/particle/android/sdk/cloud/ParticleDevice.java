@@ -461,6 +461,14 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ParticleDevice{" +
+                "deviceId=" +  deviceState.deviceId +
+                ", isConnected=" + deviceState.isConnected +
+                '}';
+    }
+
     //region Parcelable
     @Override
     public void writeToParcel(Parcel dest, int flags) {

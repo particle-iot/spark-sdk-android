@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import io.particle.android.sdk.utils.EZ;
 import io.particle.android.sdk.utils.TLog;
 import okio.BufferedSource;
@@ -22,6 +24,7 @@ import static io.particle.android.sdk.utils.Py.list;
 // Heavily inspired by RetrofitError, which we are mostly wrapping here, but
 // we're making our own exception to make it a checked exception, and to avoid
 // tying the API to a particular library used by the API's implementation
+@ParametersAreNonnullByDefault
 public class ParticleCloudException extends Exception {
 
     private static final TLog log = TLog.get(ParticleCloudException.class);
