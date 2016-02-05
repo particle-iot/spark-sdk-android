@@ -67,7 +67,7 @@ public class ParticleCloud {
     }
 
     private final ApiDefs.CloudApi mainApi;
-    private final ApiDefs.IdentityApi identityApi;
+    private ApiDefs.IdentityApi identityApi;
     private final AppDataStorage appDataStorage;
     private final TokenDelegate tokenDelegate = new TokenDelegate();
     private final LocalBroadcastManager broadcastManager;
@@ -97,6 +97,10 @@ public class ParticleCloud {
             this.token.setDelegate(new TokenDelegate());
         }
         this.eventsDelegate = new EventsDelegate(mainApi, schemeAndHostname, gson, executor, this);
+    }
+
+    public void setIdentityApi(ApiDefs.IdentityApi identityApi) {
+        this.identityApi = identityApi;
     }
 
     //region general public API
