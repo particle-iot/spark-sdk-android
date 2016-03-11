@@ -65,7 +65,7 @@ public class Py {
             return (((JSONArray) obj).length() > 0);
 
         } else if (obj instanceof Boolean) {
-            return (((Boolean) obj).booleanValue());
+            return ((Boolean) obj);
 
         } else if (obj instanceof long[]) {
             return (((long[]) obj).length > 0);

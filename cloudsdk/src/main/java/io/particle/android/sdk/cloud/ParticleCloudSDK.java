@@ -51,6 +51,7 @@ public class ParticleCloudSDK {
         instance = new ParticleCloudSDK(sdkProvider);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     static boolean isInitialized() {
         return instance != null;
     }

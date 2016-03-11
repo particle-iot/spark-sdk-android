@@ -37,7 +37,7 @@ public class Parcelables {
 
     public static Map<String, String> readStringMap(Parcel parcel) {
         Map<String, String> map = new HashMap<>();
-        Bundle bundle = parcel.readBundle();
+        Bundle bundle = parcel.readBundle(Parcelables.class.getClassLoader());
         for (String key : bundle.keySet()) {
             map.put(key, bundle.getString(key));
         }
@@ -54,7 +54,7 @@ public class Parcelables {
 
     public static <T extends Parcelable> Map<String, T> readParcelableMap(Parcel parcel) {
         Map<String, T> map = new HashMap<>();
-        Bundle bundle = parcel.readBundle();
+        Bundle bundle = parcel.readBundle(Parcelables.class.getClassLoader());
         for (String key : bundle.keySet()) {
             T parcelable = bundle.getParcelable(key);
             map.put(key, parcelable);
@@ -73,7 +73,7 @@ public class Parcelables {
 
     public static <T extends Serializable> Map<String, T> readSerializableMap(Parcel parcel) {
         Map<String, T> map = new HashMap<>();
-        Bundle bundle = parcel.readBundle();
+        Bundle bundle = parcel.readBundle(Parcelables.class.getClassLoader());
         for (String key : bundle.keySet()) {
             @SuppressWarnings("unchecked")
             T serializable = (T) bundle.getSerializable(key);
