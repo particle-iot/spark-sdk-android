@@ -577,8 +577,11 @@ public class ParticleCloud {
 
         ImmutableMap<String, VariableType> variables = ImmutableMap.of();
         if (completeDevice.variables != null) {
-            variables = ImmutableMap.copyOf(Maps.transformEntries(
-                    completeDevice.variables, sMapTransformer));
+            // have to do this because we were seeing null keys(!) somehow, and
+            // ImmutableMap doesn't allow this.
+            Map<String, VariableType> stringVariableTypeMap = Maps.transformEntries(
+                    completeDevice.variables, sMapTransformer);
+            variables = ImmutableMap.copyOf(stringVariableTypeMap);
         }
         return new DeviceState(
                 completeDevice.deviceId,
