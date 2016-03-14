@@ -139,7 +139,7 @@ public class ParticleAccessToken {
         // ensure that we don't call accessTokenExpiredAt() on the main thread, since
         // the delegate (in the default impl) will make a call to try logging back
         // in, but making network calls on the main thread is doubleplus ungood.
-        // (It throws an exception when you target a recent API, as well it should!)
+        // (It'll throw an exception if you even try this, as well it should!)
         EZ.runAsync(new Runnable() {
             @Override
             public void run() {

@@ -48,7 +48,7 @@ import static io.particle.android.sdk.utils.Py.truthy;
 // FIXME: move device state management out to another class
 // FIXME: move some of the type conversion junk out of this into another class, too
 
-// don't warn about public APIs not being referenced inside this module
+// this is an SDK; it's expected it won't reference all its own methods
 @SuppressWarnings({"UnusedDeclaration"})
 @ParametersAreNonnullByDefault
 public class ParticleCloud {
