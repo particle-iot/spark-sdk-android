@@ -7,8 +7,6 @@ import android.support.annotation.WorkerThread;
 
 import com.google.common.base.Preconditions;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +23,7 @@ import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
 import io.particle.android.sdk.utils.EZ;
+import io.particle.android.sdk.utils.ParticleInternalStringUtils;
 import io.particle.android.sdk.utils.TLog;
 import okio.Okio;
 import retrofit.RetrofitError;
@@ -286,7 +285,7 @@ public class ParticleDevice implements Parcelable {
             args = list();
         }
 
-        String argsString = StringUtils.join(args, ",");
+        String argsString = ParticleInternalStringUtils.join(args, ',');
         Preconditions.checkArgument(argsString.length() < MAX_PARTICLE_FUNCTION_ARG_LENGTH,
                 String.format("Arguments '%s' exceed max args length of %d",
                         argsString, MAX_PARTICLE_FUNCTION_ARG_LENGTH));
