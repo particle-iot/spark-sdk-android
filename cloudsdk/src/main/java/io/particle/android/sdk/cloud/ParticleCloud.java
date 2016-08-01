@@ -700,7 +700,8 @@ public class ParticleCloud {
             };
 
 
-    // FIXME: this class seems like a good idea, but it needs review and polish
+    // FIXME: review and polish this.  The more I think about it, the more I like it, but
+    // make sure it's what we _really_ want.   Maybe apply it to the regular getDevices() too?
     public static class PartialDeviceListResultException extends Exception {
 
         final List<ParticleDevice> devices;

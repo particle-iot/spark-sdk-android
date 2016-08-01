@@ -1,5 +1,6 @@
 package io.particle.android.sdk.cloud;
 
+import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
@@ -31,7 +32,10 @@ import retrofit.mime.TypedFile;
 
 import static io.particle.android.sdk.utils.Py.list;
 
-// don't warn about public APIs not being referenced inside this module
+
+// don't warn about public APIs not being referenced inside this module, or about
+// the _default locale_ in a bunch of backend code
+@SuppressLint("DefaultLocale")
 @SuppressWarnings({"UnusedDeclaration"})
 @ParametersAreNonnullByDefault
 public class ParticleDevice implements Parcelable {
