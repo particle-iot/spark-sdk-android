@@ -34,15 +34,16 @@ ext {
 
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 24
+    buildToolsVersion '24.0.1'
+
     dexOptions {
         javaMaxHeapSize "2g"
     }
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName project.version
     }
@@ -74,7 +75,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'net.danlew:android.joda:2.9.0'
 
-    compile 'com.android.support:support-v4:23.2.1'
+    compile 'com.android.support:support-v4:24.1.1'
 }
 
 apply from: '../pom_generator_v1.gradle'
