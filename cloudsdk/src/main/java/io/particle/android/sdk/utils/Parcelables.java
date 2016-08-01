@@ -6,9 +6,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.common.collect.Lists;
+import android.support.v4.util.ArrayMap;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class Parcelables {
 
 
     public static Map<String, String> readStringMap(Parcel parcel) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new ArrayMap<>();
         Bundle bundle = parcel.readBundle(Parcelables.class.getClassLoader());
         for (String key : bundle.keySet()) {
             map.put(key, bundle.getString(key));
@@ -53,7 +53,7 @@ public class Parcelables {
     }
 
     public static <T extends Parcelable> Map<String, T> readParcelableMap(Parcel parcel) {
-        Map<String, T> map = new HashMap<>();
+        Map<String, T> map = new ArrayMap<>();
         Bundle bundle = parcel.readBundle(Parcelables.class.getClassLoader());
         for (String key : bundle.keySet()) {
             T parcelable = bundle.getParcelable(key);
@@ -70,9 +70,8 @@ public class Parcelables {
         parcel.writeBundle(b);
     }
 
-
     public static <T extends Serializable> Map<String, T> readSerializableMap(Parcel parcel) {
-        Map<String, T> map = new HashMap<>();
+        Map<String, T> map = new ArrayMap<>();
         Bundle bundle = parcel.readBundle(Parcelables.class.getClassLoader());
         for (String key : bundle.keySet()) {
             @SuppressWarnings("unchecked")
