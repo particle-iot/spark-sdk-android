@@ -36,6 +36,9 @@ ext {
 android {
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
+    dexOptions {
+        javaMaxHeapSize "2g"
+    }
 
     defaultConfig {
         minSdkVersion 15
