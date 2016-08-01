@@ -5,8 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-import com.google.common.base.Preconditions;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +22,7 @@ import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
 import io.particle.android.sdk.utils.EZ;
 import io.particle.android.sdk.utils.ParticleInternalStringUtils;
+import io.particle.android.sdk.utils.Preconditions;
 import io.particle.android.sdk.utils.TLog;
 import okio.Okio;
 import retrofit.RetrofitError;

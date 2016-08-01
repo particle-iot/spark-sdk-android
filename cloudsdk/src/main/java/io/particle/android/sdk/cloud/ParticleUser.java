@@ -1,10 +1,10 @@
 package io.particle.android.sdk.cloud;
 
-import com.google.common.base.Preconditions;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.persistance.SensitiveDataStorage;
+import io.particle.android.sdk.utils.Preconditions;
 
 import static io.particle.android.sdk.utils.Py.truthy;
 

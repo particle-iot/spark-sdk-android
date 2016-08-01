@@ -57,17 +57,12 @@ android {
         disable 'InvalidPackage'
     }
 
-    packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     compile 'com.google.code.findbugs:jsr305:3.0.1'
-    compile 'com.google.guava:guava:18.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.squareup.okhttp:okhttp:2.7.5'
     compile 'com.squareup.okio:okio:1.9.0'

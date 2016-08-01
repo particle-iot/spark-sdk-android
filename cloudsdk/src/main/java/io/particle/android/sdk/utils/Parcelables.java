@@ -4,11 +4,10 @@ package io.particle.android.sdk.utils;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.google.common.collect.Lists;
 import android.support.v4.util.ArrayMap;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class Parcelables {
 
 
     public static List<String> readStringList(Parcel parcel) {
-        List<String> sourceList = Lists.newArrayList();
+        List<String> sourceList = new ArrayList<>();
         parcel.readStringList(sourceList);
         return sourceList;
     }

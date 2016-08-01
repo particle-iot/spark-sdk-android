@@ -8,22 +8,16 @@ import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Maps.EntryTransformer;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -37,11 +31,15 @@ import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
 import io.particle.android.sdk.persistance.AppDataStorage;
+import io.particle.android.sdk.utils.Funcy;
+import io.particle.android.sdk.utils.Funcy.Func;
+import io.particle.android.sdk.utils.Py.PySet;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
 
 import static io.particle.android.sdk.utils.Py.all;
 import static io.particle.android.sdk.utils.Py.list;
+import static io.particle.android.sdk.utils.Py.set;
 import static io.particle.android.sdk.utils.Py.truthy;
 
 
@@ -566,23 +564,11 @@ public class ParticleCloud {
     private DeviceState fromCompleteDevice(CompleteDevice completeDevice) {
         // FIXME: we're sometimes getting back nulls in the list of functions...  WUT?
         // Once analytics are in place, look into adding something here so we know where
-        // this is coming from.
-        // In the meantime, filter out nulls from this list, since that's obviously doubleplusungood.
-        List<String> unfilteredFuncs = (completeDevice.functions == null)
-                ? Collections.<String>emptyList()
-                : completeDevice.functions;
-        ImmutableSet<String> functions = FluentIterable.from(unfilteredFuncs)
-                .filter(Predicates.notNull())
-                .toSet();
+        // this is coming from.  In the meantime, filter out nulls from this list, since that's
+        // obviously doubleplusungood.
+        Set<String> functions = set(Funcy.filter(completeDevice.functions, Funcy.<String>notNull()));
+        Map<String, VariableType> variables = transformVariables(completeDevice);
 
-        ImmutableMap<String, VariableType> variables = ImmutableMap.of();
-        if (completeDevice.variables != null) {
-            // have to do this because we were seeing null keys(!) somehow, and
-            // ImmutableMap doesn't allow this.
-            Map<String, VariableType> stringVariableTypeMap = Maps.transformEntries(
-                    completeDevice.variables, sMapTransformer);
-            variables = ImmutableMap.copyOf(stringVariableTypeMap);
-        }
         return new DeviceState(
                 completeDevice.deviceId,
                 completeDevice.name,
@@ -598,8 +584,8 @@ public class ParticleCloud {
 
     // for offline devices
     private DeviceState fromSimpleDeviceModel(Models.SimpleDevice offlineDevice) {
-        ImmutableSet<String> functions = ImmutableSet.of();
-        ImmutableMap<String, VariableType> variables = ImmutableMap.of();
+        Set<String> functions = new HashSet<>();
+        Map<String, VariableType> variables = new ArrayMap<>();
         return new DeviceState(
                 offlineDevice.id,
                 offlineDevice.name,
@@ -614,19 +600,46 @@ public class ParticleCloud {
     }
 
 
+    private static Map<String, VariableType> transformVariables(CompleteDevice completeDevice) {
+        if (completeDevice.variables == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, VariableType> variables = new ArrayMap<>();
+
+        for (Entry<String, String> entry : completeDevice.variables.entrySet()) {
+            if (!all(entry.getKey(), entry.getValue())) {
+                log.w(String.format(
+                        "Found null key and/or value for variable in device $1%s.  key=$2%s, value=$3%s",
+                        completeDevice.name, entry.getKey(), entry.getValue()));
+                continue;
+            }
+
+            VariableType variableType = toVariableType.apply(entry.getValue());
+            if (variableType == null) {
+                log.w(String.format("Unknown variable type for device $1%s: '$2%s'",
+                        completeDevice.name, entry.getKey()));
+                continue;
+            }
+
+            variables.put(entry.getKey(), variableType);
+        }
+
+        return variables;
+    }
+
+
     private void pruneDeviceMap(List<SimpleDevice> latestCloudDeviceList) {
         synchronized (devices) {
             // make a copy of the current keyset since we mutate `devices` below
-            Set<String> currentDeviceIds = Sets.newHashSet(devices.keySet());
-            Set<String> newDeviceIds = FluentIterable.from(latestCloudDeviceList)
-                    .transform(toDeviceId)
-                    .toSet();
+            PySet<String> currentDeviceIds = set(devices.keySet());
+            PySet<String> newDeviceIds = set(Funcy.transformList(latestCloudDeviceList, toDeviceId));
             // quoting the Sets docs for this next operation:
             // "The returned set contains all elements that are contained by set1 and
             //  not contained by set2"
             // In short, this set is all the device IDs which we have in our devices map,
             // but which we did not hear about in this latest update from the cloud
-            Set<String> toRemove = Sets.difference(currentDeviceIds, newDeviceIds);
+            Set<String> toRemove = currentDeviceIds.getDifference(newDeviceIds);
             for (String deviceId : toRemove) {
                 devices.remove(deviceId);
             }
@@ -634,13 +647,12 @@ public class ParticleCloud {
     }
 
 
-    private static final Function<SimpleDevice, String> toDeviceId =
-            new Function<SimpleDevice, String>() {
-                @Override
-                public String apply(SimpleDevice input) {
-                    return input.id;
-                }
-            };
+    private static final Func<SimpleDevice, String> toDeviceId = new Func<SimpleDevice, String>() {
+        @Override
+        public String apply(SimpleDevice input) {
+            return input.id;
+        }
+    };
 
 
 
@@ -667,10 +679,9 @@ public class ParticleCloud {
     //endregion
 
 
-    private static Maps.EntryTransformer<String, String, VariableType> sMapTransformer =
-            new EntryTransformer<String, String, VariableType>() {
+    private static Func<String, VariableType> toVariableType = new Func<String, VariableType>() {
                 @Override
-                public VariableType transformEntry(@Nullable String key, @Nullable String value) {
+                public VariableType apply(@Nullable String value) {
                     if (value == null) {
                         return null;
                     }

@@ -4,10 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -27,16 +28,17 @@ class DeviceState implements Parcelable {
     final String deviceId;
     final String name;
     final boolean isConnected;
-    final ImmutableSet<String> functions;
-    final ImmutableMap<String, VariableType> variables;
+    final Set<String> functions;
+    final Map<String, VariableType> variables;
     final String version;
     final ParticleDevice.ParticleDeviceType deviceType;
     final boolean requiresUpdate;
     final Date lastHeard;
 
-    DeviceState(String deviceId, String name, boolean isConnected, ImmutableSet<String> functions,
-                ImmutableMap<String, VariableType> variables, @Nullable String version,
-                ParticleDevice.ParticleDeviceType deviceType, boolean requiresUpdate, Date lastHeard) {
+    DeviceState(String deviceId, String name, boolean isConnected, Set<String> functions,
+                Map<String, VariableType> variables, @Nullable String version,
+                ParticleDevice.ParticleDeviceType deviceType, boolean requiresUpdate,
+                Date lastHeard) {
         this.deviceId = deviceId;
         this.name = name;
         this.isConnected = isConnected;
@@ -89,8 +91,8 @@ class DeviceState implements Parcelable {
         deviceId = in.readString();
         name = in.readString();
         isConnected = Parcelables.readBoolean(in);
-        functions = ImmutableSet.copyOf(Parcelables.readStringList(in));
-        variables = ImmutableMap.copyOf(Parcelables.<VariableType>readSerializableMap(in));
+        functions = new HashSet<>(Parcelables.readStringList(in));
+        variables = Parcelables.readSerializableMap(in);
         version = in.readString();
         deviceType = ParticleDevice.ParticleDeviceType.valueOf(in.readString());
         requiresUpdate = Parcelables.readBoolean(in);
@@ -102,7 +104,7 @@ class DeviceState implements Parcelable {
         dest.writeString(deviceId);
         dest.writeString(name);
         Parcelables.writeBoolean(dest, isConnected);
-        dest.writeStringList(functions.asList());
+        dest.writeStringList(new ArrayList<>(functions));
         Parcelables.writeSerializableMap(dest, variables);
         dest.writeString(version);
         dest.writeString(deviceType.name());
