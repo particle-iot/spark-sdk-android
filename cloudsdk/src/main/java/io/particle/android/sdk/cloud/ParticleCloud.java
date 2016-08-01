@@ -701,7 +701,7 @@ public class ParticleCloud {
 
 
     // FIXME: this class seems like a good idea, but it needs review and polish
-    public class PartialDeviceListResultException extends Exception {
+    public static class PartialDeviceListResultException extends Exception {
 
         final List<ParticleDevice> devices;
 
