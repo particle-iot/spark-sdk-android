@@ -71,7 +71,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.google.guava:guava:18.0'
     compile 'com.squareup.okhttp:okhttp:2.7.5'
-    compile 'com.squareup.okio:okio:1.6.0'
+    compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'net.danlew:android.joda:2.9.0'
 
