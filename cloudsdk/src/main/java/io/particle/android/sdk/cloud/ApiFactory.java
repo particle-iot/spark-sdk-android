@@ -6,17 +6,8 @@ import android.support.annotation.StringRes;
 import android.util.Base64;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 import com.squareup.okhttp.OkHttpClient;
 
-import org.joda.time.DateTime;
-
-import java.lang.reflect.Type;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -67,9 +58,7 @@ public class ApiFactory {
         this.ctx = ctx.getApplicationContext();
         this.tokenDelegate = tokenGetterDelegate;
         this.basicAuthCredentialsProvider = basicAuthProvider;
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new StringlyTypedDateAdapter())
-                .create();
+        this.gson = new Gson();
 
         normalTimeoutClient = buildClientWithTimeout(REGULAR_TIMEOUT);
         fastTimeoutClient = buildClientWithTimeout(PER_DEVICE_FAST_TIMEOUT);
@@ -167,17 +156,6 @@ public class ApiFactory {
         @Override
         public String getClientSecret() {
             return clientSecret;
-        }
-    }
-
-
-    private static class StringlyTypedDateAdapter implements JsonDeserializer<Date> {
-
-        @Override
-        public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-                throws JsonParseException {
-            String asStr = json.getAsString();
-            return new DateTime(asStr).toDate();
         }
     }
 

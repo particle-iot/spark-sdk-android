@@ -3,8 +3,6 @@ package io.particle.android.sdk.cloud;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.cloud.ApiFactory.OauthBasicAuthCredentialsProvider;
@@ -46,7 +44,6 @@ public class ParticleCloudSDK {
         }
 
         Context appContext = ctx.getApplicationContext();
-        JodaTimeAndroid.init(appContext);
         SDKProvider sdkProvider = new SDKProvider(appContext, oauthProvider);
         instance = new ParticleCloudSDK(sdkProvider);
     }
