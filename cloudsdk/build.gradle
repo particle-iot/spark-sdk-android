@@ -68,7 +68,7 @@ dependencies {
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
 
-    compile 'com.android.support:support-v4:24.1.1'
+    compile 'com.android.support:support-fragment:24.2.0'
 }
 
 apply from: '../pom_generator_v1.gradle'
