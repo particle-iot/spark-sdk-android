@@ -35,7 +35,7 @@ dependencies {
     // UNCOMMENT THE FOLLOWING TO USE A PUBLISHED VERSION OF THE SDK:
     //    compile 'io.particle:cloudsdk:0.3.3'
 
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:support-v4:24.1.1'
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:support-fragment:24.2.0'
 }
 
