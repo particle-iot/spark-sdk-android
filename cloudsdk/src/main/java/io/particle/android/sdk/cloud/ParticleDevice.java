@@ -406,6 +406,31 @@ public class ParticleDevice implements Parcelable {
         });
     }
 
+    @WorkerThread
+    public void flashCodeFile(final File file) throws ParticleCloudException {
+        performFlashingChange(new FlashingChange() {
+            @Override
+            public void executeFlashingChange() throws RetrofitError {
+                mainApi.flashFile(deviceState.deviceId,
+                        new TypedFile("multipart/form-data", file));
+            }
+        });
+    }
+
+
+    @WorkerThread
+    public void flashCodeFile(InputStream stream) throws ParticleCloudException, IOException {
+        final byte[] bytes = Okio.buffer(Okio.source(stream)).readByteArray();
+        performFlashingChange(new FlashingChange() {
+            @Override
+            public void executeFlashingChange() throws RetrofitError {
+                TypedFakeFile file = new TypedFakeFile(bytes);
+                file.setFileName("test.ino");
+                mainApi.flashFile(deviceState.deviceId, file);
+            }
+        });
+    }
+
     public ParticleCloud getCloud() {
         return cloud;
     }
@@ -501,6 +526,8 @@ public class ParticleDevice implements Parcelable {
 
     private static class TypedFakeFile extends TypedByteArray {
 
+        private String fileName = "tinker_firmware.bin";
+
         /**
          * Constructs a new typed byte array.  Sets mimeType to {@code application/unknown} if absent.
          *
@@ -509,10 +536,17 @@ public class ParticleDevice implements Parcelable {
         public TypedFakeFile(byte[] bytes) {
             super("application/octet-stream", bytes);
         }
+        public TypedFakeFile(byte[] bytes, String mimeType) {
+            super(mimeType, bytes);
+        }
 
         @Override
         public String fileName() {
-            return "tinker_firmware.bin";
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
         }
     }
 
