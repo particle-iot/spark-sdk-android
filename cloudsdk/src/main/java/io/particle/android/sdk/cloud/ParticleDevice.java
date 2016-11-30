@@ -424,9 +424,7 @@ public class ParticleDevice implements Parcelable {
         performFlashingChange(new FlashingChange() {
             @Override
             public void executeFlashingChange() throws RetrofitError {
-                TypedFakeFile file = new TypedFakeFile(bytes);
-                file.setFileName("test.ino");
-                mainApi.flashFile(deviceState.deviceId, file);
+                mainApi.flashFile(deviceState.deviceId, new TypedFakeFile(bytes, "multipart/form-data", "code.ino"));
             }
         });
     }
@@ -526,7 +524,7 @@ public class ParticleDevice implements Parcelable {
 
     private static class TypedFakeFile extends TypedByteArray {
 
-        private String fileName = "tinker_firmware.bin";
+        private final String fileName;
 
         /**
          * Constructs a new typed byte array.  Sets mimeType to {@code application/unknown} if absent.
@@ -534,19 +532,16 @@ public class ParticleDevice implements Parcelable {
          * @throws NullPointerException if bytes are null
          */
         public TypedFakeFile(byte[] bytes) {
-            super("application/octet-stream", bytes);
+            this(bytes, "application/octet-stream", "tinker_firmware.bin");
         }
-        public TypedFakeFile(byte[] bytes, String mimeType) {
+        public TypedFakeFile(byte[] bytes, String mimeType, String fileName) {
             super(mimeType, bytes);
+            this.fileName = fileName;
         }
 
         @Override
         public String fileName() {
             return fileName;
-        }
-
-        public void setFileName(String fileName) {
-            this.fileName = fileName;
         }
     }
 
