@@ -91,7 +91,7 @@ public class Funcy {
                                                   Func<In, Out> transformFunc,
                                                   @Nullable Predicate<Out> outTypeInclusionFilter) {
         return (Set<Out>) transformCollection(sourceSet, inTypeInclusionFilter, transformFunc,
-                outTypeInclusionFilter, listFactory);
+                outTypeInclusionFilter, setFactory);
     }
 
     public static <T> List<T> filter(@Nullable List<T> toFilter, Predicate<T> predicate) {
