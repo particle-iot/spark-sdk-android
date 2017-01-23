@@ -28,7 +28,7 @@ public class Funcy {
         Out apply(In in);
     }
 
-
+    // these are available as methods to enable generics handling
     public static <T> Predicate<T> alwaysTrue() {
         //noinspection unchecked
         return (Predicate<T>) alwaysTrue;
@@ -157,24 +157,9 @@ public class Funcy {
     }
 
 
-    private static final Predicate<?> alwaysTrue = new Predicate<Object>() {
-        @Override
-        public boolean test(Object testTarget) {
-            return true;
-        }
-    };
-    private static final Predicate<?> alwaysFalse = new Predicate<Object>() {
-        @Override
-        public boolean test(Object testTarget) {
-            return false;
-        }
-    };
-    private static final Predicate<?> notNull = new Predicate<Object>() {
-        @Override
-        public boolean test(@Nullable Object testTarget) {
-            return testTarget != null;
-        }
-    };
+    private static final Predicate<?> alwaysTrue = (Predicate<Object>) testTarget -> true;
+    private static final Predicate<?> alwaysFalse = (Predicate<Object>) testTarget -> false;
+    private static final Predicate<?> notNull = (Predicate<Object>) testTarget -> testTarget != null;
 
 
     private interface CollectionFactory<C extends Collection> {
