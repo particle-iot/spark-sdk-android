@@ -97,7 +97,14 @@ class EventsDelegate {
                 return;
             }
             eventReaders.remove(eventListenerID);
-            reader.stopListening();
+            try {
+                reader.stopListening();
+            } catch (IOException e) {
+                // handling the exception here instead of putting it in the method signature
+                // is inconsistent, but SDK consumers aren't going to care about receiving
+                // this exception, so just swallow it here.
+                log.w("Error while trying to stop event listener", e);
+            }
         }
     }
 
@@ -153,8 +160,9 @@ class EventsDelegate {
             });
         }
 
-        void stopListening() {
+        void stopListening() throws IOException {
             future.cancel(false);
+            sseEventSource.close();
         }
 
 

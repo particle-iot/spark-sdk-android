@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'me.tatarka.retrolambda'
 
 // This is the library version used when deploying the artifact
 version = '0.3.4'
@@ -34,8 +35,8 @@ ext {
 
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.1'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
 
     dexOptions {
         javaMaxHeapSize "2g"
@@ -43,14 +44,15 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName project.version
+        consumerProguardFiles 'consumer-proguard-rules.pro'
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     lintOptions {
@@ -68,7 +70,9 @@ dependencies {
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
 
-    compile 'com.android.support:support-fragment:24.2.0'
+    compile 'com.android.support:support-fragment:25.1.0'
+
+    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 }
 
 apply from: '../pom_generator_v1.gradle'
