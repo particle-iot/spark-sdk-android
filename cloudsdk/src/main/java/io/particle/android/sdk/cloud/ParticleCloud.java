@@ -30,6 +30,7 @@ import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
+import io.particle.android.sdk.cloud.models.SignUpInfo;
 import io.particle.android.sdk.persistance.AppDataStorage;
 import io.particle.android.sdk.utils.Funcy;
 import io.particle.android.sdk.utils.Funcy.Func;
@@ -71,6 +72,7 @@ public class ParticleCloud {
     }
 
     private final ApiDefs.CloudApi mainApi;
+    private final Gson gson;
     private final ApiDefs.IdentityApi identityApi;
     // FIXME: document why this exists (and try to make it not exist...)
     private final ApiDefs.CloudApi deviceFastTimeoutApi;
@@ -100,6 +102,7 @@ public class ParticleCloud {
         this.identityApi = identityApi;
         this.deviceFastTimeoutApi = perDeviceFastTimeoutApi;
         this.appDataStorage = appDataStorage;
+        this.gson = gson;
         this.broadcastManager = broadcastManager;
         this.user = ParticleUser.fromSavedSession();
         this.token = ParticleAccessToken.fromSavedSession();
@@ -163,7 +166,21 @@ public class ParticleCloud {
     @WorkerThread
     public void signUpWithUser(String user, String password) throws ParticleCloudException {
         try {
-            identityApi.signUp(user, password);
+            identityApi.signUp(new SignUpInfo(user, password));
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    /**
+     * Sign up with new account credentials to Particle cloud
+     *
+     * @param signUpInfo Required sign up information, must contain a valid email address and password
+     */
+    @WorkerThread
+    public void signUpWithUser(SignUpInfo signUpInfo) throws ParticleCloudException {
+        try {
+            identityApi.signUp(signUpInfo);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -179,15 +196,31 @@ public class ParticleCloud {
     @WorkerThread
     public void signUpAndLogInWithCustomer(String email, String password, String orgSlug)
             throws ParticleCloudException {
-        if (!all(email, password, orgSlug)) {
+        try {
+            signUpAndLogInWithCustomer(new SignUpInfo(email, password), orgSlug);
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    /**
+     * Create new customer account on the Particle cloud and log in
+     *
+     * @param signUpInfo Required sign up information, must contain a valid email address and password
+     * @param orgSlug    Organization slug to use
+     */
+    @WorkerThread
+    public void signUpAndLogInWithCustomer(SignUpInfo signUpInfo, String orgSlug)
+            throws ParticleCloudException {
+        if (!all(signUpInfo.getUsername(), signUpInfo.getPassword(), orgSlug)) {
             throw new IllegalArgumentException(
                     "Email, password, and organization must all be specified");
         }
 
+        signUpInfo.setGrantType("client_credentials");
         try {
-            Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(
-                    "client_credentials", email, password, orgSlug);
-            onLogIn(response, email, password);
+            Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(signUpInfo, orgSlug);
+            onLogIn(response, signUpInfo.getUsername(), signUpInfo.getPassword());
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -655,7 +688,6 @@ public class ParticleCloud {
     };
 
 
-
     private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
 
         @Override
@@ -680,24 +712,24 @@ public class ParticleCloud {
 
 
     private static Func<String, VariableType> toVariableType = new Func<String, VariableType>() {
-                @Override
-                public VariableType apply(@Nullable String value) {
-                    if (value == null) {
-                        return null;
-                    }
+        @Override
+        public VariableType apply(@Nullable String value) {
+            if (value == null) {
+                return null;
+            }
 
-                    switch (value) {
-                        case "int32":
-                            return VariableType.INT;
-                        case "double":
-                            return VariableType.DOUBLE;
-                        case "string":
-                            return VariableType.STRING;
-                        default:
-                            return null;
-                    }
-                }
-            };
+            switch (value) {
+                case "int32":
+                    return VariableType.INT;
+                case "double":
+                    return VariableType.DOUBLE;
+                case "string":
+                    return VariableType.STRING;
+                default:
+                    return null;
+            }
+        }
+    };
 
 
     // FIXME: review and polish this.  The more I think about it, the more I like it, but
