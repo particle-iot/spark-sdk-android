@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
                             public Object callApi(ParticleCloud sparkCloud) throws ParticleCloudException, IOException {
                                 sparkCloud.logIn(email, password);
                                 sparkCloud.getDevices();
-                                mDevice = sparkCloud.getDevice("41003d000447343232363230");
+                                mDevice = sparkCloud.getDevice("1f0034000747343232361234");
                                 Object obj;
 
                                 try {

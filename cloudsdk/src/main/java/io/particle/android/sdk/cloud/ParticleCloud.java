@@ -72,7 +72,6 @@ public class ParticleCloud {
     }
 
     private final ApiDefs.CloudApi mainApi;
-    private final Gson gson;
     private final ApiDefs.IdentityApi identityApi;
     // FIXME: document why this exists (and try to make it not exist...)
     private final ApiDefs.CloudApi deviceFastTimeoutApi;
@@ -102,7 +101,6 @@ public class ParticleCloud {
         this.identityApi = identityApi;
         this.deviceFastTimeoutApi = perDeviceFastTimeoutApi;
         this.appDataStorage = appDataStorage;
-        this.gson = gson;
         this.broadcastManager = broadcastManager;
         this.user = ParticleUser.fromSavedSession();
         this.token = ParticleAccessToken.fromSavedSession();
@@ -680,12 +678,7 @@ public class ParticleCloud {
     }
 
 
-    private static final Func<SimpleDevice, String> toDeviceId = new Func<SimpleDevice, String>() {
-        @Override
-        public String apply(SimpleDevice input) {
-            return input.id;
-        }
-    };
+    private static final Func<SimpleDevice, String> toDeviceId = input -> input.id;
 
 
     private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
@@ -711,23 +704,20 @@ public class ParticleCloud {
     //endregion
 
 
-    private static Func<String, VariableType> toVariableType = new Func<String, VariableType>() {
-        @Override
-        public VariableType apply(@Nullable String value) {
-            if (value == null) {
-                return null;
-            }
+    private static Func<String, VariableType> toVariableType = value -> {
+        if (value == null) {
+            return null;
+        }
 
-            switch (value) {
-                case "int32":
-                    return VariableType.INT;
-                case "double":
-                    return VariableType.DOUBLE;
-                case "string":
-                    return VariableType.STRING;
-                default:
-                    return null;
-            }
+        switch (value) {
+            case "int32":
+                return VariableType.INT;
+            case "double":
+                return VariableType.DOUBLE;
+            case "string":
+                return VariableType.STRING;
+            default:
+                return null;
         }
     };
 
