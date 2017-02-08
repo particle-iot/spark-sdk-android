@@ -2,6 +2,10 @@
 *.apk
 *.ap_
 
+# OS X noise
+# Intellij
+.DS_Store
+
 # Files for the Dalvik VM
 *.dex
 
