@@ -1,8 +1,8 @@
 0.4.0
- ===== 
-* Retrolambda support + some lambdafying of the code 
+=====
+* Retrolambda support + some lambdafying of the code
 * Change target to API 25
- * Bug fixes: "Unsubscribing from events not working", "type bug in Funcy" 
+* Bug fixes: "Unsubscribing from events not working", "type bug in Funcy"
 
 
 0.3.4
