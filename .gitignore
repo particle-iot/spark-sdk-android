@@ -2,6 +2,10 @@
 *.apk
 *.ap_
 
+# OS X noise
+# Intellij
+.DS_Store
+
 # Files for the Dalvik VM
 *.dex
 
@@ -42,7 +46,19 @@ proguard/
 # mighty ban hammer of .gitignore.
 *.iml
 
-# OS X noise
-.DS_Store
+# Intellij
+*.iml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/libraries
 
+# Keystore files
+*.jks
+
+# External native build folder generated in Android Studio 2.2 and later
+.externalNativeBuild
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
 
