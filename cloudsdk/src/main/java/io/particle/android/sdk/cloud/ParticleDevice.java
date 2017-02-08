@@ -175,13 +175,21 @@ public class ParticleDevice implements Parcelable {
         return deviceState.deviceType;
     }
 
+    public int getPlatformID() {
+        return deviceState.platformId;
+    }
+
+    public int getProductID() {
+        return deviceState.productId;
+    }
+
     public Date getLastHeard() {
         return deviceState.lastHeard;
     }
 
     /**
      * Return the value for <code>variableName</code> on this Particle device.
-     *
+     * <p>
      * Unless you specifically require generic handling, it is recommended that you use the
      * <code>get(type)Variable</code> methods instead, e.g.:  <code>getIntVariable()</code>.
      * These type-specific methods don't require extra casting or type checking on your part, and
@@ -193,18 +201,18 @@ public class ParticleDevice implements Parcelable {
 
         VariableRequester<Object, ReadObjectVariableResponse> requester =
                 new VariableRequester<Object, ReadObjectVariableResponse>(this) {
-            @Override
-            ReadObjectVariableResponse callApi(String variableName) {
-                return mainApi.getVariable(deviceState.deviceId, variableName);
-            }
-        };
+                    @Override
+                    ReadObjectVariableResponse callApi(String variableName) {
+                        return mainApi.getVariable(deviceState.deviceId, variableName);
+                    }
+                };
 
         return requester.getVariable(variableName);
     }
 
     /**
      * Return the value for <code>variableName</code> as an int.
-     *
+     * <p>
      * Where practical, this method is recommended over the generic {@link #getVariable(String)}.
      * See the javadoc on that method for details.
      */
@@ -225,7 +233,7 @@ public class ParticleDevice implements Parcelable {
 
     /**
      * Return the value for <code>variableName</code> as a String.
-     *
+     * <p>
      * Where practical, this method is recommended over the generic {@link #getVariable(String)}.
      * See the javadoc on that method for details.
      */
@@ -246,7 +254,7 @@ public class ParticleDevice implements Parcelable {
 
     /**
      * Return the value for <code>variableName</code> as a double.
-     *
+     * <p>
      * Where practical, this method is recommended over the generic {@link #getVariable(String)}.
      * See the javadoc on that method for details.
      */
@@ -313,7 +321,6 @@ public class ParticleDevice implements Parcelable {
      * Call a function on the device
      *
      * @param functionName Function name
-     *
      * @return value of the function
      */
     @WorkerThread
@@ -328,8 +335,7 @@ public class ParticleDevice implements Parcelable {
      * @param eventNamePrefix (optional, may be null) a filter to match against for events.  If
      *                        null or an empty string, all device events will be received by the handler
      *                        trigger eventHandler
-     * @param handler    The handler for the events received for this subscription.
-     *
+     * @param handler         The handler for the events received for this subscription.
      * @return the subscription ID
      * (see {@link ParticleCloud#subscribeToAllEvents(String, ParticleEventHandler)} for more info
      */
@@ -376,57 +382,32 @@ public class ParticleDevice implements Parcelable {
 
     @WorkerThread
     public void flashKnownApp(final KnownApp knownApp) throws ParticleCloudException {
-        performFlashingChange(new FlashingChange() {
-            @Override
-            public void executeFlashingChange() throws RetrofitError {
-                mainApi.flashKnownApp(deviceState.deviceId, knownApp.appName);
-            }
-        });
+        performFlashingChange(() -> mainApi.flashKnownApp(deviceState.deviceId, knownApp.appName));
     }
 
     @WorkerThread
     public void flashBinaryFile(final File file) throws ParticleCloudException {
-        performFlashingChange(new FlashingChange() {
-            @Override
-            public void executeFlashingChange() throws RetrofitError {
-                mainApi.flashFile(deviceState.deviceId,
-                        new TypedFile("application/octet-stream", file));
-            }
-        });
+        performFlashingChange(() -> mainApi.flashFile(deviceState.deviceId,
+                new TypedFile("application/octet-stream", file)));
     }
 
     @WorkerThread
     public void flashBinaryFile(InputStream stream) throws ParticleCloudException, IOException {
         final byte[] bytes = Okio.buffer(Okio.source(stream)).readByteArray();
-        performFlashingChange(new FlashingChange() {
-            @Override
-            public void executeFlashingChange() throws RetrofitError {
-                mainApi.flashFile(deviceState.deviceId, new TypedFakeFile(bytes));
-            }
-        });
+        performFlashingChange(() -> mainApi.flashFile(deviceState.deviceId, new TypedFakeFile(bytes)));
     }
 
     @WorkerThread
     public void flashCodeFile(final File file) throws ParticleCloudException {
-        performFlashingChange(new FlashingChange() {
-            @Override
-            public void executeFlashingChange() throws RetrofitError {
-                mainApi.flashFile(deviceState.deviceId,
-                        new TypedFile("multipart/form-data", file));
-            }
-        });
+        performFlashingChange(() -> mainApi.flashFile(deviceState.deviceId,
+                new TypedFile("multipart/form-data", file)));
     }
 
 
     @WorkerThread
     public void flashCodeFile(InputStream stream) throws ParticleCloudException, IOException {
         final byte[] bytes = Okio.buffer(Okio.source(stream)).readByteArray();
-        performFlashingChange(new FlashingChange() {
-            @Override
-            public void executeFlashingChange() throws RetrofitError {
-                mainApi.flashFile(deviceState.deviceId, new TypedFakeFile(bytes, "multipart/form-data", "code.ino"));
-            }
-        });
+        performFlashingChange(() -> mainApi.flashFile(deviceState.deviceId, new TypedFakeFile(bytes, "multipart/form-data", "code.ino")));
     }
 
     public ParticleCloud getCloud() {
@@ -470,17 +451,7 @@ public class ParticleDevice implements Parcelable {
             // Still, I don't want to introduce a whole scheduled executor setup *just for this*,
             // or write something that just sits in a Thread.sleep(), hogging a whole thread when
             // more important work could be getting blocked.
-            EZ.runOnMainThreadDelayed(30000, new Runnable() {
-                @Override
-                public void run() {
-                    EZ.runAsync(new Runnable() {
-                        @Override
-                        public void run() {
-                            resetFlashingState();
-                        }
-                    });
-                }
-            });
+            EZ.runOnMainThreadDelayed(30000, () -> EZ.runAsync(() -> resetFlashingState()));
         } catch (RetrofitError e) {
             throw new ParticleCloudException(e);
         }
@@ -489,7 +460,7 @@ public class ParticleDevice implements Parcelable {
     @Override
     public String toString() {
         return "ParticleDevice{" +
-                "deviceId=" +  deviceState.deviceId +
+                "deviceId=" + deviceState.deviceId +
                 ", isConnected=" + deviceState.isConnected +
                 '}';
     }
@@ -534,6 +505,7 @@ public class ParticleDevice implements Parcelable {
         public TypedFakeFile(byte[] bytes) {
             this(bytes, "application/octet-stream", "tinker_firmware.bin");
         }
+
         public TypedFakeFile(byte[] bytes, String mimeType, String fileName) {
             super(mimeType, bytes);
             this.fileName = fileName;

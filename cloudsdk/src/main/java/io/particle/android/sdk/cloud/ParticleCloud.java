@@ -577,6 +577,8 @@ public class ParticleCloud {
                 variables,
                 completeDevice.version,
                 ParticleDeviceType.fromInt(completeDevice.productId),
+                completeDevice.platformId,
+                completeDevice.productId,
                 completeDevice.requiresUpdate,
                 completeDevice.lastHeard
         );
@@ -594,6 +596,8 @@ public class ParticleCloud {
                 variables,
                 "",  // gross, but what else are we going to do?
                 ParticleDeviceType.fromInt(offlineDevice.productId),
+                offlineDevice.platformId,
+                offlineDevice.productId,
                 false,
                 offlineDevice.lastHeard
         );
@@ -655,7 +659,6 @@ public class ParticleCloud {
     };
 
 
-
     private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
 
         @Override
@@ -680,24 +683,24 @@ public class ParticleCloud {
 
 
     private static Func<String, VariableType> toVariableType = new Func<String, VariableType>() {
-                @Override
-                public VariableType apply(@Nullable String value) {
-                    if (value == null) {
-                        return null;
-                    }
+        @Override
+        public VariableType apply(@Nullable String value) {
+            if (value == null) {
+                return null;
+            }
 
-                    switch (value) {
-                        case "int32":
-                            return VariableType.INT;
-                        case "double":
-                            return VariableType.DOUBLE;
-                        case "string":
-                            return VariableType.STRING;
-                        default:
-                            return null;
-                    }
-                }
-            };
+            switch (value) {
+                case "int32":
+                    return VariableType.INT;
+                case "double":
+                    return VariableType.DOUBLE;
+                case "string":
+                    return VariableType.STRING;
+                default:
+                    return null;
+            }
+        }
+    };
 
 
     // FIXME: review and polish this.  The more I think about it, the more I like it, but

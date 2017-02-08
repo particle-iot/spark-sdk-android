@@ -58,14 +58,18 @@ public class Responses {
             @SerializedName("product_id")
             public final int productId;
 
+            @SerializedName("platform_id")
+            public final int platformId;
+
             @SerializedName("last_heard")
             public final Date lastHeard;
 
-            public SimpleDevice(String id, String name, boolean isConnected, int productId,
+            public SimpleDevice(String id, String name, boolean isConnected, int platformId, int productId,
                                 Date lastHeard) {
                 this.id = id;
                 this.name = name;
                 this.isConnected = isConnected;
+                this.platformId = platformId;
                 this.productId = productId;
                 this.lastHeard = lastHeard;
             }
@@ -94,6 +98,9 @@ public class Responses {
             @SerializedName("product_id")
             public final int productId;
 
+            @SerializedName("platform_id")
+            public final int platformId;
+
             @SerializedName("device_needs_update")
             public final boolean requiresUpdate;
 
@@ -102,7 +109,7 @@ public class Responses {
 
             CompleteDevice(String deviceId, String name, boolean isConnected,
                            Map<String, String> variables, List<String> functions, String version,
-                           int productId, boolean requiresUpdate, Date lastHeard) {
+                           int productId, int platformId, boolean requiresUpdate, Date lastHeard) {
                 this.deviceId = deviceId;
                 this.name = name;
                 this.isConnected = isConnected;
@@ -110,6 +117,7 @@ public class Responses {
                 this.functions = functions;
                 this.version = version;
                 this.productId = productId;
+                this.platformId = platformId;
                 this.requiresUpdate = requiresUpdate;
                 this.lastHeard = lastHeard;
             }
@@ -236,7 +244,7 @@ public class Responses {
     public static class ReadDoubleVariableResponse extends ReadVariableResponse<Double> {
 
         public ReadDoubleVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
-                                       Double result) {
+                                          Double result) {
             super(commandName, variableName, coreInfo, result);
         }
     }
@@ -254,7 +262,7 @@ public class Responses {
     public static class ReadObjectVariableResponse extends ReadVariableResponse<Object> {
 
         public ReadObjectVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
-                                       Object result) {
+                                          Object result) {
             super(commandName, variableName, coreInfo, result);
         }
     }

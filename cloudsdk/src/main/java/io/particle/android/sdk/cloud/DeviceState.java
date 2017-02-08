@@ -26,6 +26,7 @@ import io.particle.android.sdk.utils.Parcelables;
 class DeviceState implements Parcelable {
 
     final String deviceId;
+    final int platformId, productId;
     final String name;
     final boolean isConnected;
     final Set<String> functions;
@@ -37,8 +38,8 @@ class DeviceState implements Parcelable {
 
     DeviceState(String deviceId, String name, boolean isConnected, Set<String> functions,
                 Map<String, VariableType> variables, @Nullable String version,
-                ParticleDevice.ParticleDeviceType deviceType, boolean requiresUpdate,
-                Date lastHeard) {
+                ParticleDevice.ParticleDeviceType deviceType, int platformId, int productId,
+                boolean requiresUpdate, Date lastHeard) {
         this.deviceId = deviceId;
         this.name = name;
         this.isConnected = isConnected;
@@ -46,6 +47,8 @@ class DeviceState implements Parcelable {
         this.variables = variables;
         this.version = version == null ? "" : version;
         this.deviceType = deviceType;
+        this.platformId = platformId;
+        this.productId = productId;
         this.requiresUpdate = requiresUpdate;
         this.lastHeard = lastHeard;
     }
@@ -64,6 +67,8 @@ class DeviceState implements Parcelable {
                 other.variables,
                 other.version,
                 other.deviceType,
+                other.platformId,
+                other.productId,
                 other.requiresUpdate,
                 other.lastHeard
         );
@@ -80,6 +85,8 @@ class DeviceState implements Parcelable {
                 other.variables,
                 other.version,
                 other.deviceType,
+                other.platformId,
+                other.productId,
                 other.requiresUpdate,
                 other.lastHeard
         );
@@ -95,6 +102,8 @@ class DeviceState implements Parcelable {
         variables = Parcelables.readSerializableMap(in);
         version = in.readString();
         deviceType = ParticleDevice.ParticleDeviceType.valueOf(in.readString());
+        platformId = in.readInt();
+        productId = in.readInt();
         requiresUpdate = Parcelables.readBoolean(in);
         lastHeard = new Date(in.readLong());
     }
@@ -108,6 +117,8 @@ class DeviceState implements Parcelable {
         Parcelables.writeSerializableMap(dest, variables);
         dest.writeString(version);
         dest.writeString(deviceType.name());
+        dest.writeInt(platformId);
+        dest.writeInt(productId);
         Parcelables.writeBoolean(dest, requiresUpdate);
         dest.writeLong(lastHeard.getTime());
     }

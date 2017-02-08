@@ -3,6 +3,7 @@ package io.particle.cloudsdk.example_app;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -20,52 +21,58 @@ public class ValueActivity extends AppCompatActivity {
     private static final String ARG_VALUE = "ARG_VALUE";
     private static final String ARG_DEVICEID = "ARG_DEVICEID";
 
-    private TextView tv;
+    private TextView tv, nameView, platformIdView, productIdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_value);
+        nameView = (TextView) findViewById(R.id.name);
+        productIdView = (TextView) findViewById(R.id.productId);
+        platformIdView = (TextView) findViewById(R.id.platformId);
         tv = (TextView) findViewById(R.id.value);
         tv.setText(String.valueOf(getIntent().getIntExtra(ARG_VALUE, 0)));
 
-        findViewById(R.id.refresh_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //...
-                // Do network work on background thread
-                Async.executeAsync(ParticleCloud.get(ValueActivity.this), new Async.ApiWork<ParticleCloud, Object>() {
-                    @Override
-                    public Object callApi(ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
-                        ParticleDevice device = ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
-                        Object variable;
-                        try {
-                            variable = device.getVariable("analogvalue");
-                        } catch (ParticleDevice.VariableDoesNotExistException e) {
-                            Toaster.l(ValueActivity.this, e.getMessage());
-                            variable = -1;
-                        }
-                        return variable;
+        findViewById(R.id.refresh_button).setOnClickListener(v -> {
+            //...
+            // Do network work on background thread
+            Async.executeAsync(ParticleCloud.get(ValueActivity.this), new Async.ApiWork<ParticleCloud, Object>() {
+                @Override
+                public Object callApi(@NonNull ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
+                    ParticleDevice device = ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
+                    //show device information
+                    runOnUiThread(() -> {
+                        nameView.setText("Name: " + device.getName());
+                        productIdView.setText("Product id: " + device.getProductID());
+                        platformIdView.setText("Platform id: " + device.getPlatformID());
+                    });
+                    Object variable;
+                    try {
+                        variable = device.getVariable("analogvalue");
+                    } catch (ParticleDevice.VariableDoesNotExistException e) {
+                        Toaster.l(ValueActivity.this, e.getMessage());
+                        variable = -1;
                     }
+                    return variable;
+                }
 
-                    @Override
-                    public void onSuccess(Object i) { // this goes on the main thread
-                        tv.setText(i.toString());
-                    }
+                @Override
+                public void onSuccess(@NonNull Object i) { // this goes on the main thread
+                    tv.setText(i.toString());
+                }
 
-                    @Override
-                    public void onFailure(ParticleCloudException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
+                @Override
+                public void onFailure(@NonNull ParticleCloudException e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 
-    public static Intent buildIntent(Context ctx, Integer value, String deviceid) {
+    public static Intent buildIntent(Context ctx, Integer value, String deviceId) {
         Intent intent = new Intent(ctx, ValueActivity.class);
         intent.putExtra(ARG_VALUE, value);
-        intent.putExtra(ARG_DEVICEID, deviceid);
+        intent.putExtra(ARG_DEVICEID, deviceId);
 
         return intent;
     }
