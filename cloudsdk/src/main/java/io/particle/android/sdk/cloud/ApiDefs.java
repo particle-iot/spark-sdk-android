@@ -10,6 +10,7 @@ import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.SimpleResponse;
+import io.particle.android.sdk.cloud.models.SignUpInfo;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
@@ -30,6 +31,7 @@ import retrofit.mime.TypedOutput;
 public class ApiDefs {
 
     // FIXME: turn some of these common strings into constants?
+
     /**
      * The main Particle cloud API
      */
@@ -117,19 +119,14 @@ public class ApiDefs {
      */
     public interface IdentityApi {
 
-        @FormUrlEncoded
         @POST("/v1/users")
-        Response signUp(@Field("username") String username,
-                        @Field("password") String password);
+        Response signUp(@Body SignUpInfo signUpInfo);
 
 
         // NOTE: the `LogInResponse` used here as a return type is intentional.  It looks
         // a little odd, but that's how this endpoint works.
-        @FormUrlEncoded
         @POST("/v1/orgs/{orgSlug}/customers")
-        Responses.LogInResponse signUpAndLogInWithCustomer(@Field("grant_type") String grantType,
-                                                           @Field("email") String email,
-                                                           @Field("password") String password,
+        Responses.LogInResponse signUpAndLogInWithCustomer(@Body SignUpInfo signUpInfo,
                                                            @Path("orgSlug") String orgSlug);
 
         @FormUrlEncoded
