@@ -1,0 +1,97 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                tools:context="io.particle.cloudsdk.example_app.ValueActivity">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/platformId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name"
+        android:text="Platform id:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/productId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/platformId"
+        android:text="Product id:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/ipAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/productId"
+        android:text="Ip address:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/lastAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ipAddress"
+        android:text="Last app name:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lastAppName"
+        android:text="Status:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/lastHeard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/status"
+        android:text="Last heard:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/cellular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lastHeard"
+        android:text="Cellular:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/imei"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cellular"
+        android:text="Imei:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/currentBuild"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imei"
+        android:text="Current build:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/defaultBuild"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/currentBuild"
+        android:text="Default build:"
+        android:textSize="16sp"/>
+
+</RelativeLayout>

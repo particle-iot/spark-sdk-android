@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
 import retrofit.client.OkClient;
@@ -74,12 +73,8 @@ public class ApiFactory {
 
     ApiDefs.CloudApi buildNewCloudApi() {
         RestAdapter restAdapter = buildCommonRestAdapterBuilder(gson, normalTimeoutClient)
-                .setRequestInterceptor(new RequestInterceptor() {
-                    @Override
-                    public void intercept(RequestFacade request) {
-                        request.addHeader("Authorization", "Bearer " + tokenDelegate.getTokenValue());
-                    }
-                })
+                .setRequestInterceptor(request -> request.addHeader("Authorization", "Bearer " +
+                        tokenDelegate.getTokenValue()))
                 .build();
         return restAdapter.create(ApiDefs.CloudApi.class);
     }
@@ -87,12 +82,8 @@ public class ApiFactory {
     // FIXME: fix this ugliness
     ApiDefs.CloudApi buildNewFastTimeoutCloudApi() {
         RestAdapter restAdapter = buildCommonRestAdapterBuilder(gson, fastTimeoutClient)
-                .setRequestInterceptor(new RequestInterceptor() {
-                    @Override
-                    public void intercept(RequestFacade request) {
-                        request.addHeader("Authorization", "Bearer " + tokenDelegate.getTokenValue());
-                    }
-                })
+                .setRequestInterceptor(request -> request.addHeader("Authorization", "Bearer " +
+                        tokenDelegate.getTokenValue()))
                 .build();
         return restAdapter.create(ApiDefs.CloudApi.class);
     }
@@ -101,12 +92,7 @@ public class ApiFactory {
         final String basicAuthValue = getBasicAuthValue();
 
         RestAdapter restAdapter = buildCommonRestAdapterBuilder(gson, normalTimeoutClient)
-                .setRequestInterceptor(new RequestInterceptor() {
-                    @Override
-                    public void intercept(RequestFacade request) {
-                        request.addHeader("Authorization", basicAuthValue);
-                    }
-                })
+                .setRequestInterceptor(request -> request.addHeader("Authorization", basicAuthValue))
                 .build();
         return restAdapter.create(ApiDefs.IdentityApi.class);
     }

@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -21,20 +23,12 @@ public class ValueActivity extends AppCompatActivity {
     private static final String ARG_VALUE = "ARG_VALUE";
     private static final String ARG_DEVICEID = "ARG_DEVICEID";
 
-    private TextView tv, nameView, platformIdView, productIdView,
-            ipAddressView, lastAppNameView, statusView, lastHeardView;
+    private TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_value);
-        nameView = (TextView) findViewById(R.id.name);
-        productIdView = (TextView) findViewById(R.id.productId);
-        platformIdView = (TextView) findViewById(R.id.platformId);
-        ipAddressView = (TextView) findViewById(R.id.ipAddress);
-        lastAppNameView = (TextView) findViewById(R.id.lastAppName);
-        statusView = (TextView) findViewById(R.id.status);
-        lastHeardView = (TextView) findViewById(R.id.lastHeard);
         tv = (TextView) findViewById(R.id.value);
         tv.setText(String.valueOf(getIntent().getIntExtra(ARG_VALUE, 0)));
 
@@ -45,16 +39,6 @@ public class ValueActivity extends AppCompatActivity {
                 @Override
                 public Object callApi(@NonNull ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
                     ParticleDevice device = ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
-                    //show device information
-                    runOnUiThread(() -> {
-                        nameView.setText("Name: " + device.getName());
-                        productIdView.setText("Product id: " + device.getProductID());
-                        platformIdView.setText("Platform id: " + device.getPlatformID());
-                        ipAddressView.setText("Ip address: " + device.getIpAddress());
-                        lastAppNameView.setText("Last app name: " + device.getLastAppName());
-                        statusView.setText("Status: " + device.getStatus());
-                        lastHeardView.setText("Last heard: " + device.getLastHeard());
-                    });
                     Object variable;
                     try {
                         variable = device.getVariable("analogvalue");
@@ -77,6 +61,22 @@ public class ValueActivity extends AppCompatActivity {
             });
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.menu_value, menu);
+        return (super.onCreateOptionsMenu(menu));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_info) {
+            Intent intent = DeviceInfoActivity.buildIntent(ValueActivity.this, getIntent().getStringExtra(ARG_DEVICEID));
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     public static Intent buildIntent(Context ctx, Integer value, String deviceId) {
         Intent intent = new Intent(ctx, ValueActivity.class);

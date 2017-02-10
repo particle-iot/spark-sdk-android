@@ -52,6 +52,16 @@ public class Responses {
 
             public final String name;
 
+            public final boolean cellular;
+
+            public final String imei;
+
+            @SerializedName("current_build_target")
+            public final String currentBuild;
+
+            @SerializedName("default_build_target")
+            public final String defaultBuild;
+
             @SerializedName("connected")
             public final boolean isConnected;
 
@@ -70,11 +80,16 @@ public class Responses {
             @SerializedName("last_heard")
             public final Date lastHeard;
 
-            public SimpleDevice(String id, String name, boolean isConnected, int platformId, int productId,
-                                String ipAddress, String status, Date lastHeard) {
+            public SimpleDevice(String id, String name, boolean isConnected, boolean cellular,
+                                String imei, String currentBuild, String defaultBuild, int platformId,
+                                int productId, String ipAddress, String status, Date lastHeard) {
                 this.id = id;
                 this.name = name;
                 this.isConnected = isConnected;
+                this.cellular = cellular;
+                this.imei = imei;
+                this.currentBuild = currentBuild;
+                this.defaultBuild = defaultBuild;
                 this.platformId = platformId;
                 this.productId = productId;
                 this.ipAddress = ipAddress;
@@ -92,6 +107,16 @@ public class Responses {
             public final String deviceId;
 
             public final String name;
+
+            public final boolean cellular;
+
+            public final String imei;
+
+            @SerializedName("current_build_target")
+            public final String currentBuild;
+
+            @SerializedName("default_build_target")
+            public final String defaultBuild;
 
             @SerializedName("connected")
             public final boolean isConnected;
@@ -124,13 +149,18 @@ public class Responses {
             @SerializedName("last_heard")
             public final Date lastHeard;
 
-            CompleteDevice(String deviceId, String name, boolean isConnected,
+            CompleteDevice(String deviceId, String name, boolean isConnected, boolean cellular,
+                           String imei, String currentBuild, String defaultBuild,
                            Map<String, String> variables, List<String> functions, String version,
                            int productId, int platformId, String ipAddress, String lastAppName,
                            String status, boolean requiresUpdate, Date lastHeard) {
                 this.deviceId = deviceId;
                 this.name = name;
                 this.isConnected = isConnected;
+                this.cellular = cellular;
+                this.imei = imei;
+                this.currentBuild = currentBuild;
+                this.defaultBuild = defaultBuild;
                 this.variables = variables;
                 this.functions = functions;
                 this.version = version;

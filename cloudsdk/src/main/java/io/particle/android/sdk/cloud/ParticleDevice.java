@@ -183,6 +183,22 @@ public class ParticleDevice implements Parcelable {
         return deviceState.productId;
     }
 
+    public boolean isCellular() {
+        return deviceState.cellular;
+    }
+
+    public String getImei() {
+        return deviceState.imei;
+    }
+
+    public String getCurrentBuild() {
+        return deviceState.currentBuild;
+    }
+
+    public String getDefaultBuild() {
+        return deviceState.defaultBuild;
+    }
+
     public String getIpAddress() {
         return deviceState.ipAddress;
     }

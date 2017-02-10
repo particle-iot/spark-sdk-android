@@ -5,6 +5,8 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="login">Login</string>
+    <string name="info">Device Info</string>
     <string name="title_activity_value">ValueActivity</string>
+    <string name="title_activity_device_info">DeviceInfoActivity</string>
 
 </resources>
