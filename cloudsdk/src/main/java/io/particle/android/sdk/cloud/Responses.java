@@ -61,16 +61,24 @@ public class Responses {
             @SerializedName("platform_id")
             public final int platformId;
 
+            @SerializedName("last_ip_address")
+            public final String ipAddress;
+
+            @SerializedName("status")
+            public final String status;
+
             @SerializedName("last_heard")
             public final Date lastHeard;
 
             public SimpleDevice(String id, String name, boolean isConnected, int platformId, int productId,
-                                Date lastHeard) {
+                                String ipAddress, String status, Date lastHeard) {
                 this.id = id;
                 this.name = name;
                 this.isConnected = isConnected;
                 this.platformId = platformId;
                 this.productId = productId;
+                this.ipAddress = ipAddress;
+                this.status = status;
                 this.lastHeard = lastHeard;
             }
         }
@@ -101,6 +109,15 @@ public class Responses {
             @SerializedName("platform_id")
             public final int platformId;
 
+            @SerializedName("last_ip_address")
+            public final String ipAddress;
+
+            @SerializedName("last_app")
+            public final String lastAppName;
+
+            @SerializedName("status")
+            public final String status;
+
             @SerializedName("device_needs_update")
             public final boolean requiresUpdate;
 
@@ -109,7 +126,8 @@ public class Responses {
 
             CompleteDevice(String deviceId, String name, boolean isConnected,
                            Map<String, String> variables, List<String> functions, String version,
-                           int productId, int platformId, boolean requiresUpdate, Date lastHeard) {
+                           int productId, int platformId, String ipAddress, String lastAppName,
+                           String status, boolean requiresUpdate, Date lastHeard) {
                 this.deviceId = deviceId;
                 this.name = name;
                 this.isConnected = isConnected;
@@ -118,6 +136,9 @@ public class Responses {
                 this.version = version;
                 this.productId = productId;
                 this.platformId = platformId;
+                this.ipAddress = ipAddress;
+                this.lastAppName = lastAppName;
+                this.status = status;
                 this.requiresUpdate = requiresUpdate;
                 this.lastHeard = lastHeard;
             }

@@ -21,7 +21,8 @@ public class ValueActivity extends AppCompatActivity {
     private static final String ARG_VALUE = "ARG_VALUE";
     private static final String ARG_DEVICEID = "ARG_DEVICEID";
 
-    private TextView tv, nameView, platformIdView, productIdView;
+    private TextView tv, nameView, platformIdView, productIdView,
+            ipAddressView, lastAppNameView, statusView, lastHeardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,10 @@ public class ValueActivity extends AppCompatActivity {
         nameView = (TextView) findViewById(R.id.name);
         productIdView = (TextView) findViewById(R.id.productId);
         platformIdView = (TextView) findViewById(R.id.platformId);
+        ipAddressView = (TextView) findViewById(R.id.ipAddress);
+        lastAppNameView = (TextView) findViewById(R.id.lastAppName);
+        statusView = (TextView) findViewById(R.id.status);
+        lastHeardView = (TextView) findViewById(R.id.lastHeard);
         tv = (TextView) findViewById(R.id.value);
         tv.setText(String.valueOf(getIntent().getIntExtra(ARG_VALUE, 0)));
 
@@ -45,6 +50,10 @@ public class ValueActivity extends AppCompatActivity {
                         nameView.setText("Name: " + device.getName());
                         productIdView.setText("Product id: " + device.getProductID());
                         platformIdView.setText("Platform id: " + device.getPlatformID());
+                        ipAddressView.setText("Ip address: " + device.getIpAddress());
+                        lastAppNameView.setText("Last app name: " + device.getLastAppName());
+                        statusView.setText("Status: " + device.getStatus());
+                        lastHeardView.setText("Last heard: " + device.getLastHeard());
                     });
                     Object variable;
                     try {

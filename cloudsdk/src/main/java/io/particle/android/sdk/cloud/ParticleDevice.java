@@ -134,7 +134,7 @@ public class ParticleDevice implements Parcelable {
      * Rename the device in the cloud. If renaming fails name will stay the same.
      */
     public void setName(String newName) throws ParticleCloudException {
-        cloud.changeDeviceName(this.deviceState.deviceId, newName);
+        cloud.rename(this.deviceState.deviceId, newName);
     }
 
     /**
@@ -181,6 +181,18 @@ public class ParticleDevice implements Parcelable {
 
     public int getProductID() {
         return deviceState.productId;
+    }
+
+    public String getIpAddress() {
+        return deviceState.ipAddress;
+    }
+
+    public String getLastAppName() {
+        return deviceState.lastAppName;
+    }
+
+    public String getStatus() {
+        return deviceState.status;
     }
 
     public Date getLastHeard() {

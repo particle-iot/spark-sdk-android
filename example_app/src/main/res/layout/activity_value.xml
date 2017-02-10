@@ -49,4 +49,36 @@
         android:text="Product id:"
         android:textSize="16sp"/>
 
+    <TextView
+        android:id="@+id/ipAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/productId"
+        android:text="Ip address:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/lastAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ipAddress"
+        android:text="Last app name:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lastAppName"
+        android:text="Status:"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/lastHeard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/status"
+        android:text="Last heard:"
+        android:textSize="16sp"/>
+
 </RelativeLayout>

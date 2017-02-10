@@ -469,7 +469,7 @@ public class ParticleCloud {
     }
 
     @WorkerThread
-    void changeDeviceName(String deviceId, String newName) throws ParticleCloudException {
+    void rename(String deviceId, String newName) throws ParticleCloudException {
         ParticleDevice particleDevice;
         synchronized (devices) {
             particleDevice = devices.get(deviceId);
@@ -485,6 +485,12 @@ public class ParticleCloud {
             updateDeviceState(originalDeviceState, true);
             throw new ParticleCloudException(e);
         }
+    }
+
+    @Deprecated
+    @WorkerThread
+    void changeDeviceName(String deviceId, String newName) throws ParticleCloudException {
+        rename(deviceId, newName);
     }
 
     @WorkerThread
@@ -579,6 +585,9 @@ public class ParticleCloud {
                 ParticleDeviceType.fromInt(completeDevice.productId),
                 completeDevice.platformId,
                 completeDevice.productId,
+                completeDevice.ipAddress,
+                completeDevice.lastAppName,
+                completeDevice.status,
                 completeDevice.requiresUpdate,
                 completeDevice.lastHeard
         );
@@ -598,6 +607,9 @@ public class ParticleCloud {
                 ParticleDeviceType.fromInt(offlineDevice.productId),
                 offlineDevice.platformId,
                 offlineDevice.productId,
+                offlineDevice.ipAddress,
+                "",
+                offlineDevice.status,
                 false,
                 offlineDevice.lastHeard
         );
