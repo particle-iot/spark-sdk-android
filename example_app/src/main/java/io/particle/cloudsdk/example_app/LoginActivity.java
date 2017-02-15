@@ -3,6 +3,7 @@ package io.particle.cloudsdk.example_app;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -24,105 +25,96 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         findViewById(R.id.login_button).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        final String email = ((EditText) findViewById(R.id.email)).getText().toString();
-                        final String password = ((EditText) findViewById(R.id.password)).getText().toString();
+                v -> {
+                    final String email = ((EditText) findViewById(R.id.email)).getText().toString();
+                    final String password = ((EditText) findViewById(R.id.password)).getText().toString();
 
-                        // Don't:
-                        AsyncTask task = new AsyncTask() {
-                            @Override
-                            protected Object doInBackground(Object[] params) {
-                                try {
-                                    ParticleCloud.get(LoginActivity.this).logIn(email, password);
+                    // Don't:
+                    AsyncTask task = new AsyncTask() {
+                        @Override
+                        protected Object doInBackground(Object[] params) {
+                            try {
+                                ParticleCloud.get(LoginActivity.this).logIn(email, password);
 
-                                } catch (final ParticleCloudException e) {
-                                    Runnable mainThread = new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toaster.l(LoginActivity.this, e.getBestMessage());
-                                            e.printStackTrace();
-                                            Log.d("info", e.getBestMessage());
+                            } catch (final ParticleCloudException e) {
+                                Runnable mainThread = () -> {
+                                    Toaster.l(LoginActivity.this, e.getBestMessage());
+                                    e.printStackTrace();
+                                    Log.d("info", e.getBestMessage());
 //                                            Log.d("info", e.getCause().toString());
-                                        }
-                                    };
-                                    runOnUiThread(mainThread);
+                                };
+                                runOnUiThread(mainThread);
 
-                                }
-
-                                return null;
                             }
 
-                        };
+                            return null;
+                        }
+
+                    };
 //                        task.execute();
 
-                        //-------
+                    //-------
 
-                        // DO!:
-                        Async.executeAsync(ParticleCloud.get(v.getContext()), new Async.ApiWork<ParticleCloud, Object>() {
+                    // DO!:
+                    Async.executeAsync(ParticleCloud.get(v.getContext()), new Async.ApiWork<ParticleCloud, Object>() {
 
-                            private ParticleDevice mDevice;
+                        private ParticleDevice mDevice;
 
-                            @Override
-                            public Object callApi(ParticleCloud sparkCloud) throws ParticleCloudException, IOException {
-                                sparkCloud.logIn(email, password);
-                                sparkCloud.getDevices();
-                                mDevice = sparkCloud.getDevice("1f0034000747343232361234");
-                                Object obj;
+                        @Override
+                        public Object callApi(@NonNull ParticleCloud sparkCloud) throws ParticleCloudException, IOException {
+                            sparkCloud.logIn(email, password);
+                            sparkCloud.getDevices();
+                            mDevice = sparkCloud.getDevice("1f0034000747343232361234");
+                            Object obj;
 
-                                try {
-                                    obj = mDevice.getVariable("analogvalue");
-                                    Log.d("BANANA", "analogvalue: " + obj);
-                                } catch (ParticleDevice.VariableDoesNotExistException e) {
-                                    Toaster.s(LoginActivity.this, "Error reading variable");
-                                    obj = -1;
-                                }
-
-                                try {
-                                    String strVariable = mDevice.getStringVariable("stringvalue");
-                                    Log.d("BANANA", "stringvalue: " + strVariable);
-                                } catch (ParticleDevice.VariableDoesNotExistException e) {
-                                    Toaster.s(LoginActivity.this, "Error reading variable");
-                                }
-
-                                try {
-                                    double dVariable = mDevice.getDoubleVariable("doublevalue");
-                                    Log.d("BANANA", "doublevalue: " + dVariable);
-                                } catch (ParticleDevice.VariableDoesNotExistException e) {
-                                    Toaster.s(LoginActivity.this, "Error reading variable");
-                                }
-
-                                try {
-                                    int intVariable = mDevice.getIntVariable("analogvalue");
-                                    Log.d("BANANA", "int analogvalue: " + intVariable);
-                                } catch (ParticleDevice.VariableDoesNotExistException e) {
-                                    Toaster.s(LoginActivity.this, "Error reading variable");
-                                }
-
-                                return -1;
-
+                            try {
+                                obj = mDevice.getVariable("analogvalue");
+                                Log.d("BANANA", "analogvalue: " + obj);
+                            } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                Toaster.s(LoginActivity.this, "Error reading variable");
+                                obj = -1;
                             }
 
-                            @Override
-                            public void onSuccess(Object value) {
-                                Toaster.l(LoginActivity.this, "Logged in");
-                                Intent intent = ValueActivity.buildIntent(LoginActivity.this, 123, mDevice.getID());
-                                startActivity(intent);
+                            try {
+                                String strVariable = mDevice.getStringVariable("stringvalue");
+                                Log.d("BANANA", "stringvalue: " + strVariable);
+                            } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                Toaster.s(LoginActivity.this, "Error reading variable");
                             }
 
-                            @Override
-                            public void onFailure(ParticleCloudException e) {
-                                Toaster.l(LoginActivity.this, e.getBestMessage());
-                                e.printStackTrace();
-                                Log.d("info", e.getBestMessage());
+                            try {
+                                double dVariable = mDevice.getDoubleVariable("doublevalue");
+                                Log.d("BANANA", "doublevalue: " + dVariable);
+                            } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                Toaster.s(LoginActivity.this, "Error reading variable");
                             }
-                        });
 
+                            try {
+                                int intVariable = mDevice.getIntVariable("analogvalue");
+                                Log.d("BANANA", "int analogvalue: " + intVariable);
+                            } catch (ParticleDevice.VariableDoesNotExistException e) {
+                                Toaster.s(LoginActivity.this, "Error reading variable");
+                            }
 
-                    }
+                            return -1;
+
+                        }
+
+                        @Override
+                        public void onSuccess(@NonNull Object value) {
+                            Toaster.l(LoginActivity.this, "Logged in");
+                            Intent intent = ValueActivity.buildIntent(LoginActivity.this, 123, mDevice.getID());
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull ParticleCloudException e) {
+                            Toaster.l(LoginActivity.this, e.getBestMessage());
+                            e.printStackTrace();
+                            Log.d("info", e.getBestMessage());
+                        }
+                    });
                 }
-
         );
     }
 

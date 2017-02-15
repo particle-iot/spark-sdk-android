@@ -52,21 +52,48 @@ public class Responses {
 
             public final String name;
 
+            public final boolean cellular;
+
+            public final String imei;
+
+            @SerializedName("current_build_target")
+            public final String currentBuild;
+
+            @SerializedName("default_build_target")
+            public final String defaultBuild;
+
             @SerializedName("connected")
             public final boolean isConnected;
 
             @SerializedName("product_id")
             public final int productId;
 
+            @SerializedName("platform_id")
+            public final int platformId;
+
+            @SerializedName("last_ip_address")
+            public final String ipAddress;
+
+            @SerializedName("status")
+            public final String status;
+
             @SerializedName("last_heard")
             public final Date lastHeard;
 
-            public SimpleDevice(String id, String name, boolean isConnected, int productId,
-                                Date lastHeard) {
+            public SimpleDevice(String id, String name, boolean isConnected, boolean cellular,
+                                String imei, String currentBuild, String defaultBuild, int platformId,
+                                int productId, String ipAddress, String status, Date lastHeard) {
                 this.id = id;
                 this.name = name;
                 this.isConnected = isConnected;
+                this.cellular = cellular;
+                this.imei = imei;
+                this.currentBuild = currentBuild;
+                this.defaultBuild = defaultBuild;
+                this.platformId = platformId;
                 this.productId = productId;
+                this.ipAddress = ipAddress;
+                this.status = status;
                 this.lastHeard = lastHeard;
             }
         }
@@ -81,6 +108,16 @@ public class Responses {
 
             public final String name;
 
+            public final boolean cellular;
+
+            public final String imei;
+
+            @SerializedName("current_build_target")
+            public final String currentBuild;
+
+            @SerializedName("default_build_target")
+            public final String defaultBuild;
+
             @SerializedName("connected")
             public final boolean isConnected;
 
@@ -94,22 +131,44 @@ public class Responses {
             @SerializedName("product_id")
             public final int productId;
 
+            @SerializedName("platform_id")
+            public final int platformId;
+
+            @SerializedName("last_ip_address")
+            public final String ipAddress;
+
+            @SerializedName("last_app")
+            public final String lastAppName;
+
+            @SerializedName("status")
+            public final String status;
+
             @SerializedName("device_needs_update")
             public final boolean requiresUpdate;
 
             @SerializedName("last_heard")
             public final Date lastHeard;
 
-            CompleteDevice(String deviceId, String name, boolean isConnected,
+            CompleteDevice(String deviceId, String name, boolean isConnected, boolean cellular,
+                           String imei, String currentBuild, String defaultBuild,
                            Map<String, String> variables, List<String> functions, String version,
-                           int productId, boolean requiresUpdate, Date lastHeard) {
+                           int productId, int platformId, String ipAddress, String lastAppName,
+                           String status, boolean requiresUpdate, Date lastHeard) {
                 this.deviceId = deviceId;
                 this.name = name;
                 this.isConnected = isConnected;
+                this.cellular = cellular;
+                this.imei = imei;
+                this.currentBuild = currentBuild;
+                this.defaultBuild = defaultBuild;
                 this.variables = variables;
                 this.functions = functions;
                 this.version = version;
                 this.productId = productId;
+                this.platformId = platformId;
+                this.ipAddress = ipAddress;
+                this.lastAppName = lastAppName;
+                this.status = status;
                 this.requiresUpdate = requiresUpdate;
                 this.lastHeard = lastHeard;
             }
@@ -236,7 +295,7 @@ public class Responses {
     public static class ReadDoubleVariableResponse extends ReadVariableResponse<Double> {
 
         public ReadDoubleVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
-                                       Double result) {
+                                          Double result) {
             super(commandName, variableName, coreInfo, result);
         }
     }
@@ -254,7 +313,7 @@ public class Responses {
     public static class ReadObjectVariableResponse extends ReadVariableResponse<Object> {
 
         public ReadObjectVariableResponse(String commandName, String variableName, CoreInfo coreInfo,
-                                       Object result) {
+                                          Object result) {
             super(commandName, variableName, coreInfo, result);
         }
     }

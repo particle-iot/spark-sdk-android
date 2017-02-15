@@ -500,7 +500,7 @@ public class ParticleCloud {
     }
 
     @WorkerThread
-    void changeDeviceName(String deviceId, String newName) throws ParticleCloudException {
+    void rename(String deviceId, String newName) throws ParticleCloudException {
         ParticleDevice particleDevice;
         synchronized (devices) {
             particleDevice = devices.get(deviceId);
@@ -516,6 +516,12 @@ public class ParticleCloud {
             updateDeviceState(originalDeviceState, true);
             throw new ParticleCloudException(e);
         }
+    }
+
+    @Deprecated
+    @WorkerThread
+    void changeDeviceName(String deviceId, String newName) throws ParticleCloudException {
+        rename(deviceId, newName);
     }
 
     @WorkerThread
@@ -600,34 +606,47 @@ public class ParticleCloud {
         Set<String> functions = set(Funcy.filter(completeDevice.functions, Funcy.<String>notNull()));
         Map<String, VariableType> variables = transformVariables(completeDevice);
 
-        return new DeviceState(
-                completeDevice.deviceId,
-                completeDevice.name,
-                completeDevice.isConnected,
-                functions,
-                variables,
-                completeDevice.version,
-                ParticleDeviceType.fromInt(completeDevice.productId),
-                completeDevice.requiresUpdate,
-                completeDevice.lastHeard
-        );
+        return new DeviceState.DeviceStateBuilder(completeDevice.deviceId, functions, variables)
+                .name(completeDevice.name)
+                .cellular(completeDevice.cellular)
+                .connected(completeDevice.isConnected)
+                .version(completeDevice.version)
+                .deviceType(ParticleDeviceType.fromInt(completeDevice.productId))
+                .platformId(completeDevice.platformId)
+                .productId(completeDevice.productId)
+                .imei(completeDevice.imei)
+                .currentBuild(completeDevice.currentBuild)
+                .defaultBuild(completeDevice.defaultBuild)
+                .ipAddress(completeDevice.ipAddress)
+                .lastAppName(completeDevice.lastAppName)
+                .status(completeDevice.status)
+                .requiresUpdate(completeDevice.requiresUpdate)
+                .lastHeard(completeDevice.lastHeard)
+                .build();
     }
 
     // for offline devices
     private DeviceState fromSimpleDeviceModel(Models.SimpleDevice offlineDevice) {
         Set<String> functions = new HashSet<>();
         Map<String, VariableType> variables = new ArrayMap<>();
-        return new DeviceState(
-                offlineDevice.id,
-                offlineDevice.name,
-                offlineDevice.isConnected,
-                functions,
-                variables,
-                "",  // gross, but what else are we going to do?
-                ParticleDeviceType.fromInt(offlineDevice.productId),
-                false,
-                offlineDevice.lastHeard
-        );
+
+        return new DeviceState.DeviceStateBuilder(offlineDevice.id, functions, variables)
+                .name(offlineDevice.name)
+                .cellular(offlineDevice.cellular)
+                .connected(offlineDevice.isConnected)
+                .version("")
+                .deviceType(ParticleDeviceType.fromInt(offlineDevice.productId))
+                .platformId(offlineDevice.platformId)
+                .productId(offlineDevice.productId)
+                .imei(offlineDevice.imei)
+                .currentBuild(offlineDevice.currentBuild)
+                .defaultBuild(offlineDevice.defaultBuild)
+                .ipAddress(offlineDevice.ipAddress)
+                .lastAppName("")
+                .status(offlineDevice.status)
+                .requiresUpdate(false)
+                .lastHeard(offlineDevice.lastHeard)
+                .build();
     }
 
 
@@ -680,7 +699,6 @@ public class ParticleCloud {
 
     private static final Func<SimpleDevice, String> toDeviceId = input -> input.id;
 
-
     private class TokenDelegate implements ParticleAccessToken.ParticleAccessTokenDelegate {
 
         @Override
@@ -702,7 +720,6 @@ public class ParticleCloud {
         }
     }
     //endregion
-
 
     private static Func<String, VariableType> toVariableType = value -> {
         if (value == null) {

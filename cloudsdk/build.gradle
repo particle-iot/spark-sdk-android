@@ -70,7 +70,7 @@ dependencies {
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
 
-    compile 'com.android.support:support-fragment:25.1.0'
+    compile 'com.android.support:support-fragment:25.1.1'
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 }
