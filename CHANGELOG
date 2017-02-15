@@ -1,3 +1,9 @@
+0.4.1
+=====
+* Optional account information included in sign up api calls
+* Exposed new device fields
+
+
 0.4.0
 =====
 * Retrolambda support + some lambdafying of the code
