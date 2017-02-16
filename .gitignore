@@ -52,6 +52,9 @@ proguard/
 .idea/tasks.xml
 .idea/gradle.xml
 .idea/libraries
+.idea/inspectionProfiles/Project_Default.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/qaplug_profiles.xml
 
 # Keystore files
 *.jks
