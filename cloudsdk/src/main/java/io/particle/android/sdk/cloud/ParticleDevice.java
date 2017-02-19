@@ -23,7 +23,7 @@ import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
-import io.particle.android.sdk.cloud.models.FlashStateChange;
+import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.utils.EZ;
 import io.particle.android.sdk.utils.ParticleInternalStringUtils;
 import io.particle.android.sdk.utils.Preconditions;
@@ -62,6 +62,16 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
+    public enum ParticleDeviceState {
+        CAME_ONLINE,
+        FLASH_STARTED,
+        FLASH_SUCCEEDED,
+        FLASH_FAILED,
+        APP_HASH_UPDATED,
+        ENTERED_SAFE_MODE,
+        SAFE_MODE_UPDATER,
+        WENT_OFFLINE
+    }
 
     public enum VariableType {
         INT,
@@ -100,6 +110,38 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
+    private final ParticleEventHandler eventHandler = new ParticleEventHandler() {
+        @Override
+        public void onEvent(String eventName, ParticleEvent particleEvent) {
+            EventBus eventBus = EventBus.getDefault();
+
+            switch (eventName) {
+                case "spark/status":
+                    sendUpdateStatusChange(eventBus, particleEvent.dataPayload);
+                    break;
+                case "spark/flash/status":
+                    sendUpdateFlashChange(eventBus, particleEvent.dataPayload);
+                    break;
+                case "spark/device/app-hash":
+                    eventBus.post(new DeviceStateChange(ParticleDevice.this,
+                            ParticleDeviceState.APP_HASH_UPDATED));
+                    break;
+                case "spark/status/safe-mode":
+                    eventBus.post(new DeviceStateChange(ParticleDevice.this,
+                            ParticleDeviceState.SAFE_MODE_UPDATER));
+                    break;
+                case "spark/safe-mode-updater/updating":
+                    eventBus.post(new DeviceStateChange(ParticleDevice.this,
+                            ParticleDeviceState.ENTERED_SAFE_MODE));
+                    break;
+            }
+        }
+
+        @Override
+        public void onEventError(Exception e) {
+            log.d("Event error in system event handler");
+        }
+    };
 
     private static final int MAX_PARTICLE_FUNCTION_ARG_LENGTH = 63;
 
@@ -117,6 +159,15 @@ public class ParticleDevice implements Parcelable {
         this.mainApi = mainApi;
         this.cloud = cloud;
         this.deviceState = deviceState;
+        subscribeSystemEvents();
+    }
+
+    private void subscribeSystemEvents() {
+        try {
+            subscribeToEvents(null, eventHandler);
+        } catch (IOException e) {
+            log.d("Failed to auto-subscribe to system events");
+        }
     }
 
     /**
@@ -454,7 +505,6 @@ public class ParticleDevice implements Parcelable {
     @WorkerThread
     private void resetFlashingState() {
         isFlashing = false;
-        EventBus.getDefault().post(new FlashStateChange(this, isFlashing));
         try {
             this.refresh();  // reload our new state
         } catch (ParticleCloudException e) {
@@ -475,7 +525,6 @@ public class ParticleDevice implements Parcelable {
         try {
             flashingChange.executeFlashingChange();
             isFlashing = true;
-            EventBus.getDefault().post(new FlashStateChange(this, isFlashing));
             cloud.notifyDeviceChanged();
             // Gross.  We're using this "run delayed" hack just for the *scheduling* aspect
             // of this, and then we're just telling the scheduled runnable to drop right back to a
@@ -486,6 +535,28 @@ public class ParticleDevice implements Parcelable {
             EZ.runOnMainThreadDelayed(30000, () -> EZ.runAsync(() -> resetFlashingState()));
         } catch (RetrofitError e) {
             throw new ParticleCloudException(e);
+        }
+    }
+
+    private void sendUpdateStatusChange(EventBus eventBus, String data) {
+        switch (data) {
+            case "online":
+                eventBus.post(new DeviceStateChange(this, ParticleDeviceState.CAME_ONLINE));
+                break;
+            case "offline":
+                eventBus.post(new DeviceStateChange(this, ParticleDeviceState.WENT_OFFLINE));
+                break;
+        }
+    }
+
+    private void sendUpdateFlashChange(EventBus eventBus, String data) {
+        switch (data) {
+            case "started":
+                eventBus.post(new DeviceStateChange(this, ParticleDeviceState.FLASH_STARTED));
+                break;
+            case "success":
+                eventBus.post(new DeviceStateChange(this, ParticleDeviceState.FLASH_SUCCEEDED));
+                break;
         }
     }
 
