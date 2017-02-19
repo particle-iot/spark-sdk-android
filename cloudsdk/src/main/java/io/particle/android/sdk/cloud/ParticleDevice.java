@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +23,7 @@ import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
+import io.particle.android.sdk.cloud.models.FlashStateChange;
 import io.particle.android.sdk.utils.EZ;
 import io.particle.android.sdk.utils.ParticleInternalStringUtils;
 import io.particle.android.sdk.utils.Preconditions;
@@ -451,6 +454,7 @@ public class ParticleDevice implements Parcelable {
     @WorkerThread
     private void resetFlashingState() {
         isFlashing = false;
+        EventBus.getDefault().post(new FlashStateChange(this, isFlashing));
         try {
             this.refresh();  // reload our new state
         } catch (ParticleCloudException e) {
@@ -459,7 +463,6 @@ public class ParticleDevice implements Parcelable {
             log.w("Unable to reset flashing state for %s" + deviceState.deviceId, e);
         }
     }
-
 
     private interface FlashingChange {
         void executeFlashingChange() throws RetrofitError;
@@ -472,6 +475,7 @@ public class ParticleDevice implements Parcelable {
         try {
             flashingChange.executeFlashingChange();
             isFlashing = true;
+            EventBus.getDefault().post(new FlashStateChange(this, isFlashing));
             cloud.notifyDeviceChanged();
             // Gross.  We're using this "run delayed" hack just for the *scheduling* aspect
             // of this, and then we're just telling the scheduled runnable to drop right back to a
