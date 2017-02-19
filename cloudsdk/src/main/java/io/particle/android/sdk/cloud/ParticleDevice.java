@@ -43,14 +43,29 @@ public class ParticleDevice implements Parcelable {
     public enum ParticleDeviceType {
         CORE,
         PHOTON,
+        P1,
+        RaspberryPi,
+        RedBearDuo,
+        Bluz,
+        DigistumpOak,
         ELECTRON;
 
         public static ParticleDeviceType fromInt(int intValue) {
             switch (intValue) {
                 case 0:
                     return CORE;
+                case 8:
+                    return P1;
                 case 10:
                     return ELECTRON;
+                case 31:
+                    return RaspberryPi;
+                case 82:
+                    return DigistumpOak;
+                case 88:
+                    return RedBearDuo;
+                case 103:
+                    return Bluz;
                 case 5:
                 case 6:
                 default:
@@ -58,7 +73,6 @@ public class ParticleDevice implements Parcelable {
             }
         }
     }
-
 
     public enum VariableType {
         INT,
@@ -485,11 +499,13 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
+
     @Override
     public String toString() {
         return "ParticleDevice{" +
                 "deviceId=" + deviceState.deviceId +
                 ", isConnected=" + deviceState.isConnected +
+                ", deviceType=" + deviceState.deviceType +
                 '}';
     }
 
