@@ -44,10 +44,10 @@ public class ParticleDevice implements Parcelable {
         CORE,
         PHOTON,
         P1,
-        RaspberryPi,
-        RedBearDuo,
-        Bluz,
-        DigistumpOak,
+        RASPBERRY_PI,
+        RED_BEAR_DUO,
+        BLUZ,
+        DIGISTUMP_OAK,
         ELECTRON;
 
         public static ParticleDeviceType fromInt(int intValue) {
@@ -59,13 +59,13 @@ public class ParticleDevice implements Parcelable {
                 case 10:
                     return ELECTRON;
                 case 31:
-                    return RaspberryPi;
+                    return RASPBERRY_PI;
                 case 82:
-                    return DigistumpOak;
+                    return DIGISTUMP_OAK;
                 case 88:
-                    return RedBearDuo;
+                    return RED_BEAR_DUO;
                 case 103:
-                    return Bluz;
+                    return BLUZ;
                 case 5:
                 case 6:
                 default:
