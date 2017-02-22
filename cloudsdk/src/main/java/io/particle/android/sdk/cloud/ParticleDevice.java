@@ -5,7 +5,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -26,7 +25,6 @@ import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
 import io.particle.android.sdk.cloud.models.DeviceStateChange;
-import io.particle.android.sdk.utils.EZ;
 import io.particle.android.sdk.utils.ParticleInternalStringUtils;
 import io.particle.android.sdk.utils.Preconditions;
 import io.particle.android.sdk.utils.TLog;
@@ -398,6 +396,15 @@ public class ParticleDevice implements Parcelable {
     }
 
     /**
+     * Unsubscribe from events.
+     *
+     * @param handler Particle event listener of the subscription to be cancelled.
+     */
+    private void unsubscribeFromEvents(SimpleParticleEventHandler handler) throws ParticleCloudException {
+        cloud.unsubscribeFromEventWithHandler(handler);
+    }
+
+    /**
      * Remove device from current logged in user account
      */
     @WorkerThread
@@ -462,18 +469,6 @@ public class ParticleDevice implements Parcelable {
         cloud.getDevice(deviceState.deviceId);
     }
 
-    @WorkerThread
-    private void resetFlashingState() {
-        isFlashing = false;
-        try {
-            this.refresh();  // reload our new state
-        } catch (ParticleCloudException e) {
-            cloud.notifyDeviceChanged();
-            // not much else we can really do here...
-            log.w("Unable to reset flashing state for %s" + deviceState.deviceId, e);
-        }
-    }
-
     private interface FlashingChange {
         void executeFlashingChange() throws RetrofitError;
     }
@@ -484,16 +479,26 @@ public class ParticleDevice implements Parcelable {
     private void performFlashingChange(FlashingChange flashingChange) throws ParticleCloudException {
         try {
             flashingChange.executeFlashingChange();
-            isFlashing = true;
-            cloud.notifyDeviceChanged();
-            // Gross.  We're using this "run delayed" hack just for the *scheduling* aspect
-            // of this, and then we're just telling the scheduled runnable to drop right back to a
-            // background thread so we don't call resetFlashingState() on the main thread.
-            // Still, I don't want to introduce a whole scheduled executor setup *just for this*,
-            // or write something that just sits in a Thread.sleep(), hogging a whole thread when
-            // more important work could be getting blocked.
-            EZ.runOnMainThreadDelayed(30000, () -> EZ.runAsync(() -> resetFlashingState()));
-        } catch (RetrofitError e) {
+            //listens for flashing event, on success unsubscribe from listening.
+            subscribeToSystemEvent("spark/flash/status", new SimpleParticleEventHandler() {
+                @Override
+                public void onEvent(String eventName, ParticleEvent particleEvent) {
+                    if (particleEvent.dataPayload.equals("success")) {
+                        isFlashing = false;
+                        try {
+                            ParticleDevice.this.refresh();
+                            unsubscribeFromEvents(this);
+                        } catch (ParticleCloudException e) {
+                            // not much else we can really do here...
+                            log.w("Unable to reset flashing state for %s" + deviceState.deviceId, e);
+                        }
+                    } else {
+                        isFlashing = true;
+                    }
+                    cloud.notifyDeviceChanged();
+                }
+            });
+        } catch (RetrofitError | IOException e) {
             throw new ParticleCloudException(e);
         }
     }
@@ -535,7 +540,7 @@ public class ParticleDevice implements Parcelable {
     }
 
     private long subscribeToSystemEvent(String eventNamePrefix,
-                                        ParticleEventHandler.SimpleParticleEventHandler
+                                        SimpleParticleEventHandler
                                                 particleEventHandler) throws IOException {
         //Error would be handled in same way for every event name prefix, thus only simple onEvent listener is needed
         return subscribeToEvents(eventNamePrefix, new ParticleEventHandler() {

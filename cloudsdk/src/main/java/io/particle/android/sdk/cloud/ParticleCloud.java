@@ -486,6 +486,16 @@ public class ParticleCloud {
     public void unsubscribeFromEventWithID(long eventListenerID) throws ParticleCloudException {
         eventsDelegate.unsubscribeFromEventWithID(eventListenerID);
     }
+
+    /**
+     * Unsubscribe event listener from events.
+     *
+     * @param handler Particle event listener you want to unsubscribe from events
+     */
+    @WorkerThread
+    void unsubscribeFromEventWithHandler(SimpleParticleEventHandler handler) throws ParticleCloudException {
+        eventsDelegate.unsubscribeFromEventWithHandler(handler);
+    }
     //endregion
 
 
