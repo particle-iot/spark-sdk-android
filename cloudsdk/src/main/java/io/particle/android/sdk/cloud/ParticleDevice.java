@@ -5,12 +5,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -110,44 +112,11 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
-    private final ParticleEventHandler eventHandler = new ParticleEventHandler() {
-        @Override
-        public void onEvent(String eventName, ParticleEvent particleEvent) {
-            EventBus eventBus = EventBus.getDefault();
-
-            switch (eventName) {
-                case "spark/status":
-                    sendUpdateStatusChange(eventBus, particleEvent.dataPayload);
-                    break;
-                case "spark/flash/status":
-                    sendUpdateFlashChange(eventBus, particleEvent.dataPayload);
-                    break;
-                case "spark/device/app-hash":
-                    eventBus.post(new DeviceStateChange(ParticleDevice.this,
-                            ParticleDeviceState.APP_HASH_UPDATED));
-                    break;
-                case "spark/status/safe-mode":
-                    eventBus.post(new DeviceStateChange(ParticleDevice.this,
-                            ParticleDeviceState.SAFE_MODE_UPDATER));
-                    break;
-                case "spark/safe-mode-updater/updating":
-                    eventBus.post(new DeviceStateChange(ParticleDevice.this,
-                            ParticleDeviceState.ENTERED_SAFE_MODE));
-                    break;
-            }
-        }
-
-        @Override
-        public void onEventError(Exception e) {
-            log.d("Event error in system event handler");
-        }
-    };
-
     private static final int MAX_PARTICLE_FUNCTION_ARG_LENGTH = 63;
 
     private static final TLog log = TLog.get(ParticleDevice.class);
 
-
+    private final List<Long> subscriptions = new ArrayList<>();
     private final ApiDefs.CloudApi mainApi;
     private final ParticleCloud cloud;
 
@@ -159,15 +128,6 @@ public class ParticleDevice implements Parcelable {
         this.mainApi = mainApi;
         this.cloud = cloud;
         this.deviceState = deviceState;
-        subscribeSystemEvents();
-    }
-
-    private void subscribeSystemEvents() {
-        try {
-            subscribeToEvents(null, eventHandler);
-        } catch (IOException e) {
-            log.d("Failed to auto-subscribe to system events");
-        }
     }
 
     /**
@@ -536,6 +496,59 @@ public class ParticleDevice implements Parcelable {
         } catch (RetrofitError e) {
             throw new ParticleCloudException(e);
         }
+    }
+
+    /**
+     * Subscribes to system events of current device. Events emitted to EventBus listener.
+     *
+     * @throws ParticleCloudException Failure to subscribe to system events.
+     * @see <a href="https://github.com/greenrobot/EventBus">EventBus</a>
+     */
+    public void subscribeToSystemEvents() throws ParticleCloudException {
+        try {
+            EventBus eventBus = EventBus.getDefault();
+            subscriptions.add(subscribeToSystemEvent("spark/status", (eventName, particleEvent) ->
+                    sendUpdateStatusChange(eventBus, particleEvent.dataPayload)));
+            subscriptions.add(subscribeToSystemEvent("spark/flash/status", (eventName, particleEvent) ->
+                    sendUpdateFlashChange(eventBus, particleEvent.dataPayload)));
+            subscriptions.add(subscribeToSystemEvent("spark/device/app-hash", (eventName, particleEvent) ->
+                    eventBus.post(new DeviceStateChange(ParticleDevice.this, ParticleDeviceState.APP_HASH_UPDATED))));
+            subscriptions.add(subscribeToSystemEvent("spark/status/safe-mode", (eventName, particleEvent) ->
+                    eventBus.post(new DeviceStateChange(ParticleDevice.this, ParticleDeviceState.SAFE_MODE_UPDATER))));
+            subscriptions.add(subscribeToSystemEvent("spark/safe-mode-updater/updating", (eventName, particleEvent) ->
+                    eventBus.post(new DeviceStateChange(ParticleDevice.this, ParticleDeviceState.ENTERED_SAFE_MODE))));
+        } catch (IOException e) {
+            log.d("Failed to auto-subscribe to system events");
+            throw new ParticleCloudException(e);
+        }
+    }
+
+    /**
+     * Unsubscribes from system events of current device.
+     *
+     * @throws ParticleCloudException Failure to unsubscribe from system events.
+     */
+    public void unsubscribeFromSystemEvents() throws ParticleCloudException {
+        for (Long subscriptionId : subscriptions) {
+            unsubscribeFromEvents(subscriptionId);
+        }
+    }
+
+    private long subscribeToSystemEvent(String eventNamePrefix,
+                                        ParticleEventHandler.SimpleParticleEventHandler
+                                                particleEventHandler) throws IOException {
+        //Error would be handled in same way for every event name prefix, thus only simple onEvent listener is needed
+        return subscribeToEvents(eventNamePrefix, new ParticleEventHandler() {
+            @Override
+            public void onEvent(String eventName, ParticleEvent particleEvent) {
+                particleEventHandler.onEvent(eventName, particleEvent);
+            }
+
+            @Override
+            public void onEventError(Exception e) {
+                log.d("Event error in system event handler");
+            }
+        });
     }
 
     private void sendUpdateStatusChange(EventBus eventBus, String data) {
