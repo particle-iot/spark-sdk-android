@@ -2,6 +2,7 @@ package io.particle.android.sdk.cloud.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -10,9 +11,9 @@ import io.particle.android.sdk.cloud.ParticleDevice;
 @ParametersAreNonnullByDefault
 public class DeviceStateChange implements Parcelable {
     private final ParticleDevice device;
-    private final ParticleDevice.ParticleDeviceState state;
+    @NonNull private final ParticleDevice.ParticleDeviceState state;
 
-    public DeviceStateChange(ParticleDevice device, ParticleDevice.ParticleDeviceState state) {
+    public DeviceStateChange(ParticleDevice device, @NonNull ParticleDevice.ParticleDeviceState state) {
         this.device = device;
         this.state = state;
     }
@@ -26,13 +27,14 @@ public class DeviceStateChange implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.device, flags);
-        dest.writeInt(this.state == null ? -1 : this.state.ordinal());
+        dest.writeInt(this.state == ParticleDevice.ParticleDeviceState.UNKNOWN ? -1 : this.state.ordinal());
     }
 
     protected DeviceStateChange(Parcel in) {
         this.device = in.readParcelable(ParticleDevice.class.getClassLoader());
         int tmpState = in.readInt();
-        this.state = tmpState == -1 ? null : ParticleDevice.ParticleDeviceState.values()[tmpState];
+        this.state = tmpState == -1 ? ParticleDevice.ParticleDeviceState.UNKNOWN :
+                ParticleDevice.ParticleDeviceState.values()[tmpState];
     }
 
     public static final Parcelable.Creator<DeviceStateChange> CREATOR = new Parcelable.Creator<DeviceStateChange>() {
@@ -51,6 +53,7 @@ public class DeviceStateChange implements Parcelable {
         return device;
     }
 
+    @NonNull
     public ParticleDevice.ParticleDeviceState getState() {
         return state;
     }

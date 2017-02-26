@@ -30,6 +30,7 @@ import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
+import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.cloud.models.SignUpInfo;
 import io.particle.android.sdk.persistance.AppDataStorage;
 import io.particle.android.sdk.utils.Funcy;
@@ -544,6 +545,12 @@ public class ParticleCloud {
     // FIXME: exposing this is weak, figure out something better
     void notifyDeviceChanged() {
         sendUpdateBroadcast();
+    }
+
+    void sendSystemEventBroadcast(DeviceStateChange stateChange) {
+        Intent intent = new Intent(BroadcastContract.BROADCAST_SYSTEM_EVENT);
+        intent.putExtra("event", stateChange);
+        broadcastManager.sendBroadcast(intent);
     }
 
     // this is accessible at the package level for access from ParticleDevice's Parcelable impl

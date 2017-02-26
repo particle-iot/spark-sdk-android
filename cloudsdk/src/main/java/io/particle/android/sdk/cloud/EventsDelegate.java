@@ -112,11 +112,10 @@ class EventsDelegate {
     void unsubscribeFromEventWithHandler(SimpleParticleEventHandler handler) throws ParticleCloudException {
         synchronized (eventReaders) {
             for (int i = 0; i < eventReaders.size(); i++) {
-                long key = eventReaders.keyAt(i);
-                EventReader reader = eventReaders.get(key);
+                EventReader reader = eventReaders.valueAt(i);
 
                 if (reader.handler == handler) {
-                    eventReaders.remove(key);
+                    eventReaders.remove(i);
                     try {
                         reader.stopListening();
                     } catch (IOException e) {
