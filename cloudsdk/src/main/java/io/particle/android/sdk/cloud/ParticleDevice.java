@@ -66,7 +66,6 @@ public class ParticleDevice implements Parcelable {
                     return RED_BEAR_DUO;
                 case 103:
                     return BLUZ;
-                case 5:
                 case 6:
                 default:
                     return PHOTON;
