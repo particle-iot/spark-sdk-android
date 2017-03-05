@@ -151,13 +151,7 @@ class EventsDelegate {
         void startListening() throws IOException {
             sseEventSource.connect();
             final SseEventReader sseEventReader = sseEventSource.getEventReader();
-
-            future = executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    startHandlingEvents(sseEventReader);
-                }
-            });
+            future = executor.submit(() -> startHandlingEvents(sseEventReader));
         }
 
         void stopListening() throws IOException {
