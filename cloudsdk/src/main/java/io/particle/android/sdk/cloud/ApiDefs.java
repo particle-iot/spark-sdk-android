@@ -136,6 +136,11 @@ public class ApiDefs {
                                       @Field("password") String password);
 
         @FormUrlEncoded
+        @POST("/oauth/token")
+        Responses.LogInResponse logIn(@Field("grant_type") String grantType,
+                                      @Field("refresh_token") String refreshToken);
+
+        @FormUrlEncoded
         @POST("/v1/password/reset")
 //        @POST("/v1/orgs/{orgName}/customers/reset_password")
         Response requestPasswordReset(@Field("email") String email);//,

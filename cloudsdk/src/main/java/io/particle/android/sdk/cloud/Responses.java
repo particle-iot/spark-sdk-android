@@ -218,12 +218,16 @@ public class Responses {
         @SerializedName("access_token")
         public final String accessToken;
 
+        @SerializedName("refresh_token")
+        public final String refreshToken;
+
         @SerializedName("token_type")
         public final String tokenType;
 
-        public LogInResponse(long expiresInSeconds, String accessToken, String tokenType) {
+        public LogInResponse(long expiresInSeconds, String accessToken, String refreshToken, String tokenType) {
             this.expiresInSeconds = expiresInSeconds;
             this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
             this.tokenType = tokenType;
         }
     }

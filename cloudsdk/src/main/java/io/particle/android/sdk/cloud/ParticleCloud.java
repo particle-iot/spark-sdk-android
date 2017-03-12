@@ -11,6 +11,7 @@ import android.support.v4.util.ArrayMap;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -121,9 +122,20 @@ public class ParticleCloud {
         return (this.token == null) ? null : this.token.getAccessToken();
     }
 
+    public void setAccessToken(String tokenString) {
+        Calendar distantFuture = Calendar.getInstance();
+        //Adding 20 years to current time to create date in distant future
+        distantFuture.add(Calendar.YEAR, 20);
+        setAccessToken(tokenString, distantFuture.getTime(), null);
+    }
+
     public void setAccessToken(String tokenString, Date expirationDate) {
+        setAccessToken(tokenString, expirationDate, null);
+    }
+
+    public void setAccessToken(String tokenString, Date expirationDate, @Nullable String refreshToken) {
         ParticleAccessToken.removeSession();
-        this.token = ParticleAccessToken.fromTokenData(expirationDate, tokenString);
+        this.token = ParticleAccessToken.fromTokenData(expirationDate, tokenString, refreshToken);
         this.token.setDelegate(tokenDelegate);
     }
 
@@ -603,7 +615,7 @@ public class ParticleCloud {
         // Once analytics are in place, look into adding something here so we know where
         // this is coming from.  In the meantime, filter out nulls from this list, since that's
         // obviously doubleplusungood.
-        Set<String> functions = set(Funcy.filter(completeDevice.functions, Funcy.<String>notNull()));
+        Set<String> functions = set(Funcy.filter(completeDevice.functions, Funcy.notNull()));
         Map<String, VariableType> variables = transformVariables(completeDevice);
 
         return new DeviceState.DeviceStateBuilder(completeDevice.deviceId, functions, variables)
@@ -696,6 +708,17 @@ public class ParticleCloud {
         }
     }
 
+    @WorkerThread
+    private void refreshAccessToken(String refreshToken) throws ParticleCloudException {
+        try {
+            Responses.LogInResponse response = identityApi.logIn("refresh_token", refreshToken);
+            ParticleAccessToken.removeSession();
+            this.token = ParticleAccessToken.fromNewSession(response);
+            this.token.setDelegate(tokenDelegate);
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
 
     private static final Func<SimpleDevice, String> toDeviceId = input -> input.id;
 
@@ -704,16 +727,25 @@ public class ParticleCloud {
         @Override
         public void accessTokenExpiredAt(final ParticleAccessToken accessToken, Date expirationDate) {
             // handle auto-renewal of expired access tokens by internal timer event
-            // If user is null, don't bother because we have no credentials.
-            if (user != null) {
+            String refreshToken = accessToken.getRefreshToken();
+            if (refreshToken != null) {
                 try {
-                    logIn(user.getUser(), user.getPassword());
+                    refreshAccessToken(refreshToken);
                     return;
-
                 } catch (ParticleCloudException e) {
-                    log.e("Error while trying to log in: ", e);
+                    log.e("Error while trying to refresh token: ", e);
                 }
             }
+            //TODO remove if login is not needed
+            // If user is null, don't bother because we have no credentials.
+//            if (user != null) {
+//                try {
+//                    logIn(user.getUser(), user.getPassword());
+//                    return;
+//                } catch (ParticleCloudException e) {
+//                    log.e("Error while trying to log in: ", e);
+//                }
+//            }
 
             ParticleAccessToken.removeSession();
             token = null;
