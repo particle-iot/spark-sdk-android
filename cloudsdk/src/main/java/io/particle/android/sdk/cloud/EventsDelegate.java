@@ -172,8 +172,11 @@ class EventsDelegate {
 
                         ParticleEvent event = gson.fromJson(asStr, ParticleEvent.class);
 
-                        handler.onEvent(sseEventReader.getName(), event);
-
+                        try {
+                            handler.onEvent(sseEventReader.getName(), event);
+                        } catch (Exception ex) {
+                            handler.onEventError(ex);
+                        }
                     } else {
                         log.w("type null or not data: " + type);
                     }
