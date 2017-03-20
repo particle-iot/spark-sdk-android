@@ -108,6 +108,27 @@ class EventsDelegate {
         }
     }
 
+    @WorkerThread
+    void unsubscribeFromEventWithHandler(SimpleParticleEventHandler handler) throws ParticleCloudException {
+        synchronized (eventReaders) {
+            for (int i = 0; i < eventReaders.size(); i++) {
+                EventReader reader = eventReaders.valueAt(i);
+
+                if (reader.handler == handler) {
+                    eventReaders.remove(i);
+                    try {
+                        reader.stopListening();
+                    } catch (IOException e) {
+                        // handling the exception here instead of putting it in the method signature
+                        // is inconsistent, but SDK consumers aren't going to care about receiving
+                        // this exception, so just swallow it here.
+                        log.w("Error while trying to stop event listener", e);
+                    }
+                    return;
+                }
+            }
+        }
+    }
 
     private long subscribeToEventWithUri(Uri uri, ParticleEventHandler handler) throws IOException {
         synchronized (eventReaders) {
@@ -152,12 +173,7 @@ class EventsDelegate {
             sseEventSource.connect();
             final SseEventReader sseEventReader = sseEventSource.getEventReader();
 
-            future = executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    startHandlingEvents(sseEventReader);
-                }
-            });
+            future = executor.submit(() -> startHandlingEvents(sseEventReader));
         }
 
         void stopListening() throws IOException {
