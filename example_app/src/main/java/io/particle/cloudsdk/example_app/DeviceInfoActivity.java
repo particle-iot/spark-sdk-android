@@ -7,12 +7,17 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.io.IOException;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleDevice;
+import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.utils.Async;
+import io.particle.android.sdk.utils.Toaster;
 
 /**
  * Created by Julius.
@@ -29,6 +34,7 @@ public class DeviceInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_info);
+        //Get and display device information
         nameView = (TextView) findViewById(R.id.name);
         productIdView = (TextView) findViewById(R.id.productId);
         platformIdView = (TextView) findViewById(R.id.platformId);
@@ -44,7 +50,9 @@ public class DeviceInfoActivity extends AppCompatActivity {
         Async.executeAsync(ParticleCloud.get(this), new Async.ApiWork<ParticleCloud, ParticleDevice>() {
             @Override
             public ParticleDevice callApi(@NonNull ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
-                return ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
+                ParticleDevice device = ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
+                device.subscribeToSystemEvents();
+                return device;
             }
 
             @Override
@@ -67,6 +75,30 @@ public class DeviceInfoActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //Register to EventBus for system event listening
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onEvent(DeviceStateChange deviceStateChange) {
+        Toaster.l(this, deviceStateChange.getDevice().getName() + " system event received");
+        //unsubscribe from further system events
+        try {
+            deviceStateChange.getDevice().unsubscribeFromSystemEvents();
+        } catch (ParticleCloudException e) {
+            Toaster.l(this, "Failed to unsubscribe.");
+        }
     }
 
     public static Intent buildIntent(Context ctx, String deviceId) {
