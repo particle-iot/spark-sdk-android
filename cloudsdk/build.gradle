@@ -69,6 +69,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.7.5'
     compile 'com.squareup.okio:okio:1.9.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
 
     compile 'com.android.support:support-fragment:25.2.0'
 

@@ -3,8 +3,11 @@ package io.particle.android.sdk.cloud;
 import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -21,7 +25,7 @@ import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
-import io.particle.android.sdk.utils.EZ;
+import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.utils.ParticleInternalStringUtils;
 import io.particle.android.sdk.utils.Preconditions;
 import io.particle.android.sdk.utils.TLog;
@@ -59,6 +63,17 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
+    public enum ParticleDeviceState {
+        CAME_ONLINE,
+        FLASH_STARTED,
+        FLASH_SUCCEEDED,
+        FLASH_FAILED,
+        APP_HASH_UPDATED,
+        ENTERED_SAFE_MODE,
+        SAFE_MODE_UPDATER,
+        WENT_OFFLINE,
+        UNKNOWN
+    }
 
     public enum VariableType {
         INT,
@@ -97,12 +112,11 @@ public class ParticleDevice implements Parcelable {
         }
     }
 
-
     private static final int MAX_PARTICLE_FUNCTION_ARG_LENGTH = 63;
 
     private static final TLog log = TLog.get(ParticleDevice.class);
 
-
+    private final CopyOnWriteArrayList<Long> subscriptions = new CopyOnWriteArrayList<>();
     private final ApiDefs.CloudApi mainApi;
     private final ParticleCloud cloud;
 
@@ -448,19 +462,6 @@ public class ParticleDevice implements Parcelable {
         cloud.getDevice(deviceState.deviceId);
     }
 
-    @WorkerThread
-    private void resetFlashingState() {
-        isFlashing = false;
-        try {
-            this.refresh();  // reload our new state
-        } catch (ParticleCloudException e) {
-            cloud.notifyDeviceChanged();
-            // not much else we can really do here...
-            log.w("Unable to reset flashing state for %s" + deviceState.deviceId, e);
-        }
-    }
-
-
     private interface FlashingChange {
         void executeFlashingChange() throws RetrofitError;
     }
@@ -471,17 +472,117 @@ public class ParticleDevice implements Parcelable {
     private void performFlashingChange(FlashingChange flashingChange) throws ParticleCloudException {
         try {
             flashingChange.executeFlashingChange();
-            isFlashing = true;
-            cloud.notifyDeviceChanged();
-            // Gross.  We're using this "run delayed" hack just for the *scheduling* aspect
-            // of this, and then we're just telling the scheduled runnable to drop right back to a
-            // background thread so we don't call resetFlashingState() on the main thread.
-            // Still, I don't want to introduce a whole scheduled executor setup *just for this*,
-            // or write something that just sits in a Thread.sleep(), hogging a whole thread when
-            // more important work could be getting blocked.
-            EZ.runOnMainThreadDelayed(30000, () -> EZ.runAsync(() -> resetFlashingState()));
-        } catch (RetrofitError e) {
+            //listens for flashing event, on success unsubscribe from listening.
+            subscribeToSystemEvent("spark/flash/status", new SimpleParticleEventHandler() {
+                @Override
+                public void onEvent(String eventName, ParticleEvent particleEvent) {
+                    if ("success".equals(particleEvent.dataPayload)) {
+                        isFlashing = false;
+                        try {
+                            ParticleDevice.this.refresh();
+                            cloud.unsubscribeFromEventWithHandler(this);
+                        } catch (ParticleCloudException e) {
+                            // not much else we can really do here...
+                            log.w("Unable to reset flashing state for %s" + deviceState.deviceId, e);
+                        }
+                    } else {
+                        isFlashing = true;
+                    }
+                    cloud.notifyDeviceChanged();
+                }
+            });
+        } catch (RetrofitError | IOException e) {
             throw new ParticleCloudException(e);
+        }
+    }
+
+    /**
+     * Subscribes to system events of current device. Events emitted to EventBus listener.
+     *
+     * @throws ParticleCloudException Failure to subscribe to system events.
+     * @see <a href="https://github.com/greenrobot/EventBus">EventBus</a>
+     */
+    @MainThread
+    public void subscribeToSystemEvents() throws ParticleCloudException {
+        try {
+            EventBus eventBus = EventBus.getDefault();
+            subscriptions.add(subscribeToSystemEvent("spark/status", (eventName, particleEvent) ->
+                    sendUpdateStatusChange(eventBus, particleEvent.dataPayload)));
+            subscriptions.add(subscribeToSystemEvent("spark/flash/status", (eventName, particleEvent) ->
+                    sendUpdateFlashChange(eventBus, particleEvent.dataPayload)));
+            subscriptions.add(subscribeToSystemEvent("spark/device/app-hash", (eventName, particleEvent) ->
+                    sendSystemEventBroadcast(new DeviceStateChange(ParticleDevice.this,
+                            ParticleDeviceState.APP_HASH_UPDATED), eventBus)));
+            subscriptions.add(subscribeToSystemEvent("spark/status/safe-mode", (eventName, particleEvent) ->
+                    sendSystemEventBroadcast(new DeviceStateChange(ParticleDevice.this,
+                            ParticleDeviceState.SAFE_MODE_UPDATER), eventBus)));
+            subscriptions.add(subscribeToSystemEvent("spark/safe-mode-updater/updating", (eventName, particleEvent) ->
+                    sendSystemEventBroadcast(new DeviceStateChange(ParticleDevice.this,
+                            ParticleDeviceState.ENTERED_SAFE_MODE), eventBus)));
+        } catch (IOException e) {
+            log.d("Failed to auto-subscribe to system events");
+            throw new ParticleCloudException(e);
+        }
+    }
+
+    private void sendSystemEventBroadcast(DeviceStateChange deviceStateChange, EventBus eventBus) {
+        cloud.sendSystemEventBroadcast(deviceStateChange);
+        eventBus.post(deviceStateChange);
+    }
+
+    /**
+     * Unsubscribes from system events of current device.
+     *
+     * @throws ParticleCloudException Failure to unsubscribe from system events.
+     */
+    public void unsubscribeFromSystemEvents() throws ParticleCloudException {
+        for (Long subscriptionId : subscriptions) {
+            unsubscribeFromEvents(subscriptionId);
+        }
+    }
+
+    private long subscribeToSystemEvent(String eventNamePrefix,
+                                        SimpleParticleEventHandler
+                                                particleEventHandler) throws IOException {
+        //Error would be handled in same way for every event name prefix, thus only simple onEvent listener is needed
+        return subscribeToEvents(eventNamePrefix, new ParticleEventHandler() {
+            @Override
+            public void onEvent(String eventName, ParticleEvent particleEvent) {
+                particleEventHandler.onEvent(eventName, particleEvent);
+            }
+
+            @Override
+            public void onEventError(Exception e) {
+                log.d("Event error in system event handler");
+            }
+        });
+    }
+
+    private void sendUpdateStatusChange(EventBus eventBus, String data) {
+        DeviceStateChange deviceStateChange = null;
+        switch (data) {
+            case "online":
+                sendSystemEventBroadcast(new DeviceStateChange(this, ParticleDeviceState.CAME_ONLINE),
+                        eventBus);
+                break;
+            case "offline":
+                sendSystemEventBroadcast(new DeviceStateChange(this, ParticleDeviceState.WENT_OFFLINE),
+                        eventBus);
+                break;
+        }
+    }
+
+    private void sendUpdateFlashChange(EventBus eventBus, String data) {
+        DeviceStateChange deviceStateChange = null;
+        switch (data) {
+            case "started":
+                sendSystemEventBroadcast(new DeviceStateChange(this, ParticleDeviceState.FLASH_STARTED),
+                        eventBus);
+                break;
+            case "success":
+                sendSystemEventBroadcast(new DeviceStateChange(this, ParticleDeviceState.FLASH_SUCCEEDED),
+                        eventBus);
+                break;
         }
     }
 
