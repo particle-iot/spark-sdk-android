@@ -96,9 +96,8 @@ public class ApiDefs {
         ClaimCodeResponse generateClaimCode(@Field("blank") String blankBody);
 
         @FormUrlEncoded
-        @POST("/v1/orgs/{orgSlug}/products/{productSlug}/device_claims")
+        @POST("/v1/products/{productSlug}/device_claims")
         ClaimCodeResponse generateClaimCodeForOrg(@Field("blank") String blankBody,
-                                                  @Path("orgSlug") String orgSlug,
                                                   @Path("productSlug") String productSlug);
 
         @FormUrlEncoded
@@ -125,9 +124,9 @@ public class ApiDefs {
 
         // NOTE: the `LogInResponse` used here as a return type is intentional.  It looks
         // a little odd, but that's how this endpoint works.
-        @POST("/v1/orgs/{orgSlug}/customers")
+        @POST("/v1/products/{productSlug}/customers")
         Responses.LogInResponse signUpAndLogInWithCustomer(@Body SignUpInfo signUpInfo,
-                                                           @Path("orgSlug") String orgSlug);
+                                                           @Path("productSlug") String productSlug);
 
         @FormUrlEncoded
         @POST("/oauth/token")
@@ -140,6 +139,10 @@ public class ApiDefs {
 //        @POST("/v1/orgs/{orgName}/customers/reset_password")
         Response requestPasswordReset(@Field("email") String email);//,
 //                                      @Path("orgName") String orgName);
-    }
 
+        @FormUrlEncoded
+        @POST("/v1/products/{productSlug}/customers/reset_password")
+        Response requestPasswordResetForCustomer(@Field("email") String email,
+                                                 @Path("productSlug") String productSlug);
+    }
 }
