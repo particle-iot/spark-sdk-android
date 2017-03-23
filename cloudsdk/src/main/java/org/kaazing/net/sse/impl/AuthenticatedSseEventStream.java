@@ -58,19 +58,15 @@ public class AuthenticatedSseEventStream extends SseEventStream {
     private final StringBuffer dataBuffer = new StringBuffer();
     private transient static final Timer timer = new Timer("reconnect", true);
 
-    static final HttpRequestHandlerFactory SSE_HANDLER_FACTORY = new HttpRequestHandlerFactory() {
+    static final HttpRequestHandlerFactory SSE_HANDLER_FACTORY = () -> {
+        HttpRequestAuthenticationHandler authHandler = new HttpRequestAuthenticationHandler();
+        HttpRequestRedirectHandler redirectHandler = new HttpRequestRedirectHandler();
+        HttpRequestHandler transportHandler = HttpRequestTransportHandler.DEFAULT_FACTORY.createHandler();
 
-        @Override
-        public HttpRequestHandler createHandler() {
-            HttpRequestAuthenticationHandler authHandler = new HttpRequestAuthenticationHandler();
-            HttpRequestRedirectHandler redirectHandler = new HttpRequestRedirectHandler();
-            HttpRequestHandler transportHandler = HttpRequestTransportHandler.DEFAULT_FACTORY.createHandler();
+        authHandler.setNextHandler(redirectHandler);
+        redirectHandler.setNextHandler(transportHandler);
 
-            authHandler.setNextHandler(redirectHandler);
-            redirectHandler.setNextHandler(transportHandler);
-
-            return authHandler;
-        }
+        return authHandler;
     };
 
     private ReadyState readyState = ReadyState.CONNECTING;
@@ -87,6 +83,7 @@ public class AuthenticatedSseEventStream extends SseEventStream {
     private HttpRequestHandler sseHandler;
     private SseEventStreamListener listener;
     private final ParticleCloud cloud;
+    private String name = MESSAGE;
 
     public AuthenticatedSseEventStream(String sseLoc, ParticleCloud cloud) throws IOException {
         super(sseLoc);
@@ -118,7 +115,7 @@ public class AuthenticatedSseEventStream extends SseEventStream {
     public void connect() throws IOException {
         LOG.entering(CLASS_NAME, "connect");
         if (lastEventId != null && (lastEventId.length() > 0)) {
-            sseLocation += (sseLocation.indexOf("?") == -1 ? "?" : "&") + ".ka=" + lastEventId;
+            sseLocation += (!sseLocation.contains("?") ? "?" : "&") + ".ka=" + lastEventId;
         }
 
         try {
@@ -193,10 +190,8 @@ public class AuthenticatedSseEventStream extends SseEventStream {
         String line;
         try {
             messageBuffer = messageBuffer + message;
-            String field = null;
-            String value = null;
-            String name = MESSAGE;
-            String data = "";
+            String field;
+            String value;
             immediateReconnect = false;
             while (!aborted && !errored) {
                 line = fetchLineFromBuffer();
@@ -232,23 +227,30 @@ public class AuthenticatedSseEventStream extends SseEventStream {
                     value = line.substring(valueAt);
                 }
                 // process the field of completed event
-                if (field.equals("event")) {
-                    name = value;
-                } else if (field.equals("id")) {
-                    this.lastEventId = value;
-                } else if (field.equals("retry")) {
-                    retry = Integer.parseInt(value);
-                } else if (field.equals("data")) {
-                    // deliver event if data is specified and non-empty, or name is specified and not "message"
-                    if (value != null || (name != null && name.length() > 0 && !MESSAGE.equals(name))) {
-                        dataBuffer.append(value).append("\n");
-                    }
-                } else if (field.equals("location")) {
-                    if (value != null && value.length() > 0) {
-                        this.sseLocation = value;
-                    }
-                } else if (field.equals("reconnect")) {
-                    immediateReconnect = true;
+                switch (field) {
+                    case "event":
+                        name = value;
+                        break;
+                    case "id":
+                        this.lastEventId = value;
+                        break;
+                    case "retry":
+                        retry = Integer.parseInt(value);
+                        break;
+                    case "data":
+                        // deliver event if data is specified and non-empty, or name is specified and not "message"
+                        if (name != null && name.length() > 0 && !MESSAGE.equals(name)) {
+                            dataBuffer.append(value).append("\n");
+                        }
+                        break;
+                    case "location":
+                        if (value.length() > 0) {
+                            this.sseLocation = value;
+                        }
+                        break;
+                    case "reconnect":
+                        immediateReconnect = true;
+                        break;
                 }
             }
 
@@ -331,10 +333,10 @@ public class AuthenticatedSseEventStream extends SseEventStream {
     }
 
     private void doOpen() {
-        /**
-         * Only file the event once in the case its already opened,
-         * Currently, this is being called twice, once when the SSE
-         * gets connected and then again when the ready state changes.
+        /*
+          Only file the event once in the case its already opened,
+          Currently, this is being called twice, once when the SSE
+          gets connected and then again when the ready state changes.
          */
         if (readyState == ReadyState.CONNECTING) {
             readyState = ReadyState.OPEN;
@@ -345,6 +347,7 @@ public class AuthenticatedSseEventStream extends SseEventStream {
     private void doMessage(String eventName, String data) {
         // messages before OPEN and after CLOSE should not be delivered.
         if (getReadyState() != ReadyState.OPEN) {
+            LOG.log(Level.INFO, "event message discarded " + getReadyState().name());
             return;
         }
 
@@ -353,6 +356,7 @@ public class AuthenticatedSseEventStream extends SseEventStream {
 
     private void doError(Exception exception) {
         if (getReadyState() == ReadyState.CLOSED) {
+            LOG.log(Level.INFO, "event error discarded " + getReadyState().name());
             return;
         }
 

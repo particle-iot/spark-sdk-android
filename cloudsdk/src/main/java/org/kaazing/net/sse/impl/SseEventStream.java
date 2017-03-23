@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2007-2014 Kaazing Corporation. All rights reserved.
- * 
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -8,9 +8,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -47,54 +47,51 @@ import java.util.logging.Logger;
  * ServerSentEvent stream implementation.
  */
 public class SseEventStream {
-    private static final String  MESSAGE = "message";
-    private static final String  CLASS_NAME = SseEventStream.class.getName();
-    private static final Logger  LOG = Logger.getLogger(CLASS_NAME);
+    private static final String MESSAGE = "message";
+    private static final String CLASS_NAME = SseEventStream.class.getName();
+    private static final Logger LOG = Logger.getLogger(CLASS_NAME);
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private final StringBuffer dataBuffer = new StringBuffer();
+    private String name = MESSAGE;
 
     private transient static final Timer timer = new Timer("reconnect", true);
 
-    static final HttpRequestHandlerFactory SSE_HANDLER_FACTORY = new HttpRequestHandlerFactory() {
-        
-        @Override
-        public HttpRequestHandler createHandler() {
-            HttpRequestAuthenticationHandler authHandler = new HttpRequestAuthenticationHandler();
-            HttpRequestRedirectHandler redirectHandler = new HttpRequestRedirectHandler();
-            HttpRequestHandler transportHandler = HttpRequestTransportHandler.DEFAULT_FACTORY.createHandler();
-  
-            authHandler.setNextHandler(redirectHandler);
-            redirectHandler.setNextHandler(transportHandler);
-            
-            return authHandler;
-        }
+    static final HttpRequestHandlerFactory SSE_HANDLER_FACTORY = () -> {
+        HttpRequestAuthenticationHandler authHandler = new HttpRequestAuthenticationHandler();
+        HttpRequestRedirectHandler redirectHandler = new HttpRequestRedirectHandler();
+        HttpRequestHandler transportHandler = HttpRequestTransportHandler.DEFAULT_FACTORY.createHandler();
+
+        authHandler.setNextHandler(redirectHandler);
+        redirectHandler.setNextHandler(transportHandler);
+
+        return authHandler;
     };
 
-    private ReadyState             readyState = ReadyState.CONNECTING;
-    private String                 lastEventId = "";
-    private boolean                aborted = false;
-    private boolean                errored = false;
-    private String                 sseLocation;
-    private long                   retry = 3000; // same as actionscript implementation
-    private boolean                immediateReconnect = false;
-    private String                 messageBuffer = "";
-    private HttpRequest            sseSource;
-    private AtomicBoolean          progressEventReceived = new AtomicBoolean(false);
-    private AtomicBoolean          reconnected = new AtomicBoolean(false);
-    private HttpRequestHandler     sseHandler;
+    private ReadyState readyState = ReadyState.CONNECTING;
+    private String lastEventId = "";
+    private boolean aborted = false;
+    private boolean errored = false;
+    private String sseLocation;
+    private long retry = 3000; // same as actionscript implementation
+    private boolean immediateReconnect = false;
+    private String messageBuffer = "";
+    private HttpRequest sseSource;
+    private AtomicBoolean progressEventReceived = new AtomicBoolean(false);
+    private AtomicBoolean reconnected = new AtomicBoolean(false);
+    private HttpRequestHandler sseHandler;
     private SseEventStreamListener listener;
 
 
     public SseEventStream(String sseLoc) throws IOException {
         LOG.entering(CLASS_NAME, "<init>", sseLoc);
-        
+
         // Validate the URI.
         URI.create(sseLoc);
- 
+
         this.sseLocation = sseLoc;
 
         sseHandler = SSE_HANDLER_FACTORY.createHandler();
-        
+
         sseHandler.setListener(new EventStreamHttpRequestListener());
     }
 
@@ -112,7 +109,7 @@ public class SseEventStream {
     public void connect() throws IOException {
         LOG.entering(CLASS_NAME, "connect");
         if (lastEventId != null && (lastEventId.length() > 0)) {
-            sseLocation += (sseLocation.indexOf("?") == -1 ? "?" : "&") + ".ka=" + lastEventId;
+            sseLocation += (!sseLocation.contains("?") ? "?" : "&") + ".ka=" + lastEventId;
         }
 
         try {
@@ -125,7 +122,7 @@ public class SseEventStream {
                     @Override
                     public void run() {
                         // TODO: Why is this commented out? - no fallback to long polling?
-                        
+
                         // if (!SseEventStream.this.progressEventReceived.get() && readyState != ReadyState.CLOSED) {
                         // if (sseLocation.indexOf("?") == -1) {
                         // sseLocation += "?.ki=p";
@@ -154,11 +151,11 @@ public class SseEventStream {
             doError(e);
         }
     }
-    
+
     public long getRetryTimeout() {
         return retry;
     }
-    
+
     public void setRetryTimeout(long millis) {
         retry = millis;
     }
@@ -186,10 +183,8 @@ public class SseEventStream {
         String line;
         try {
             messageBuffer = messageBuffer + message;
-            String field = null;
-            String value = null;
-            String name = MESSAGE;
-            String data = "";
+            String field;
+            String value;
             immediateReconnect = false;
             while (!aborted && !errored) {
                 line = fetchLineFromBuffer();
@@ -207,7 +202,7 @@ public class SseEventStream {
                         dataBuffer.setLength(0);
                     }
                 }
-                
+
                 int colonAt = line.indexOf(':');
                 if (colonAt == -1) {
                     // no colon, line is field name with empty value
@@ -225,23 +220,30 @@ public class SseEventStream {
                     value = line.substring(valueAt);
                 }
                 // process the field of completed event
-                if (field.equals("event")) {
-                    name = value;
-                } else if (field.equals("id")) {
-                    this.lastEventId = value;
-                } else if (field.equals("retry")) {
-                    retry = Integer.parseInt(value);
-                } else if (field.equals("data")) {
-                    // deliver event if data is specified and non-empty, or name is specified and not "message"
-                    if (value != null || (name != null && name.length() > 0 && !MESSAGE.equals(name))) {
-                        dataBuffer.append(value).append("\n");
-                    }
-                } else if (field.equals("location")) {
-                    if (value != null && value.length() > 0) {
-                        this.sseLocation = value;
-                    }
-                } else if (field.equals("reconnect")) {
-                    immediateReconnect = true;
+                switch (field) {
+                    case "event":
+                        name = value;
+                        break;
+                    case "id":
+                        this.lastEventId = value;
+                        break;
+                    case "retry":
+                        retry = Integer.parseInt(value);
+                        break;
+                    case "data":
+                        // deliver event if data is specified and non-empty, or name is specified and not "message"
+                        if (name != null && name.length() > 0 && !MESSAGE.equals(name)) {
+                            dataBuffer.append(value).append("\n");
+                        }
+                        break;
+                    case "location":
+                        if (value.length() > 0) {
+                            this.sseLocation = value;
+                        }
+                        break;
+                    case "reconnect":
+                        immediateReconnect = true;
+                        break;
                 }
             }
 
@@ -316,7 +318,7 @@ public class SseEventStream {
         @Override
         public void requestClosed(HttpRequest request) {
         }
-        
+
         @Override
         public void errorOccurred(HttpRequest request, Exception exception) {
             doError(exception);
@@ -324,26 +326,26 @@ public class SseEventStream {
     }
 
     private void doOpen() {
-        /**
-         * Only file the event once in the case its already opened,
-         * Currently, this is being called twice, once when the SSE
-         * gets connected and then again when the ready state changes.
+        /*
+          Only file the event once in the case its already opened,
+          Currently, this is being called twice, once when the SSE
+          gets connected and then again when the ready state changes.
          */
-        if(readyState == ReadyState.CONNECTING){
+        if (readyState == ReadyState.CONNECTING) {
             readyState = ReadyState.OPEN;
             listener.streamOpened();
         }
     }
-    
+
     private void doMessage(String eventName, String data) {
         // messages before OPEN and after CLOSE should not be delivered.
         if (getReadyState() != ReadyState.OPEN) {
             return;
         }
-        
+
         listener.messageReceived(eventName, data);
     }
-    
+
     private void doError(Exception exception) {
         if (getReadyState() == ReadyState.CLOSED) {
             return;
@@ -353,7 +355,7 @@ public class SseEventStream {
         errored = true;
         listener.streamErrored(exception);
     }
-    
+
     public void setListener(SseEventStreamListener listener) {
         this.listener = listener;
     }
