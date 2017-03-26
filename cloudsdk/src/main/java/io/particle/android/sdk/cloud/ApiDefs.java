@@ -135,10 +135,8 @@ public class ApiDefs {
                                       @Field("password") String password);
 
         @FormUrlEncoded
-        @POST("/v1/password/reset")
-//        @POST("/v1/orgs/{orgName}/customers/reset_password")
-        Response requestPasswordReset(@Field("email") String email);//,
-//                                      @Path("orgName") String orgName);
+        @POST("/v1/user/password-reset")
+        Response requestPasswordReset(@Field("username") String email);
 
         @FormUrlEncoded
         @POST("/v1/products/{productId}/customers/reset_password")
