@@ -47,15 +47,29 @@ public class ParticleDevice implements Parcelable {
     public enum ParticleDeviceType {
         CORE,
         PHOTON,
+        P1,
+        RASPBERRY_PI,
+        RED_BEAR_DUO,
+        BLUZ,
+        DIGISTUMP_OAK,
         ELECTRON;
 
         public static ParticleDeviceType fromInt(int intValue) {
             switch (intValue) {
                 case 0:
                     return CORE;
+                case 8:
+                    return P1;
                 case 10:
                     return ELECTRON;
-                case 5:
+                case 31:
+                    return RASPBERRY_PI;
+                case 82:
+                    return DIGISTUMP_OAK;
+                case 88:
+                    return RED_BEAR_DUO;
+                case 103:
+                    return BLUZ;
                 case 6:
                 default:
                     return PHOTON;
@@ -74,7 +88,7 @@ public class ParticleDevice implements Parcelable {
         WENT_OFFLINE,
         UNKNOWN
     }
-
+  
     public enum VariableType {
         INT,
         DOUBLE,
@@ -495,7 +509,7 @@ public class ParticleDevice implements Parcelable {
             throw new ParticleCloudException(e);
         }
     }
-
+  
     /**
      * Subscribes to system events of current device. Events emitted to EventBus listener.
      *
@@ -585,12 +599,13 @@ public class ParticleDevice implements Parcelable {
                 break;
         }
     }
-
+  
     @Override
     public String toString() {
         return "ParticleDevice{" +
                 "deviceId=" + deviceState.deviceId +
                 ", isConnected=" + deviceState.isConnected +
+                ", deviceType=" + deviceState.deviceType +
                 '}';
     }
 
