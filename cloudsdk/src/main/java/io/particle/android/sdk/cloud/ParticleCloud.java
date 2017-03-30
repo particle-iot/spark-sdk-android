@@ -10,6 +10,10 @@ import android.support.v4.util.ArrayMap;
 
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +42,8 @@ import io.particle.android.sdk.utils.Funcy.Func;
 import io.particle.android.sdk.utils.Py.PySet;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 import static io.particle.android.sdk.utils.Py.all;
 import static io.particle.android.sdk.utils.Py.list;
@@ -164,11 +170,7 @@ public class ParticleCloud {
      */
     @WorkerThread
     public void signUpWithUser(String user, String password) throws ParticleCloudException {
-        try {
-            identityApi.signUp(new SignUpInfo(user, password));
-        } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
-        }
+        signUpWithUser(new SignUpInfo(user, password));
     }
 
     /**
@@ -179,9 +181,26 @@ public class ParticleCloud {
     @WorkerThread
     public void signUpWithUser(SignUpInfo signUpInfo) throws ParticleCloudException {
         try {
-            identityApi.signUp(signUpInfo);
+            Response response = identityApi.signUp(signUpInfo);
+            String bodyString = new String(((TypedByteArray) response.getBody()).getBytes());
+            JSONObject obj = new JSONObject(bodyString);
+
+            //workaround for sign up bug - invalid credentials bug
+            if (obj.has("ok") && !obj.getBoolean("ok")) {
+                JSONArray arrJson = obj.getJSONArray("errors");
+                String[] arr = new String[arrJson.length()];
+
+                for (int i = 0; i < arrJson.length(); i++) {
+                    arr[i] = arrJson.getString(i);
+                }
+                if (arr.length > 0) {
+                    throw new ParticleCloudException(new Exception(arr[0]));
+                }
+            }
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
+        } catch (JSONException ignore) {
+            //ignore - who cares if we're not getting error response
         }
     }
 
@@ -205,8 +224,8 @@ public class ParticleCloud {
     /**
      * Create new customer account on the Particle cloud and log in
      *
-     * @param signUpInfo  Required sign up information, must contain a valid email address and password
-     * @param productId Product id to use
+     * @param signUpInfo Required sign up information, must contain a valid email address and password
+     * @param productId  Product id to use
      */
     @WorkerThread
     public void signUpAndLogInWithCustomer(SignUpInfo signUpInfo, Integer productId)

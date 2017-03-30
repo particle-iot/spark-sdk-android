@@ -6,6 +6,7 @@
 * Fix for eventName emitting "message" most of the time
 * Org endpoints changed to product id
 * Password reset url changed to match url used in iOS.
+* Workaround/fix for sign up not throwing exception on error.
 
 
 0.4.1
