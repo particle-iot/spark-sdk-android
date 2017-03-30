@@ -188,15 +188,15 @@ public class ParticleCloud {
     /**
      * Create new customer account on the Particle cloud and log in
      *
-     * @param email    Required user name, must be a valid email address
-     * @param password Required password
-     * @param orgSlug  Organization slug to use
+     * @param email     Required user name, must be a valid email address
+     * @param password  Required password
+     * @param productId Product id to use
      */
     @WorkerThread
-    public void signUpAndLogInWithCustomer(String email, String password, String orgSlug)
+    public void signUpAndLogInWithCustomer(String email, String password, Integer productId)
             throws ParticleCloudException {
         try {
-            signUpAndLogInWithCustomer(new SignUpInfo(email, password), orgSlug);
+            signUpAndLogInWithCustomer(new SignUpInfo(email, password), productId);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -205,20 +205,20 @@ public class ParticleCloud {
     /**
      * Create new customer account on the Particle cloud and log in
      *
-     * @param signUpInfo Required sign up information, must contain a valid email address and password
-     * @param orgSlug    Organization slug to use
+     * @param signUpInfo  Required sign up information, must contain a valid email address and password
+     * @param productId Product id to use
      */
     @WorkerThread
-    public void signUpAndLogInWithCustomer(SignUpInfo signUpInfo, String orgSlug)
+    public void signUpAndLogInWithCustomer(SignUpInfo signUpInfo, Integer productId)
             throws ParticleCloudException {
-        if (!all(signUpInfo.getUsername(), signUpInfo.getPassword(), orgSlug)) {
+        if (!all(signUpInfo.getUsername(), signUpInfo.getPassword(), productId)) {
             throw new IllegalArgumentException(
                     "Email, password, and organization must all be specified");
         }
 
         signUpInfo.setGrantType("client_credentials");
         try {
-            Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(signUpInfo, orgSlug);
+            Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(signUpInfo, productId);
             onLogIn(response, signUpInfo.getUsername(), signUpInfo.getPassword());
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
@@ -381,12 +381,12 @@ public class ParticleCloud {
     }
 
     @WorkerThread
-    public Responses.ClaimCodeResponse generateClaimCodeForOrg(String orgSlug, String productSlug)
+    public Responses.ClaimCodeResponse generateClaimCodeForOrg(Integer productId)
             throws ParticleCloudException {
         try {
             // Offer empty string to appease newer OkHttp versions which require a POST body,
             // even if it's empty or (as far as the endpoint cares) nonsense
-            return mainApi.generateClaimCodeForOrg("okhttp_appeasement", orgSlug, productSlug);
+            return mainApi.generateClaimCodeForOrg("okhttp_appeasement", productId);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -397,6 +397,15 @@ public class ParticleCloud {
     public void requestPasswordReset(String email) throws ParticleCloudException {
         try {
             identityApi.requestPasswordReset(email);
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    @WorkerThread
+    public void requestPasswordResetForCustomer(String email, Integer productId) throws ParticleCloudException {
+        try {
+            identityApi.requestPasswordResetForCustomer(email, productId);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }

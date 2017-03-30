@@ -96,10 +96,9 @@ public class ApiDefs {
         ClaimCodeResponse generateClaimCode(@Field("blank") String blankBody);
 
         @FormUrlEncoded
-        @POST("/v1/orgs/{orgSlug}/products/{productSlug}/device_claims")
+        @POST("/v1/products/{productId}/device_claims")
         ClaimCodeResponse generateClaimCodeForOrg(@Field("blank") String blankBody,
-                                                  @Path("orgSlug") String orgSlug,
-                                                  @Path("productSlug") String productSlug);
+                                                  @Path("productId") Integer productId);
 
         @FormUrlEncoded
         @POST("/v1/devices")
@@ -125,9 +124,9 @@ public class ApiDefs {
 
         // NOTE: the `LogInResponse` used here as a return type is intentional.  It looks
         // a little odd, but that's how this endpoint works.
-        @POST("/v1/orgs/{orgSlug}/customers")
+        @POST("/v1/products/{productId}/customers")
         Responses.LogInResponse signUpAndLogInWithCustomer(@Body SignUpInfo signUpInfo,
-                                                           @Path("orgSlug") String orgSlug);
+                                                           @Path("productId") Integer productId);
 
         @FormUrlEncoded
         @POST("/oauth/token")
@@ -136,10 +135,12 @@ public class ApiDefs {
                                       @Field("password") String password);
 
         @FormUrlEncoded
-        @POST("/v1/password/reset")
-//        @POST("/v1/orgs/{orgName}/customers/reset_password")
-        Response requestPasswordReset(@Field("email") String email);//,
-//                                      @Path("orgName") String orgName);
-    }
+        @POST("/v1/user/password-reset")
+        Response requestPasswordReset(@Field("username") String email);
 
+        @FormUrlEncoded
+        @POST("/v1/products/{productId}/customers/reset_password")
+        Response requestPasswordResetForCustomer(@Field("email") String email,
+                                                 @Path("productId") Integer productId);
+    }
 }
