@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
 // This is the library version used when deploying the artifact
-version = '0.4.1'
+version = '0.4.2'
 
 ext {
     bintrayRepo = 'android'
@@ -71,7 +71,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.android.support:support-fragment:25.3.0'
+    compile 'com.android.support:support-fragment:25.3.1'
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 }
