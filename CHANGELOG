@@ -1,3 +1,14 @@
+0.4.2
+=====
+* Support for all device types/names by platform id
+* Global listener in ParticleCloud for system events
+* resetFlashingState - works with global system events instead of flashing timer
+* Fix for eventName emitting "message" most of the time
+* Org endpoints changed to product id
+* Password reset url changed to match url used in iOS.
+* Workaround/fix for sign up not throwing exception on error.
+
+
 0.4.1
 =====
 * Optional account information included in sign up api calls

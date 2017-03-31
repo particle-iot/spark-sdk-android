@@ -121,7 +121,6 @@ public class ApiDefs {
         @POST("/v1/users")
         Response signUp(@Body SignUpInfo signUpInfo);
 
-
         // NOTE: the `LogInResponse` used here as a return type is intentional.  It looks
         // a little odd, but that's how this endpoint works.
         @POST("/v1/products/{productId}/customers")
