@@ -13,21 +13,40 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 public class SignUpInfo implements Parcelable {
-    private String username, password;
+    private String username, password, email;
     @SerializedName("grant_type") @Nullable
     private String grantType;
     @SerializedName("account_info") @Nullable
     private AccountInfo accountInfo;
 
+    public SignUpInfo(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    public SignUpInfo(String username, String password, String email, AccountInfo accountInfo) {
+        this.username = username;
+        this.password = password;
+        this.accountInfo = accountInfo;
+        this.email = email;
+    }
+
     public SignUpInfo(String username, String password) {
         this.username = username;
         this.password = password;
+        this.email = username;
     }
 
     public SignUpInfo(String username, String password, AccountInfo accountInfo) {
         this.username = username;
         this.password = password;
         this.accountInfo = accountInfo;
+        this.email = username;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getUsername() {
@@ -66,6 +85,7 @@ public class SignUpInfo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.username);
         dest.writeString(this.password);
+        dest.writeString(this.email);
         dest.writeString(this.grantType);
         dest.writeParcelable(this.accountInfo, flags);
     }
@@ -73,6 +93,7 @@ public class SignUpInfo implements Parcelable {
     protected SignUpInfo(Parcel in) {
         this.username = in.readString();
         this.password = in.readString();
+        this.email = in.readString();
         this.grantType = in.readString();
         this.accountInfo = in.readParcelable(AccountInfo.class.getClassLoader());
     }
