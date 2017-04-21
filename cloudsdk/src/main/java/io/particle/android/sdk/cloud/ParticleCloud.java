@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -258,6 +259,7 @@ public class ParticleCloud {
     public void signUpAndLogInWithCustomer(String email, String password, String orgSlug)
             throws ParticleCloudException {
         try {
+            log.w("Use product id instead of organization slug.");
             signUpAndLogInWithCustomer(new SignUpInfo(email, password), orgSlug);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
@@ -461,6 +463,7 @@ public class ParticleCloud {
     public Responses.ClaimCodeResponse generateClaimCodeForOrg(String organizationSlug, String productSlug)
             throws ParticleCloudException {
         try {
+            log.w("Use product id instead of organization slug.");
             // Offer empty string to appease newer OkHttp versions which require a POST body,
             // even if it's empty or (as far as the endpoint cares) nonsense
             return mainApi.generateClaimCodeForOrg("okhttp_appeasement", organizationSlug, productSlug);
@@ -492,6 +495,7 @@ public class ParticleCloud {
     @Deprecated
     public void requestPasswordResetForCustomer(String email, String organizationSlug) throws ParticleCloudException {
         try {
+            log.w("Use product id instead of organization slug.");
             identityApi.requestPasswordResetForCustomer(email, organizationSlug);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
