@@ -233,7 +233,7 @@ public class ParticleCloud {
             throws ParticleCloudException {
         if (!all(signUpInfo.getUsername(), signUpInfo.getPassword(), productId)) {
             throw new IllegalArgumentException(
-                    "Email, password, and product slug must all be specified");
+                    "Email, password, and product id must all be specified");
         }
 
         signUpInfo.setGrantType("client_credentials");
