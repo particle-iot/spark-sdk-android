@@ -21,9 +21,9 @@
 
 package org.kaazing.gateway.client.impl.http;
 
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.util.logging.Logger;
 
 public class HttpRequestLoggingHandler extends HttpRequestHandlerAdapter {
 

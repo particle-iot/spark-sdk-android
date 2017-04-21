@@ -21,13 +21,6 @@
 
 package org.kaazing.gateway.client.impl.wsn;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandler;
 import org.kaazing.gateway.client.impl.WebSocketHandlerListener;
@@ -43,6 +36,13 @@ import org.kaazing.gateway.client.transport.ws.WebSocketDelegate;
 import org.kaazing.gateway.client.transport.ws.WebSocketDelegateImpl;
 import org.kaazing.gateway.client.transport.ws.WebSocketDelegateListener;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WebSocketNativeDelegateHandler implements WebSocketHandler {
 

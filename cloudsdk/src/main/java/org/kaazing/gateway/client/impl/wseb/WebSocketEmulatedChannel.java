@@ -21,9 +21,9 @@
 
 package org.kaazing.gateway.client.impl.wseb;
 
+import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.impl.ws.CloseCommandMessage;
 import org.kaazing.gateway.client.impl.ws.WebSocketSelectedChannel;
-import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.util.HttpURI;
 
 public class WebSocketEmulatedChannel extends WebSocketSelectedChannel {

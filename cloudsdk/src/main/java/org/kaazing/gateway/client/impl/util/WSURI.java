@@ -21,11 +21,11 @@
 
 package org.kaazing.gateway.client.impl.util;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.kaazing.gateway.client.util.GenericURI;
 import org.kaazing.gateway.client.util.URIUtils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 /**

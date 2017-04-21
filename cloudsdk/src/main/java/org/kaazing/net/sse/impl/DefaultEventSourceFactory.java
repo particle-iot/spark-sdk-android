@@ -21,12 +21,12 @@
 
 package org.kaazing.net.sse.impl;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.kaazing.net.http.HttpRedirectPolicy;
 import org.kaazing.net.sse.SseEventSource;
 import org.kaazing.net.sse.SseEventSourceFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class DefaultEventSourceFactory extends SseEventSourceFactory {
 

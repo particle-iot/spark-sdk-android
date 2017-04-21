@@ -21,13 +21,13 @@
 
 package org.kaazing.gateway.client.impl.wsn;
 
+import org.kaazing.gateway.client.impl.bridge.Proxy;
+import org.kaazing.gateway.client.impl.util.WSURI;
+import org.kaazing.gateway.client.impl.ws.WebSocketSelectedChannel;
+import org.kaazing.gateway.client.transport.ws.WebSocketDelegate;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.kaazing.gateway.client.impl.bridge.Proxy;
-import org.kaazing.gateway.client.impl.ws.WebSocketSelectedChannel;
-import org.kaazing.gateway.client.impl.util.WSURI;
-import org.kaazing.gateway.client.transport.ws.WebSocketDelegate;
 
 public class WebSocketNativeChannel extends WebSocketSelectedChannel {
 

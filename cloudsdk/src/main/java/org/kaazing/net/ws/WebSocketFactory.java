@@ -21,14 +21,14 @@
 
 package org.kaazing.net.ws;
 
+import org.kaazing.net.auth.ChallengeHandler;
+import org.kaazing.net.http.HttpRedirectPolicy;
+import org.kaazing.net.ws.WebSocketExtension.Parameter;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.ServiceLoader;
-
-import org.kaazing.net.auth.ChallengeHandler;
-import org.kaazing.net.http.HttpRedirectPolicy;
-import org.kaazing.net.ws.WebSocketExtension.Parameter;
 
 /**
  * {@link WebSocketFactory} is an abstract class that can be used to create

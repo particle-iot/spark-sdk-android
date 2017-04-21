@@ -21,12 +21,6 @@
 
 package org.kaazing.gateway.client.impl.wseb;
 
-import static org.kaazing.gateway.client.impl.Channel.HEADER_SEQUENCE;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.kaazing.gateway.client.impl.Channel;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.http.HttpRequest;
 import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
@@ -40,6 +34,11 @@ import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
 import org.kaazing.gateway.client.impl.ws.WebSocketSelectedChannel;
 import org.kaazing.gateway.client.util.HttpURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.kaazing.gateway.client.impl.Channel.HEADER_SEQUENCE;
 /*
  * WebSocket Emulated Handler Chain
  * EmulateHandler  

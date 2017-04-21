@@ -21,11 +21,11 @@
 
 package org.kaazing.gateway.client.impl.http;
 
+import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.kaazing.gateway.client.util.WrappedByteBuffer;
 
 public class HttpResponse {
 

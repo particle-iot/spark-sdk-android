@@ -21,11 +21,11 @@
 
 package org.kaazing.gateway.client.impl.wseb;
 
-import java.nio.charset.Charset;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.DecoderInput;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.nio.charset.Charset;
+import java.util.logging.Logger;
 
 public class WebSocketEmulatedDecoderImpl<C> implements WebSocketEmulatedDecoder<C> {
 

@@ -21,24 +21,24 @@
 
 package org.kaazing.gateway.client.impl.wsn;
 
+import org.kaazing.gateway.client.impl.CommandMessage;
+import org.kaazing.gateway.client.impl.WebSocketChannel;
+import org.kaazing.gateway.client.impl.WebSocketHandler;
+import org.kaazing.gateway.client.impl.WebSocketHandlerAdapter;
+import org.kaazing.gateway.client.impl.WebSocketHandlerListener;
+import org.kaazing.gateway.client.impl.util.WSURI;
+import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
+import org.kaazing.gateway.client.impl.ws.WebSocketHandshakeObject;
+import org.kaazing.gateway.client.util.StringUtils;
+import org.kaazing.gateway.client.util.WrappedByteBuffer;
+import org.kaazing.net.http.HttpRedirectPolicy;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.kaazing.gateway.client.impl.CommandMessage;
-import org.kaazing.gateway.client.impl.WebSocketChannel;
-import org.kaazing.gateway.client.impl.WebSocketHandler;
-import org.kaazing.gateway.client.impl.WebSocketHandlerAdapter;
-import org.kaazing.gateway.client.impl.WebSocketHandlerListener;
-import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
-import org.kaazing.gateway.client.impl.ws.WebSocketHandshakeObject;
-import org.kaazing.gateway.client.impl.util.WSURI;
-import org.kaazing.gateway.client.util.StringUtils;
-import org.kaazing.gateway.client.util.WrappedByteBuffer;
-import org.kaazing.net.http.HttpRedirectPolicy;
 /*
  * WebSocket Native Handler Chain
  * NativeHandler - AuthenticationHandler - HandshakeHandler - ControlFrameHandler - {BalancingHandler} - Codec - BridgeHandler

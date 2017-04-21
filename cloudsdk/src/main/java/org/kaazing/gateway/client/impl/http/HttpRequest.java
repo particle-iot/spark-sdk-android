@@ -21,12 +21,12 @@
 
 package org.kaazing.gateway.client.impl.http;
 
+import org.kaazing.gateway.client.impl.Channel;
+import org.kaazing.gateway.client.util.HttpURI;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.kaazing.gateway.client.impl.Channel;
-import org.kaazing.gateway.client.util.HttpURI;
 
 public class HttpRequest {
 

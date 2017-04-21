@@ -21,22 +21,22 @@
 
 package org.kaazing.gateway.client.impl.ws;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.CommandMessage;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandler;
 import org.kaazing.gateway.client.impl.WebSocketHandlerListener;
+import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.impl.ws.WebSocketSelectedHandlerImpl.WebSocketSelectedHandlerFactory;
 import org.kaazing.gateway.client.impl.wseb.WebSocketEmulatedChannel;
 import org.kaazing.gateway.client.impl.wseb.WebSocketEmulatedHandler;
 import org.kaazing.gateway.client.impl.wsn.WebSocketNativeChannel;
 import org.kaazing.gateway.client.impl.wsn.WebSocketNativeHandler;
-import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /*
  * WebSocket Handler Chain
  * WebSocket - {CompoisteHandler}  

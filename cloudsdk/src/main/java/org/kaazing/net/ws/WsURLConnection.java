@@ -21,6 +21,10 @@
 
 package org.kaazing.net.ws;
 
+import org.kaazing.net.auth.ChallengeHandler;
+import org.kaazing.net.http.HttpRedirectPolicy;
+import org.kaazing.net.ws.WebSocketExtension.Parameter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,10 +33,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
-
-import org.kaazing.net.auth.ChallengeHandler;
-import org.kaazing.net.http.HttpRedirectPolicy;
-import org.kaazing.net.ws.WebSocketExtension.Parameter;
 
 /**
  * A URLConnection with support for WebSocket-specific features. See

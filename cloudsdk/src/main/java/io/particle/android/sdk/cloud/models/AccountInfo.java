@@ -5,8 +5,6 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
-import javax.annotation.Nullable;
-
 /**
  * Keeps secondary user account information.
  */

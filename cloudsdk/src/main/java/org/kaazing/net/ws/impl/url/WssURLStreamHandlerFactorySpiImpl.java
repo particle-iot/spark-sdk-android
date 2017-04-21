@@ -21,11 +21,11 @@
 
 package org.kaazing.net.ws.impl.url;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-
 import java.net.URLStreamHandler;
 import java.util.Collection;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 public class WssURLStreamHandlerFactorySpiImpl extends WsURLStreamHandlerFactorySpiImpl {
     private static final Collection<String> _supportedProtocols = unmodifiableList(asList("wss", "wse+ssl", "wssn"));

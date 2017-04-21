@@ -21,10 +21,6 @@
 
 package org.kaazing.gateway.client.impl.wsn;
 
-import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.CommandMessage;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandler;
@@ -33,15 +29,13 @@ import org.kaazing.gateway.client.impl.WebSocketHandlerListener;
 import org.kaazing.gateway.client.impl.auth.AuthenticationUtil;
 import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
-import org.kaazing.gateway.client.impl.ws.WebSocketHandshakeObject;
-import org.kaazing.gateway.client.impl.ws.WebSocketReAuthenticateHandler;
-import org.kaazing.gateway.client.impl.wseb.WebSocketEmulatedChannel;
-import org.kaazing.gateway.client.util.HttpURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
 import org.kaazing.net.auth.ChallengeHandler;
 import org.kaazing.net.auth.ChallengeRequest;
 import org.kaazing.net.auth.ChallengeResponse;
 import org.kaazing.net.impl.util.ResumableTimer;
+
+import java.util.logging.Logger;
 
 /*
  * WebSocket Native Handler Chain

@@ -21,9 +21,9 @@
 
 package org.kaazing.net.sse;
 
-import java.io.IOException;
-
 import org.kaazing.net.http.HttpRedirectPolicy;
+
+import java.io.IOException;
 
 /**
  * SseEventSource provides an implementation of HTML5 Server-sent Events. 

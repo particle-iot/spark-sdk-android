@@ -21,8 +21,12 @@
 
 package org.kaazing.net.ws.impl;
 
-import static java.util.Collections.unmodifiableCollection;
-import static java.util.Collections.unmodifiableMap;
+import org.kaazing.net.auth.ChallengeHandler;
+import org.kaazing.net.http.HttpRedirectPolicy;
+import org.kaazing.net.ws.WebSocket;
+import org.kaazing.net.ws.WebSocketExtension.Parameter;
+import org.kaazing.net.ws.WebSocketFactory;
+import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,12 +39,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.kaazing.net.auth.ChallengeHandler;
-import org.kaazing.net.http.HttpRedirectPolicy;
-import org.kaazing.net.ws.WebSocket;
-import org.kaazing.net.ws.WebSocketExtension.Parameter;
-import org.kaazing.net.ws.WebSocketFactory;
-import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
+import static java.util.Collections.unmodifiableCollection;
+import static java.util.Collections.unmodifiableMap;
 
 public final class DefaultWebSocketFactory extends WebSocketFactory {
     private static final Map<String, WebSocketExtensionFactorySpi>  _extensionFactories;

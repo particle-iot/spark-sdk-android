@@ -21,8 +21,6 @@
 
 package org.kaazing.gateway.client.impl;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.net.http.HttpRedirectPolicy;
 

@@ -21,16 +21,16 @@
 
 package org.kaazing.net.sse.impl;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.net.http.HttpRedirectPolicy;
 import org.kaazing.net.impl.util.BlockingQueueImpl;
 import org.kaazing.net.sse.SseEventReader;
 import org.kaazing.net.sse.SseEventSource;
 import org.kaazing.net.sse.SseException;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SseEventSourceImpl extends SseEventSource {
     private static final String _CLASS_NAME = SseEventSourceImpl.class.getName();

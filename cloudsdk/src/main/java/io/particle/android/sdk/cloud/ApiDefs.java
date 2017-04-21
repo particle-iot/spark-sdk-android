@@ -101,6 +101,13 @@ public class ApiDefs {
                                                   @Path("productId") Integer productId);
 
         @FormUrlEncoded
+        @POST("/v1/orgs/{orgSlug}/products/{productSlug}/device_claims")
+        @Deprecated
+        ClaimCodeResponse generateClaimCodeForOrg(@Field("blank") String blankBody,
+                                                  @Path("orgSlug") String orgSlug,
+                                                  @Path("productSlug") String productSlug);
+
+        @FormUrlEncoded
         @POST("/v1/devices")
         SimpleResponse claimDevice(@Field("id") String deviceID);
 
@@ -125,7 +132,14 @@ public class ApiDefs {
         // a little odd, but that's how this endpoint works.
         @POST("/v1/products/{productId}/customers")
         Responses.LogInResponse signUpAndLogInWithCustomer(@Body SignUpInfo signUpInfo,
-                                                           @Path("productId") Integer productId);
+                                                               @Path("productId") Integer productId);
+
+        // NOTE: the `LogInResponse` used here as a return type is intentional.  It looks
+        // a little odd, but that's how this endpoint works.
+        @POST("/v1/orgs/{orgSlug}/customers")
+        @Deprecated
+        Responses.LogInResponse signUpAndLogInWithCustomer(@Body SignUpInfo signUpInfo,
+                                                           @Path("orgSlug") String orgSlug);
 
         @FormUrlEncoded
         @POST("/oauth/token")
@@ -140,6 +154,13 @@ public class ApiDefs {
         @FormUrlEncoded
         @POST("/v1/products/{productId}/customers/reset_password")
         Response requestPasswordResetForCustomer(@Field("email") String email,
-                                                 @Path("productId") Integer productId);
+                                                     @Path("productId") Integer productId);
+
+        @FormUrlEncoded
+        @POST("/v1/orgs/{orgName}/customers/reset_password")
+        @Deprecated
+        Response requestPasswordResetForCustomer(@Field("email") String email,
+                                                 @Path("orgName") String orgName);
+
     }
 }

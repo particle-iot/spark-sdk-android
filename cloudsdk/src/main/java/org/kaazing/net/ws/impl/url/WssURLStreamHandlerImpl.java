@@ -21,9 +21,9 @@
 
 package org.kaazing.net.ws.impl.url;
 
-import java.util.Map;
-
 import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
+
+import java.util.Map;
 
 public class WssURLStreamHandlerImpl extends WsURLStreamHandlerImpl {
 

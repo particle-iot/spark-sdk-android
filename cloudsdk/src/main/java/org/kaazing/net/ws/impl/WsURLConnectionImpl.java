@@ -21,6 +21,14 @@
 
 package org.kaazing.net.ws.impl;
 
+import org.kaazing.net.auth.ChallengeHandler;
+import org.kaazing.net.http.HttpRedirectPolicy;
+import org.kaazing.net.ws.WebSocketExtension.Parameter;
+import org.kaazing.net.ws.WebSocketMessageReader;
+import org.kaazing.net.ws.WebSocketMessageWriter;
+import org.kaazing.net.ws.WsURLConnection;
+import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,14 +40,6 @@ import java.security.Permission;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.kaazing.net.auth.ChallengeHandler;
-import org.kaazing.net.http.HttpRedirectPolicy;
-import org.kaazing.net.ws.WebSocketExtension.Parameter;
-import org.kaazing.net.ws.WebSocketMessageReader;
-import org.kaazing.net.ws.WebSocketMessageWriter;
-import org.kaazing.net.ws.WsURLConnection;
-import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
 
 public class WsURLConnectionImpl extends WsURLConnection {
     private WebSocketImpl    _webSocket;

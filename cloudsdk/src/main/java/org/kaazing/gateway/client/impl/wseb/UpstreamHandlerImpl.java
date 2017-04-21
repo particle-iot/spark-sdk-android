@@ -21,21 +21,21 @@
 
 package org.kaazing.gateway.client.impl.wseb;
 
-import static org.kaazing.gateway.client.impl.Channel.HEADER_SEQUENCE;
+import org.kaazing.gateway.client.impl.EncoderOutput;
+import org.kaazing.gateway.client.impl.http.HttpRequest;
+import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
+import org.kaazing.gateway.client.impl.http.HttpRequestHandler;
+import org.kaazing.gateway.client.impl.http.HttpRequestListener;
+import org.kaazing.gateway.client.impl.http.HttpRequestTransportHandler;
+import org.kaazing.gateway.client.impl.http.HttpResponse;
+import org.kaazing.gateway.client.impl.ws.CloseCommandMessage;
+import org.kaazing.gateway.client.util.WrappedByteBuffer;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
-import org.kaazing.gateway.client.impl.EncoderOutput;
-import org.kaazing.gateway.client.impl.http.HttpRequest;
-import org.kaazing.gateway.client.impl.http.HttpRequestHandler;
-import org.kaazing.gateway.client.impl.http.HttpRequestListener;
-import org.kaazing.gateway.client.impl.http.HttpRequestTransportHandler;
-import org.kaazing.gateway.client.impl.http.HttpResponse;
-import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
-import org.kaazing.gateway.client.impl.ws.CloseCommandMessage;
-import org.kaazing.gateway.client.util.WrappedByteBuffer;
+import static org.kaazing.gateway.client.impl.Channel.HEADER_SEQUENCE;
 /*
  * WebSocket Emulated Handler Chain
  * EmulateHandler  

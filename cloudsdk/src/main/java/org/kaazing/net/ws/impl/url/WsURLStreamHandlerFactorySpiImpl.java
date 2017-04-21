@@ -21,9 +21,8 @@
 
 package org.kaazing.net.ws.impl.url;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
+import org.kaazing.net.URLStreamHandlerFactorySpi;
+import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
 
 import java.net.URLStreamHandler;
 import java.util.Collection;
@@ -31,8 +30,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.kaazing.net.URLStreamHandlerFactorySpi;
-import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 
 public class WsURLStreamHandlerFactorySpiImpl extends URLStreamHandlerFactorySpi {
     private static final Collection<String> _supportedProtocols = unmodifiableList(asList("ws", "wse", "wsn"));

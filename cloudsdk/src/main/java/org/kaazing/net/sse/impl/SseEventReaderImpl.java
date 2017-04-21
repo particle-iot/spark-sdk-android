@@ -21,14 +21,14 @@
 
 package org.kaazing.net.sse.impl;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.net.impl.util.BlockingQueueImpl;
 import org.kaazing.net.sse.SseEventReader;
 import org.kaazing.net.sse.SseEventType;
 import org.kaazing.net.sse.SseException;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SseEventReaderImpl extends SseEventReader {
     private static final String _CLASS_NAME = SseEventReaderImpl.class.getName();

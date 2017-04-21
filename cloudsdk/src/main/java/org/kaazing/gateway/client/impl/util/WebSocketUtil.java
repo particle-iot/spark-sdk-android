@@ -21,10 +21,10 @@
 
 package org.kaazing.gateway.client.impl.util;
 
+import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Logger;
-
-import org.kaazing.gateway.client.util.WrappedByteBuffer;
 
 
 

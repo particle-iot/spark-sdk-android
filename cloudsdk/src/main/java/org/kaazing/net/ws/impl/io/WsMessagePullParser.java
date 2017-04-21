@@ -21,11 +21,11 @@
 
 package org.kaazing.net.ws.impl.io;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import org.kaazing.net.ws.WebSocketMessageReader;
 import org.kaazing.net.ws.WebSocketMessageType;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * The inspiration of this class is the XmlPullParser. Eventually, we may 

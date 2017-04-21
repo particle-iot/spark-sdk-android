@@ -21,12 +21,6 @@
 
 package org.kaazing.gateway.client.impl.wsn;
 
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.CommandMessage;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandler;
@@ -38,6 +32,12 @@ import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
 import org.kaazing.gateway.client.impl.ws.WebSocketHandshakeObject;
 import org.kaazing.gateway.client.impl.ws.WebSocketSelectedChannel;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /*
  * WebSocket Native Handler Chain

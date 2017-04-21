@@ -21,13 +21,13 @@
 
 package org.kaazing.net.ws.impl.io;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
 import org.kaazing.net.ws.WebSocketException;
 import org.kaazing.net.ws.WebSocketMessageType;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 public class WsInputStreamImpl extends InputStream {
 

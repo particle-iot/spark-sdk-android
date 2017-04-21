@@ -21,7 +21,8 @@
 
 package org.kaazing.net.ws.impl;
 
-import static java.util.Collections.unmodifiableSet;
+import org.kaazing.net.ws.WebSocketExtension.Parameter;
+import org.kaazing.net.ws.impl.spi.WebSocketExtensionParameterValuesSpi;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -29,8 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.kaazing.net.ws.WebSocketExtension.Parameter;
-import org.kaazing.net.ws.impl.spi.WebSocketExtensionParameterValuesSpi;
+import static java.util.Collections.unmodifiableSet;
 
 public final class WsExtensionParameterValuesSpiImpl extends WebSocketExtensionParameterValuesSpi {
 

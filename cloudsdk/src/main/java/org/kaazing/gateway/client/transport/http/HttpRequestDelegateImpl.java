@@ -21,6 +21,14 @@
 
 package org.kaazing.gateway.client.transport.http;
 
+import org.kaazing.gateway.client.transport.CloseEvent;
+import org.kaazing.gateway.client.transport.ErrorEvent;
+import org.kaazing.gateway.client.transport.IoBufferUtil;
+import org.kaazing.gateway.client.transport.LoadEvent;
+import org.kaazing.gateway.client.transport.OpenEvent;
+import org.kaazing.gateway.client.transport.ProgressEvent;
+import org.kaazing.gateway.client.transport.ReadyStateChangedEvent;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,14 +40,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.kaazing.gateway.client.transport.CloseEvent;
-import org.kaazing.gateway.client.transport.ErrorEvent;
-import org.kaazing.gateway.client.transport.IoBufferUtil;
-import org.kaazing.gateway.client.transport.LoadEvent;
-import org.kaazing.gateway.client.transport.OpenEvent;
-import org.kaazing.gateway.client.transport.ProgressEvent;
-import org.kaazing.gateway.client.transport.ReadyStateChangedEvent;
 
 public class HttpRequestDelegateImpl implements HttpRequestDelegate {
     private static final String CLASS_NAME = HttpRequestDelegateImpl.class.getName();

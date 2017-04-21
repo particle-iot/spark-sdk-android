@@ -21,13 +21,28 @@
 
 package org.kaazing.gateway.client.transport.ws;
 
+import org.kaazing.gateway.client.transport.AuthenticateEvent;
+import org.kaazing.gateway.client.transport.CloseEvent;
+import org.kaazing.gateway.client.transport.ErrorEvent;
+import org.kaazing.gateway.client.transport.IoBufferUtil;
+import org.kaazing.gateway.client.transport.LoadEvent;
+import org.kaazing.gateway.client.transport.MessageEvent;
+import org.kaazing.gateway.client.transport.OpenEvent;
+import org.kaazing.gateway.client.transport.ProgressEvent;
+import org.kaazing.gateway.client.transport.ReadyStateChangedEvent;
+import org.kaazing.gateway.client.transport.RedirectEvent;
+import org.kaazing.gateway.client.transport.http.HttpRequestDelegate;
+import org.kaazing.gateway.client.transport.http.HttpRequestDelegateFactory;
+import org.kaazing.gateway.client.transport.http.HttpRequestDelegateImpl;
+import org.kaazing.gateway.client.transport.http.HttpRequestDelegateListener;
+import org.kaazing.gateway.client.transport.ws.WsMessage.Kind;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,22 +60,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.kaazing.gateway.client.transport.AuthenticateEvent;
-import org.kaazing.gateway.client.transport.CloseEvent;
-import org.kaazing.gateway.client.transport.ErrorEvent;
-import org.kaazing.gateway.client.transport.IoBufferUtil;
-import org.kaazing.gateway.client.transport.LoadEvent;
-import org.kaazing.gateway.client.transport.MessageEvent;
-import org.kaazing.gateway.client.transport.OpenEvent;
-import org.kaazing.gateway.client.transport.ProgressEvent;
-import org.kaazing.gateway.client.transport.ReadyStateChangedEvent;
-import org.kaazing.gateway.client.transport.RedirectEvent;
-import org.kaazing.gateway.client.transport.http.HttpRequestDelegate;
-import org.kaazing.gateway.client.transport.http.HttpRequestDelegateFactory;
-import org.kaazing.gateway.client.transport.http.HttpRequestDelegateImpl;
-import org.kaazing.gateway.client.transport.http.HttpRequestDelegateListener;
-import org.kaazing.gateway.client.transport.ws.WsMessage.Kind;
 
 public class WebSocketDelegateImpl implements WebSocketDelegate {
     private static final String CLASS_NAME = WebSocketDelegateImpl.class.getName();
