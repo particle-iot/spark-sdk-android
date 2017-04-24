@@ -21,13 +21,13 @@
 
 package org.kaazing.net.ws.impl.io;
 
+import org.kaazing.net.ws.WebSocketException;
+import org.kaazing.net.ws.WebSocketMessageWriter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-
-import org.kaazing.net.ws.WebSocketException;
-import org.kaazing.net.ws.WebSocketMessageWriter;
 
 public class WsOutputStreamImpl extends OutputStream {
     private WsMessageWriterImpl    _writer;

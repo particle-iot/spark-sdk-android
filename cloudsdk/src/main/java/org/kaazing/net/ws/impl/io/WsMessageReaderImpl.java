@@ -21,16 +21,16 @@
 
 package org.kaazing.net.ws.impl.io;
 
+import org.kaazing.net.impl.util.BlockingQueueImpl;
+import org.kaazing.net.ws.WebSocketException;
+import org.kaazing.net.ws.WebSocketMessageReader;
+import org.kaazing.net.ws.WebSocketMessageType;
+import org.kaazing.net.ws.impl.WebSocketImpl;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.kaazing.net.impl.util.BlockingQueueImpl;
-import org.kaazing.net.ws.WebSocketMessageType;
-import org.kaazing.net.ws.WebSocketException;
-import org.kaazing.net.ws.WebSocketMessageReader;
-import org.kaazing.net.ws.impl.WebSocketImpl;
 
 public class WsMessageReaderImpl extends WebSocketMessageReader {
     private static final String _CLASS_NAME = WsMessageReaderImpl.class.getName();

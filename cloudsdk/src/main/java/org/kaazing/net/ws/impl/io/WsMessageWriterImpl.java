@@ -21,13 +21,13 @@
 
 package org.kaazing.net.ws.impl.io;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-
 import org.kaazing.net.ws.WebSocketException;
 import org.kaazing.net.ws.WebSocketMessageWriter;
 import org.kaazing.net.ws.impl.WebSocketImpl;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 public class WsMessageWriterImpl extends WebSocketMessageWriter {
     private WebSocketImpl    _webSocket;

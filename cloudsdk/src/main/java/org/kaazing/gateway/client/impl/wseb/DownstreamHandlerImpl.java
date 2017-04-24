@@ -21,15 +21,6 @@
 
 package org.kaazing.gateway.client.impl.wseb;
 
-import static org.kaazing.gateway.client.impl.Channel.HEADER_SEQUENCE;
-
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.DecoderInput;
 import org.kaazing.gateway.client.impl.http.HttpRequest;
 import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
@@ -41,6 +32,15 @@ import org.kaazing.gateway.client.impl.ws.CloseCommandMessage;
 import org.kaazing.gateway.client.impl.ws.WebSocketReAuthenticateHandler;
 import org.kaazing.gateway.client.util.HttpURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.kaazing.gateway.client.impl.Channel.HEADER_SEQUENCE;
 
 /*
  * WebSocket Emulated Handler Chain

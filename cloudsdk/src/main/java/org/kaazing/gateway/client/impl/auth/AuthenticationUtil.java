@@ -21,13 +21,13 @@
 
 package org.kaazing.gateway.client.impl.auth;
 
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
 import org.kaazing.net.auth.ChallengeHandler;
 import org.kaazing.net.auth.ChallengeRequest;
 import org.kaazing.net.auth.ChallengeResponse;
+
+import java.util.logging.Logger;
 
 public final class AuthenticationUtil {
 

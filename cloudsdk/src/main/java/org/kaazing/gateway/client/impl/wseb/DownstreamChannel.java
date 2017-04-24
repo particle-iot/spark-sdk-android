@@ -21,6 +21,11 @@
 
 package org.kaazing.gateway.client.impl.wseb;
 
+import org.kaazing.gateway.client.impl.Channel;
+import org.kaazing.gateway.client.impl.http.HttpRequest;
+import org.kaazing.gateway.client.util.HttpURI;
+import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -29,11 +34,6 @@ import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.kaazing.gateway.client.impl.Channel;
-import org.kaazing.gateway.client.impl.http.HttpRequest;
-import org.kaazing.gateway.client.util.HttpURI;
-import org.kaazing.gateway.client.util.WrappedByteBuffer;
 
 class DownstreamChannel extends Channel {
     HttpURI location;

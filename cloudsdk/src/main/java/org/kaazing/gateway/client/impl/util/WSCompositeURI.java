@@ -21,12 +21,12 @@
 
 package org.kaazing.gateway.client.impl.util;
 
+import org.kaazing.gateway.client.util.GenericURI;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.kaazing.gateway.client.util.GenericURI;
 
 
 /**

@@ -21,10 +21,10 @@
 
 package org.kaazing.gateway.client.transport.http;
 
+import org.kaazing.gateway.client.transport.BridgeDelegate;
+
 import java.net.URL;
 import java.nio.ByteBuffer;
-
-import org.kaazing.gateway.client.transport.BridgeDelegate;
 
 public interface HttpRequestDelegate extends BridgeDelegate {
 

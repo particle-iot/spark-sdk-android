@@ -21,23 +21,17 @@
 
 package org.kaazing.gateway.client.impl.http;
 
-import static java.util.Collections.unmodifiableMap;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
 import org.kaazing.gateway.client.impl.wseb.WebSocketEmulatedChannel;
 import org.kaazing.gateway.client.util.HttpURI;
 import org.kaazing.gateway.client.util.StringUtils;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
 import org.kaazing.net.http.HttpRedirectPolicy;
+
+import java.net.URI;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /*
  * WebSocket Emulated Handler Chain
  * EmulateHandler  

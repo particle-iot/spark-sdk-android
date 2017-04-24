@@ -21,12 +21,12 @@
 
 package org.kaazing.net.ws.impl.io;
 
+import org.kaazing.net.ws.WebSocketException;
+import org.kaazing.net.ws.WebSocketMessageType;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
-
-import org.kaazing.net.ws.WebSocketException;
-import org.kaazing.net.ws.WebSocketMessageType;
 
 public class WsReaderImpl extends Reader {
     private WsMessageReaderAdapter    _adapter;

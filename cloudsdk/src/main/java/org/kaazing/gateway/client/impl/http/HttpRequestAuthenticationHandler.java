@@ -21,14 +21,6 @@
 
 package org.kaazing.gateway.client.impl.http;
 
-import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.Channel;
 import org.kaazing.gateway.client.impl.auth.AuthenticationUtil;
 import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
@@ -40,6 +32,14 @@ import org.kaazing.net.auth.ChallengeHandler;
 import org.kaazing.net.auth.ChallengeRequest;
 import org.kaazing.net.auth.ChallengeResponse;
 import org.kaazing.net.impl.util.ResumableTimer;
+
+import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * WebSocket Emulated Handler Chain

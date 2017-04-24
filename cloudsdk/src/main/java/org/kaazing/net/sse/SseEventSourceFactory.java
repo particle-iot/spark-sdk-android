@@ -21,11 +21,11 @@
 
 package org.kaazing.net.sse;
 
+import org.kaazing.net.http.HttpRedirectPolicy;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ServiceLoader;
-
-import org.kaazing.net.http.HttpRedirectPolicy;
 
 /**
  * {@link SseEventSourceFactory} is an abstract class that can be used to create

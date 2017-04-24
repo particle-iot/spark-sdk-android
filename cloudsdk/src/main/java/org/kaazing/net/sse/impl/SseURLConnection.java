@@ -21,13 +21,13 @@
 
 package org.kaazing.net.sse.impl;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-
 import org.kaazing.net.http.HttpRedirectPolicy;
 import org.kaazing.net.sse.SseEventReader;
 import org.kaazing.net.sse.SseEventType;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public abstract class SseURLConnection extends URLConnection {
 

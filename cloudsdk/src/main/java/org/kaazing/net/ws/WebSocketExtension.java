@@ -21,14 +21,14 @@
 
 package org.kaazing.net.ws;
 
+import org.kaazing.net.ws.WebSocketExtension.Parameter.Metadata;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.kaazing.net.ws.WebSocketExtension.Parameter.Metadata;
 
 /**
  * {@link WebSocketExtension} should be extended to define or register

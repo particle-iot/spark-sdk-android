@@ -21,10 +21,10 @@
 
 package org.kaazing.gateway.client.transport.ws;
 
+import org.kaazing.gateway.client.transport.BridgeDelegate;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import org.kaazing.gateway.client.transport.BridgeDelegate;
 
 public interface WebSocketDelegate extends BridgeDelegate {
 

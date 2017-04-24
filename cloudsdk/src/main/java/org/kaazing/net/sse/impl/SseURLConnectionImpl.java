@@ -21,6 +21,9 @@
 
 package org.kaazing.net.sse.impl;
 
+import org.kaazing.net.http.HttpRedirectPolicy;
+import org.kaazing.net.sse.SseEventReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,9 +33,6 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-import org.kaazing.net.http.HttpRedirectPolicy;
-import org.kaazing.net.sse.SseEventReader;
 
 public class SseURLConnectionImpl extends SseURLConnection {
     private static final String _CLASS_NAME = SseURLConnectionImpl.class.getName();

@@ -21,9 +21,6 @@
 
 package org.kaazing.gateway.client.impl.ws;
 
-import java.net.URI;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.CommandMessage;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandler;
@@ -34,6 +31,9 @@ import org.kaazing.gateway.client.impl.http.HttpRequestHandler;
 import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.impl.wsn.WebSocketNativeDelegateHandler;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.net.URI;
+import java.util.logging.Logger;
 
 public class WebSocketTransportHandler extends WebSocketHandlerAdapter {
     

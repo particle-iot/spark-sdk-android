@@ -22,16 +22,16 @@
 package org.kaazing.net.impl.auth;
 
 
-import java.net.PasswordAuthentication;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.util.auth.LoginHandlerProvider;
 import org.kaazing.net.auth.BasicChallengeHandler;
 import org.kaazing.net.auth.ChallengeRequest;
 import org.kaazing.net.auth.ChallengeResponse;
 import org.kaazing.net.auth.LoginHandler;
+
+import java.net.PasswordAuthentication;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * Challenge handler for Basic authentication. See RFC 2617.

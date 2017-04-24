@@ -21,11 +21,11 @@
 
 package org.kaazing.net.ws.impl.io;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import org.kaazing.net.ws.WebSocketMessageReader;
 import org.kaazing.net.ws.WebSocketMessageType;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * This is an internal adapter that will be used by our {@link InputStream} and 
