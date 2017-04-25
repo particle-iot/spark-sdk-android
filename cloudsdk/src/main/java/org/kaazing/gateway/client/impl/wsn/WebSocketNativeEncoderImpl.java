@@ -21,13 +21,13 @@
 
 package org.kaazing.gateway.client.impl.wsn;
 
-import java.nio.charset.Charset;
-import java.util.Random;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.EncoderOutput;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.nio.charset.Charset;
+import java.util.Random;
+import java.util.logging.Logger;
 
 
 public class WebSocketNativeEncoderImpl implements WebSocketNativeEncoder {

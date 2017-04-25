@@ -21,6 +21,9 @@
 
 package org.kaazing.gateway.client.impl.bridge;
 
+import org.kaazing.gateway.client.impl.bridge.XoaEvent.XoaEventKind;
+import org.kaazing.gateway.client.util.StringUtils;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -32,9 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.kaazing.gateway.client.impl.bridge.XoaEvent.XoaEventKind;
-import org.kaazing.gateway.client.util.StringUtils;
 
 public class BridgeUtil {
     private static final String CLASS_NAME = BridgeUtil.class.getName();

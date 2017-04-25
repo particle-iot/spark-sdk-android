@@ -25,19 +25,19 @@
 
 package org.kaazing.gateway.client.impl.bridge;
 
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.bridge.XoaEvent.XoaEventKind;
 import org.kaazing.gateway.client.impl.http.HttpRequest;
+import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
 import org.kaazing.gateway.client.impl.http.HttpRequestHandler;
 import org.kaazing.gateway.client.impl.http.HttpRequestListener;
 import org.kaazing.gateway.client.impl.http.HttpRequestUtil;
 import org.kaazing.gateway.client.impl.http.HttpResponse;
-import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
 import org.kaazing.gateway.client.util.HttpURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /*
  * WebSocket Emulated Handler Chain
  * EmulateHandler  

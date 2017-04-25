@@ -21,19 +21,19 @@
 
 package org.kaazing.gateway.client.impl.wsn;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.CommandMessage;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandler;
 import org.kaazing.gateway.client.impl.WebSocketHandlerAdapter;
 import org.kaazing.gateway.client.impl.WebSocketHandlerFactory;
 import org.kaazing.gateway.client.impl.WebSocketHandlerListener;
+import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.impl.ws.WebSocketLoggingHandler;
 import org.kaazing.gateway.client.impl.ws.WebSocketTransportHandler;
-import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * WebSocket Native Handler Chain

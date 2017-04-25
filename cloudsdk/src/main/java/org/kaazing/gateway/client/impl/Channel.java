@@ -21,9 +21,9 @@
 
 package org.kaazing.gateway.client.impl;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.kaazing.net.auth.ChallengeResponse;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Channel {
     public static final String HEADER_SEQUENCE = "X-Sequence-No";

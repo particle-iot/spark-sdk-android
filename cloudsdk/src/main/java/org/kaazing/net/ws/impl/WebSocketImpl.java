@@ -21,28 +21,6 @@
 
 package org.kaazing.net.ws.impl;
 
-import static java.util.Collections.unmodifiableCollection;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.CommandMessage;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandlerListener;
@@ -74,6 +52,28 @@ import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
 import org.kaazing.net.ws.impl.spi.WebSocketExtensionHandlerSpi;
 import org.kaazing.net.ws.impl.spi.WebSocketExtensionParameterValuesSpi;
 import org.kaazing.net.ws.impl.spi.WebSocketExtensionSpi;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static java.util.Collections.unmodifiableCollection;
 
 public class WebSocketImpl extends WebSocket {
     private static final String _CLASS_NAME = WebSocketImpl.class.getName();

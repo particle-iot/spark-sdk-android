@@ -21,15 +21,15 @@
 
 package org.kaazing.net.ws.impl.url;
 
+import org.kaazing.net.ws.WsURLConnection;
+import org.kaazing.net.ws.impl.WsURLConnectionImpl;
+import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.util.Map;
-
-import org.kaazing.net.ws.WsURLConnection;
-import org.kaazing.net.ws.impl.WsURLConnectionImpl;
-import org.kaazing.net.ws.impl.spi.WebSocketExtensionFactorySpi;
 
 class WsURLStreamHandlerImpl extends URLStreamHandler {
 

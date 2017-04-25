@@ -7,8 +7,13 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
+import android.util.Log;
 
 import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -31,6 +36,7 @@ import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
+import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.cloud.models.SignUpInfo;
 import io.particle.android.sdk.persistance.AppDataStorage;
 import io.particle.android.sdk.utils.Funcy;
@@ -38,6 +44,8 @@ import io.particle.android.sdk.utils.Funcy.Func;
 import io.particle.android.sdk.utils.Py.PySet;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 import static io.particle.android.sdk.utils.Py.all;
 import static io.particle.android.sdk.utils.Py.list;
@@ -175,11 +183,7 @@ public class ParticleCloud {
      */
     @WorkerThread
     public void signUpWithUser(String user, String password) throws ParticleCloudException {
-        try {
-            identityApi.signUp(new SignUpInfo(user, password));
-        } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
-        }
+        signUpWithUser(new SignUpInfo(user, password));
     }
 
     /**
@@ -190,7 +194,41 @@ public class ParticleCloud {
     @WorkerThread
     public void signUpWithUser(SignUpInfo signUpInfo) throws ParticleCloudException {
         try {
-            identityApi.signUp(signUpInfo);
+            Response response = identityApi.signUp(signUpInfo);
+            String bodyString = new String(((TypedByteArray) response.getBody()).getBytes());
+            JSONObject obj = new JSONObject(bodyString);
+
+            //workaround for sign up bug - invalid credentials bug
+            if (obj.has("ok") && !obj.getBoolean("ok")) {
+                JSONArray arrJson = obj.getJSONArray("errors");
+                String[] arr = new String[arrJson.length()];
+
+                for (int i = 0; i < arrJson.length(); i++) {
+                    arr[i] = arrJson.getString(i);
+                }
+                if (arr.length > 0) {
+                    throw new ParticleCloudException(new Exception(arr[0]));
+                }
+            }
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        } catch (JSONException ignore) {
+            //ignore - who cares if we're not getting error response
+        }
+    }
+
+    /**
+     * Create new customer account on the Particle cloud and log in
+     *
+     * @param email     Required user name, must be a valid email address
+     * @param password  Required password
+     * @param productId Product id to use
+     */
+    @WorkerThread
+    public void signUpAndLogInWithCustomer(String email, String password, Integer productId)
+            throws ParticleCloudException {
+        try {
+            signUpAndLogInWithCustomer(new SignUpInfo(email, password), productId);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -199,14 +237,41 @@ public class ParticleCloud {
     /**
      * Create new customer account on the Particle cloud and log in
      *
+     * @param signUpInfo Required sign up information, must contain a valid email address and password
+     * @param productId  Product id to use
+     */
+    @WorkerThread
+    public void signUpAndLogInWithCustomer(SignUpInfo signUpInfo, Integer productId)
+            throws ParticleCloudException {
+        if (!all(signUpInfo.getUsername(), signUpInfo.getPassword(), productId)) {
+            throw new IllegalArgumentException(
+                    "Email, password, and product id must all be specified");
+        }
+
+        signUpInfo.setGrantType("client_credentials");
+        try {
+            Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(signUpInfo, productId);
+            onLogIn(response, signUpInfo.getUsername(), signUpInfo.getPassword());
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+
+    /**
+     * Create new customer account on the Particle cloud and log in
+     *
      * @param email    Required user name, must be a valid email address
      * @param password Required password
      * @param orgSlug  Organization slug to use
+     * @deprecated Use product id or product slug instead
      */
     @WorkerThread
+    @Deprecated
     public void signUpAndLogInWithCustomer(String email, String password, String orgSlug)
             throws ParticleCloudException {
         try {
+            log.w("Use product id instead of organization slug.");
             signUpAndLogInWithCustomer(new SignUpInfo(email, password), orgSlug);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
@@ -218,8 +283,10 @@ public class ParticleCloud {
      *
      * @param signUpInfo Required sign up information, must contain a valid email address and password
      * @param orgSlug    Organization slug to use
+     * @deprecated Use product id or product slug instead
      */
     @WorkerThread
+    @Deprecated
     public void signUpAndLogInWithCustomer(SignUpInfo signUpInfo, String orgSlug)
             throws ParticleCloudException {
         if (!all(signUpInfo.getUsername(), signUpInfo.getPassword(), orgSlug)) {
@@ -392,12 +459,26 @@ public class ParticleCloud {
     }
 
     @WorkerThread
-    public Responses.ClaimCodeResponse generateClaimCodeForOrg(String orgSlug, String productSlug)
+    public Responses.ClaimCodeResponse generateClaimCode(Integer productId)
             throws ParticleCloudException {
         try {
             // Offer empty string to appease newer OkHttp versions which require a POST body,
             // even if it's empty or (as far as the endpoint cares) nonsense
-            return mainApi.generateClaimCodeForOrg("okhttp_appeasement", orgSlug, productSlug);
+            return mainApi.generateClaimCodeForOrg("okhttp_appeasement", productId);
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    @WorkerThread
+    @Deprecated
+    public Responses.ClaimCodeResponse generateClaimCodeForOrg(String organizationSlug, String productSlug)
+            throws ParticleCloudException {
+        try {
+            log.w("Use product id instead of organization slug.");
+            // Offer empty string to appease newer OkHttp versions which require a POST body,
+            // even if it's empty or (as far as the endpoint cares) nonsense
+            return mainApi.generateClaimCodeForOrg("okhttp_appeasement", organizationSlug, productSlug);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -408,6 +489,26 @@ public class ParticleCloud {
     public void requestPasswordReset(String email) throws ParticleCloudException {
         try {
             identityApi.requestPasswordReset(email);
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    @WorkerThread
+    public void requestPasswordResetForCustomer(String email, Integer productId) throws ParticleCloudException {
+        try {
+            identityApi.requestPasswordResetForCustomer(email, productId);
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
+    @WorkerThread
+    @Deprecated
+    public void requestPasswordResetForCustomer(String email, String organizationSlug) throws ParticleCloudException {
+        try {
+            log.w("Use product id instead of organization slug.");
+            identityApi.requestPasswordResetForCustomer(email, organizationSlug);
         } catch (RetrofitError error) {
             throw new ParticleCloudException(error);
         }
@@ -498,6 +599,16 @@ public class ParticleCloud {
     public void unsubscribeFromEventWithID(long eventListenerID) throws ParticleCloudException {
         eventsDelegate.unsubscribeFromEventWithID(eventListenerID);
     }
+
+    /**
+     * Unsubscribe event listener from events.
+     *
+     * @param handler Particle event listener you want to unsubscribe from events
+     */
+    @WorkerThread
+    void unsubscribeFromEventWithHandler(SimpleParticleEventHandler handler) throws ParticleCloudException {
+        eventsDelegate.unsubscribeFromEventWithHandler(handler);
+    }
     //endregion
 
 
@@ -546,6 +657,12 @@ public class ParticleCloud {
     // FIXME: exposing this is weak, figure out something better
     void notifyDeviceChanged() {
         sendUpdateBroadcast();
+    }
+
+    void sendSystemEventBroadcast(DeviceStateChange stateChange) {
+        Intent intent = new Intent(BroadcastContract.BROADCAST_SYSTEM_EVENT);
+        intent.putExtra("event", stateChange);
+        broadcastManager.sendBroadcast(intent);
     }
 
     // this is accessible at the package level for access from ParticleDevice's Parcelable impl

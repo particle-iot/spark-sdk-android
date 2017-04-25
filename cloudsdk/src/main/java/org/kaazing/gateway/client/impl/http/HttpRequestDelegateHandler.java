@@ -21,9 +21,6 @@
 
 package org.kaazing.gateway.client.impl.http;
 
-import java.net.URL;
-import java.util.Map.Entry;
-
 import org.kaazing.gateway.client.impl.bridge.HttpRequestBridgeHandler;
 import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
 import org.kaazing.gateway.client.impl.ws.WebSocketCompositeChannel;
@@ -39,6 +36,9 @@ import org.kaazing.gateway.client.transport.http.HttpRequestDelegate;
 import org.kaazing.gateway.client.transport.http.HttpRequestDelegateImpl;
 import org.kaazing.gateway.client.transport.http.HttpRequestDelegateListener;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.net.URL;
+import java.util.Map.Entry;
 
 public class HttpRequestDelegateHandler implements HttpRequestHandler {
 

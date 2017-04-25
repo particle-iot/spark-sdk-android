@@ -21,11 +21,11 @@
 
 package org.kaazing.net.ws.impl.spi;
 
-import java.util.Collection;
-
 import org.kaazing.net.ws.WebSocket;
 import org.kaazing.net.ws.WebSocketExtension.Parameter;
 import org.kaazing.net.ws.WsURLConnection;
+
+import java.util.Collection;
 
 /**
  * WsExtensionParameterValues is part of <i>Service Provider Interface</i> 

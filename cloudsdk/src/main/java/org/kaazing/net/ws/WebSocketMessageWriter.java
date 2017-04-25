@@ -22,7 +22,6 @@
 package org.kaazing.net.ws;
 
 import java.io.IOException;
-
 import java.nio.ByteBuffer;
 
 /**

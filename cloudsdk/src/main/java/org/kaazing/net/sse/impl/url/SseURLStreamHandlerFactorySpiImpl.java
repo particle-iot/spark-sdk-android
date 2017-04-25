@@ -21,13 +21,13 @@
 
 package org.kaazing.net.sse.impl.url;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
+import org.kaazing.net.URLStreamHandlerFactorySpi;
 
 import java.net.URLStreamHandler;
 import java.util.Collection;
 
-import org.kaazing.net.URLStreamHandlerFactorySpi;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 public class SseURLStreamHandlerFactorySpiImpl extends URLStreamHandlerFactorySpi {
     private static final Collection<String> _supportedProtocols = unmodifiableList(asList("sse"));

@@ -21,11 +21,9 @@
 
 package org.kaazing.gateway.client.impl.ws;
 
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.CommandMessage;
+
+import java.util.logging.Logger;
 
 public class CloseCommandMessage implements CommandMessage {
 

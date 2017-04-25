@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2007-2014 Kaazing Corporation. All rights reserved.
- * 
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -8,9 +8,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,6 +20,14 @@
  */
 
 package org.kaazing.gateway.client.transport.http;
+
+import org.kaazing.gateway.client.transport.CloseEvent;
+import org.kaazing.gateway.client.transport.ErrorEvent;
+import org.kaazing.gateway.client.transport.IoBufferUtil;
+import org.kaazing.gateway.client.transport.LoadEvent;
+import org.kaazing.gateway.client.transport.OpenEvent;
+import org.kaazing.gateway.client.transport.ProgressEvent;
+import org.kaazing.gateway.client.transport.ReadyStateChangedEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,14 +41,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.kaazing.gateway.client.transport.CloseEvent;
-import org.kaazing.gateway.client.transport.ErrorEvent;
-import org.kaazing.gateway.client.transport.IoBufferUtil;
-import org.kaazing.gateway.client.transport.LoadEvent;
-import org.kaazing.gateway.client.transport.OpenEvent;
-import org.kaazing.gateway.client.transport.ProgressEvent;
-import org.kaazing.gateway.client.transport.ReadyStateChangedEvent;
-
 public class HttpRequestDelegateImpl implements HttpRequestDelegate {
     private static final String CLASS_NAME = HttpRequestDelegateImpl.class.getName();
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
@@ -49,8 +49,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
      * XmlHTTPReqeuest states const unsigned short UNSENT = 0; const unsigned short OPENED = 1; const unsigned short HEADERS_RECEIVED = 2; const unsigned short
      * LOADING = 3; const unsigned short DONE = 4;
      */
-
-    public static enum State {
+    private enum State {
         UNSENT, OPENED, HEADERS_RECEIVED, LOADING, DONE
     }
 
@@ -58,7 +57,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
 
     private ByteBuffer responseBuffer = ByteBuffer.allocate(5000);
     private ByteBuffer completedResponseBuffer;
-    HttpURLConnection connection = null;
+    private HttpURLConnection connection = null;
     private HttpRequestDelegateListener listener;
 
     private int httpResponseCode;
@@ -79,11 +78,11 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
     public ByteBuffer getResponseText() {
         LOG.entering(CLASS_NAME, "getResponseText");
         switch (readyState) {
-        case LOADING:
-        case OPENED:
-            return responseBuffer.duplicate();
-        case DONE:
-            return completedResponseBuffer;
+            case LOADING:
+            case OPENED:
+                return responseBuffer.duplicate();
+            case DONE:
+                return completedResponseBuffer;
         }
         return null;
     }
@@ -102,7 +101,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
             reader.stop();
             reader = null;
         }
-    };
+    }
 
     public String getAllResponseHeaders() {
         LOG.entering(CLASS_NAME, "getAllResponseHeaders");
@@ -111,8 +110,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
             String headerText = connection.getHeaderFields().toString();
             LOG.exiting(CLASS_NAME, "getAllResponseHeaders", headerText);
             return headerText;
-        }
-        else {
+        } else {
             LOG.exiting(CLASS_NAME, "getAllResponseHeaders");
             return null;
         }
@@ -124,8 +122,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
             String headerText = connection.getHeaderField(header);
             LOG.exiting(CLASS_NAME, "getResponseHeader", headerText);
             return headerText;
-        }
-        else {
+        } else {
             LOG.exiting(CLASS_NAME, "getResponseHeader");
             return null;
         }
@@ -135,10 +132,10 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
      * @see org.kaazing.gateway.client.transport.http.HttpRequestDelegate#open(java.lang.String, java.net.URL, java.lang.String, boolean)
      */
     public void processOpen(String method, URL url, String origin, boolean async, long connectTimeout) throws Exception {
-        LOG.entering(CLASS_NAME, "processOpen", new Object[] {method, url, origin, async});
+        LOG.entering(CLASS_NAME, "processOpen", new Object[]{method, url, origin, async});
 
         this.async = async;
-        connection = (HttpURLConnection)url.openConnection();
+        connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(method);
         connection.setInstanceFollowRedirects(false);
         connection.setConnectTimeout((int) connectTimeout);
@@ -167,20 +164,19 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
             if (!async && content != null && content.hasRemaining()) {
                 connection.setDoOutput(true);
                 connection.setDoInput(true);
-                
-                OutputStream out = connection.getOutputStream(); 
+
+                OutputStream out = connection.getOutputStream();
                 out.write(content.array(), content.arrayOffset(), content.remaining());
                 out.flush();
             }
-            
+
             connection.connect();
             reader = new StreamReader();
             Thread t = new Thread(reader, "HttpRequestDelegate stream reader");
             t.setDaemon(true);
             t.start();
-        }
-        catch (Exception e) {
-            LOG.log(Level.FINE, "While processing http request", e); 
+        } catch (Exception e) {
+            LOG.log(Level.FINE, "While processing http request", e);
             // e.printStackTrace();
             listener.errorOccurred(new ErrorEvent(e));
         }
@@ -190,7 +186,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
      * @see org.kaazing.gateway.bridge.HttpRequestDelegate#setRequestHeader(java.lang.String, java.lang.String)
      */
     public void setRequestHeader(String header, String value) {
-        LOG.entering(CLASS_NAME, "setRequestHeader", new Object[] {header, value});
+        LOG.entering(CLASS_NAME, "setRequestHeader", new Object[]{header, value});
         HttpRequestUtil.validateHeader(header);
         connection.addRequestProperty(header, value);
     }
@@ -222,15 +218,14 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
         public void run() {
             try {
                 run2();
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 LOG.log(Level.INFO, e.getMessage(), e);
             }
-       }
-       
-       public void run2() {            
+        }
+
+        void run2() {
             LOG.entering(CLASS_NAME, "run");
-            InputStream in = null;
+            InputStream in;
             try {
                 httpResponseCode = connection.getResponseCode();
 
@@ -241,7 +236,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
                     throw ex;
                 }
                 Map<String, List<String>> headers = connection.getHeaderFields();
-                StringBuffer allHeadersBuffer = new StringBuffer();
+                StringBuilder allHeadersBuffer = new StringBuilder();
                 int numHeaders = headers.size();
                 for (int i = 0; i < numHeaders; i++) {
                     allHeadersBuffer.append(connection.getHeaderFieldKey(i));
@@ -250,13 +245,13 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
                     allHeadersBuffer.append("\n");
                 }
                 String allHeaders = allHeadersBuffer.toString();
-                String[] params = new String[] {Integer.toString(State.HEADERS_RECEIVED.ordinal()), Integer.toString(httpResponseCode), connection.getResponseMessage() + "",
+                String[] params = new String[]{Integer.toString(State.HEADERS_RECEIVED.ordinal()), Integer.toString(httpResponseCode), connection.getResponseMessage() + "",
                         allHeaders};
-                
+
                 setReadyState(State.HEADERS_RECEIVED);
                 listener.readyStateChanged(new ReadyStateChangedEvent(params));
-                
-                if(httpResponseCode == 401) {
+
+                if (httpResponseCode == 401) {
                     listener.loaded(new LoadEvent(ByteBuffer.allocate(0)));
                     requestCompleted.compareAndSet(false, true);
                     connection.disconnect();
@@ -264,13 +259,11 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
                 }
                 in = connection.getInputStream();
 
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.severe(e.toString());
                 listener.errorOccurred(new ErrorEvent(e));
                 return;
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
                 listener.errorOccurred(new ErrorEvent(ex));
                 return;
@@ -287,15 +280,15 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
                         throw ex;
                     }
                 }
-                
-                
+
+
                 byte[] payloadBuffer = new byte[4096]; // read in chunks
                 while (!stopped.get()) {
-                	int numberOfBytesRead = in.read(payloadBuffer, 0, payloadBuffer.length); 
-                	if (numberOfBytesRead == -1) {
-                		// end of stream, break from loop
-                		break;
-                	}
+                    int numberOfBytesRead = in.read(payloadBuffer, 0, payloadBuffer.length);
+                    if (numberOfBytesRead == -1) {
+                        // end of stream, break from loop
+                        break;
+                    }
                     ByteBuffer payload = ByteBuffer.wrap(payloadBuffer, 0, numberOfBytesRead);
                     if (!async) {
                         // build up the buffer for completed response only for
@@ -311,7 +304,7 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
                     }
                     listener.progressed(new ProgressEvent(payload, 0, 0));
                 }
-                
+
                 if (!stopped.get()) {
                     // We want to fire the load event for complete responses
                     // only that are
@@ -321,31 +314,26 @@ public class HttpRequestDelegateImpl implements HttpRequestDelegate {
                     responseBuffer.flip();
                     completedResponseBuffer = responseBuffer.duplicate();
                     setReadyState(State.DONE);
-                    
+
                     try {
                         listener.loaded(new LoadEvent(completedResponseBuffer));
-                    }
-                    finally {
+                    } finally {
                         requestCompleted.compareAndSet(false, true);
                         try {
                             connection.disconnect();
-                        }
-                        finally {
+                        } finally {
                             listener.closed(new CloseEvent(1000, true, ""));
                         }
                     }
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 LOG.severe(e.toString());
                 if (!requestCompleted.get()) {
                     listener.errorOccurred(new ErrorEvent(e));
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 LOG.log(Level.FINE, ex.getMessage(), ex);
                 listener.errorOccurred(new ErrorEvent(ex));
-                return;
             }
         }
 

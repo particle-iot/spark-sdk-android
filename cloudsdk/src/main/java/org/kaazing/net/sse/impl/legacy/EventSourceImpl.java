@@ -21,14 +21,14 @@
 
 package org.kaazing.net.sse.impl.legacy;
 
+import org.kaazing.net.sse.impl.SseEventStream;
+import org.kaazing.net.sse.impl.SseEventStreamListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.kaazing.net.sse.impl.SseEventStream;
-import org.kaazing.net.sse.impl.SseEventStreamListener;
 
 
 

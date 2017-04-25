@@ -21,9 +21,9 @@
 
 package org.kaazing.gateway.client.impl.bridge;
 
-import java.net.URI;
-
 import org.kaazing.gateway.client.impl.bridge.XoaEvent.XoaEventKind;
+
+import java.net.URI;
 
 /**
  * This class manages the handler id and URI associated with each proxy for the bridge.

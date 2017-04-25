@@ -37,18 +37,19 @@ package org.kaazing.gateway.client.impl.wseb;
  * TODO:
  *         n/a  
  */
-import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.kaazing.gateway.client.impl.CommandMessage;
 import org.kaazing.gateway.client.impl.WebSocketChannel;
 import org.kaazing.gateway.client.impl.WebSocketHandlerAdapter;
+import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.impl.ws.CloseCommandMessage;
 import org.kaazing.gateway.client.impl.ws.ReadyState;
-import org.kaazing.gateway.client.impl.util.WSURI;
 import org.kaazing.gateway.client.util.HttpURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class WebSocketEmulatedHandler extends WebSocketHandlerAdapter {
     

@@ -21,20 +21,20 @@
 
 package org.kaazing.gateway.client.impl.ws;
 
-import java.nio.charset.Charset;
-import java.util.logging.Logger;
-
 import org.kaazing.gateway.client.impl.Channel;
 import org.kaazing.gateway.client.impl.Handler;
 import org.kaazing.gateway.client.impl.http.HttpRequest;
+import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
 import org.kaazing.gateway.client.impl.http.HttpRequestAuthenticationHandler;
 import org.kaazing.gateway.client.impl.http.HttpRequestHandler;
 import org.kaazing.gateway.client.impl.http.HttpRequestListener;
 import org.kaazing.gateway.client.impl.http.HttpRequestTransportHandler;
 import org.kaazing.gateway.client.impl.http.HttpResponse;
-import org.kaazing.gateway.client.impl.http.HttpRequest.Method;
 import org.kaazing.gateway.client.util.HttpURI;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
+
+import java.nio.charset.Charset;
+import java.util.logging.Logger;
 
 public class WebSocketReAuthenticateHandler implements Handler {
 
