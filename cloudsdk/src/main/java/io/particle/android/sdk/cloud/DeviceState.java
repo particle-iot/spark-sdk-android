@@ -35,6 +35,7 @@ class DeviceState implements Parcelable {
     @Nullable final Boolean isConnected;
     @Nullable final Boolean cellular;
     @Nullable final String imei;
+    @Nullable final String lastIccid;
     @Nullable final String currentBuild;
     @Nullable final String defaultBuild;
     final Set<String> functions;
@@ -50,6 +51,7 @@ class DeviceState implements Parcelable {
         this.isConnected = deviceStateBuilder.isConnected;
         this.cellular = deviceStateBuilder.cellular;
         this.imei = deviceStateBuilder.imei;
+        this.lastIccid = deviceStateBuilder.lastIccid;
         this.currentBuild = deviceStateBuilder.currentBuild;
         this.defaultBuild = deviceStateBuilder.defaultBuild;
         this.functions = deviceStateBuilder.functions;
@@ -79,6 +81,7 @@ class DeviceState implements Parcelable {
                 .platformId(other.platformId)
                 .productId(other.productId)
                 .imei(other.imei)
+                .iccid(other.lastIccid)
                 .currentBuild(other.currentBuild)
                 .defaultBuild(other.defaultBuild)
                 .ipAddress(other.ipAddress)
@@ -100,6 +103,7 @@ class DeviceState implements Parcelable {
                 .platformId(other.platformId)
                 .productId(other.productId)
                 .imei(other.imei)
+                .iccid(other.lastIccid)
                 .currentBuild(other.currentBuild)
                 .defaultBuild(other.defaultBuild)
                 .ipAddress(other.ipAddress)
@@ -124,6 +128,7 @@ class DeviceState implements Parcelable {
         productId = (Integer) in.readValue(Integer.class.getClassLoader());
         cellular = (Boolean) in.readValue(Boolean.class.getClassLoader());
         imei = (String) in.readValue(String.class.getClassLoader());
+        lastIccid = (String) in.readValue(String.class.getClassLoader());
         currentBuild = (String) in.readValue(String.class.getClassLoader());
         defaultBuild = (String) in.readValue(String.class.getClassLoader());
         ipAddress = (String) in.readValue(String.class.getClassLoader());
@@ -146,6 +151,7 @@ class DeviceState implements Parcelable {
         dest.writeValue(productId);
         dest.writeValue(cellular);
         dest.writeValue(imei);
+        dest.writeValue(lastIccid);
         dest.writeValue(currentBuild);
         dest.writeValue(defaultBuild);
         dest.writeValue(ipAddress);
@@ -184,6 +190,7 @@ class DeviceState implements Parcelable {
         @Nullable private Boolean isConnected;
         @Nullable private Boolean cellular;
         @Nullable private String imei;
+        @Nullable private String lastIccid;
         @Nullable private String currentBuild;
         @Nullable private String defaultBuild;
         private final Set<String> functions;
@@ -243,6 +250,11 @@ class DeviceState implements Parcelable {
 
         public DeviceStateBuilder imei(@Nullable String imei) {
             this.imei = imei;
+            return this;
+        }
+
+        public DeviceStateBuilder iccid(@Nullable String iccid) {
+            this.lastIccid = iccid;
             return this;
         }
 

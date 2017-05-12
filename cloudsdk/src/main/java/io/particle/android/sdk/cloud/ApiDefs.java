@@ -37,6 +37,9 @@ public class ApiDefs {
      */
     public interface CloudApi {
 
+        @GET("/v1/sims/{lastIccid}/data_usage")
+        Response getCurrentDataUsage(@Path("lastIccid") String lastIccid);
+
         @GET("/v1/devices")
         List<Models.SimpleDevice> getDevices();
 
@@ -132,7 +135,7 @@ public class ApiDefs {
         // a little odd, but that's how this endpoint works.
         @POST("/v1/products/{productId}/customers")
         Responses.LogInResponse signUpAndLogInWithCustomer(@Body SignUpInfo signUpInfo,
-                                                               @Path("productId") Integer productId);
+                                                           @Path("productId") Integer productId);
 
         // NOTE: the `LogInResponse` used here as a return type is intentional.  It looks
         // a little odd, but that's how this endpoint works.
@@ -154,7 +157,7 @@ public class ApiDefs {
         @FormUrlEncoded
         @POST("/v1/products/{productId}/customers/reset_password")
         Response requestPasswordResetForCustomer(@Field("email") String email,
-                                                     @Path("productId") Integer productId);
+                                                 @Path("productId") Integer productId);
 
         @FormUrlEncoded
         @POST("/v1/orgs/{orgName}/customers/reset_password")

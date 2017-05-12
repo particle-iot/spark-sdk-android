@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.ArrayMap;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -732,6 +731,7 @@ public class ParticleCloud {
                 .platformId(completeDevice.platformId)
                 .productId(completeDevice.productId)
                 .imei(completeDevice.imei)
+                .iccid(completeDevice.lastIccid)
                 .currentBuild(completeDevice.currentBuild)
                 .defaultBuild(completeDevice.defaultBuild)
                 .ipAddress(completeDevice.ipAddress)
@@ -756,6 +756,7 @@ public class ParticleCloud {
                 .platformId(offlineDevice.platformId)
                 .productId(offlineDevice.productId)
                 .imei(offlineDevice.imei)
+                .iccid(offlineDevice.lastIccid)
                 .currentBuild(offlineDevice.currentBuild)
                 .defaultBuild(offlineDevice.defaultBuild)
                 .ipAddress(offlineDevice.ipAddress)

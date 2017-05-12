@@ -8,6 +8,9 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 import org.greenrobot.eventbus.EventBus;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +34,7 @@ import io.particle.android.sdk.utils.Preconditions;
 import io.particle.android.sdk.utils.TLog;
 import okio.Okio;
 import retrofit.RetrofitError;
+import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 import retrofit.mime.TypedFile;
 
@@ -88,7 +92,7 @@ public class ParticleDevice implements Parcelable {
         WENT_OFFLINE,
         UNKNOWN
     }
-  
+
     public enum VariableType {
         INT,
         DOUBLE,
@@ -219,6 +223,10 @@ public class ParticleDevice implements Parcelable {
         return deviceState.imei;
     }
 
+    public String getIccid() {
+        return deviceState.lastIccid;
+    }
+
     public String getCurrentBuild() {
         return deviceState.currentBuild;
     }
@@ -241,6 +249,29 @@ public class ParticleDevice implements Parcelable {
 
     public Date getLastHeard() {
         return deviceState.lastHeard;
+    }
+
+    @WorkerThread
+    public float getCurrentDataUsage() throws ParticleCloudException {
+        Response response = mainApi.getCurrentDataUsage(deviceState.lastIccid);
+        float maxUsage = 0;
+        try {
+            JSONObject result = new JSONObject(new String(((TypedByteArray) response.getBody()).getBytes()));
+            JSONArray usages = result.getJSONArray("usage_by_day");
+
+            for (int i = 0; i < usages.length(); i++) {
+                JSONObject usageElement = usages.getJSONObject(i);
+                if (usageElement.has("mbs_used_cumulative")) {
+                    double usage = usageElement.getDouble("mbs_used_cumulative");
+                    if (usage > maxUsage) {
+                        maxUsage = (float) usage;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            throw new ParticleCloudException(e);
+        }
+        return maxUsage;
     }
 
     /**
@@ -509,7 +540,7 @@ public class ParticleDevice implements Parcelable {
             throw new ParticleCloudException(e);
         }
     }
-  
+
     /**
      * Subscribes to system events of current device. Events emitted to EventBus listener.
      *
@@ -599,7 +630,7 @@ public class ParticleDevice implements Parcelable {
                 break;
         }
     }
-  
+
     @Override
     public String toString() {
         return "ParticleDevice{" +
