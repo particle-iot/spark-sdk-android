@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 
 import java.util.Date;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 
@@ -17,6 +18,7 @@ public class SensitiveDataStorage {
     private static final String KEY_PASSWORD = "KEY_PASSWORD";
     private static final String KEY_TOKEN = "KEY_TOKEN";
     private static final String KEY_TOKEN_EXPIRATION_DATE = "KEY_TOKEN_EXPIRATION_DATE";
+    private static final String KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN";
 
     private final SharedPreferences sharedPrefs;
 
@@ -73,6 +75,25 @@ public class SensitiveDataStorage {
                 .remove(KEY_TOKEN)
                 .apply();
     }
+
+    public void resetRefreshToken() {
+        sharedPrefs.edit()
+                .remove(KEY_REFRESH_TOKEN)
+                .apply();
+    }
+
+    public void saveRefreshToken(@Nullable String token) {
+        sharedPrefs.edit()
+                .putString(KEY_REFRESH_TOKEN, token)
+                .apply();
+    }
+
+    @Nullable
+    public String getRefreshToken() {
+        return sharedPrefs.getString(KEY_REFRESH_TOKEN, null);
+    }
+
+
 
     public void saveTokenExpirationDate(Date expirationDate) {
         sharedPrefs.edit()

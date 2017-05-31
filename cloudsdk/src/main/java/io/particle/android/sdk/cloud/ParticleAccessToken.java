@@ -28,15 +28,13 @@ public class ParticleAccessToken {
 
 
     public static synchronized ParticleAccessToken fromNewSession(Responses.LogInResponse logInResponse) {
-        if (logInResponse == null
-                || !Py.truthy(logInResponse.accessToken)
-                || !"bearer".equalsIgnoreCase(logInResponse.tokenType)) {
+        if (!Py.truthy(logInResponse.accessToken) || !"bearer".equalsIgnoreCase(logInResponse.tokenType)) {
             throw new IllegalArgumentException("Invalid LogInResponse: " + logInResponse);
         }
 
         long expirationMillis = logInResponse.expiresInSeconds * 1000;
         Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
-        return fromTokenData(expirationDate, logInResponse.accessToken);
+        return fromTokenData(expirationDate, logInResponse.accessToken, logInResponse.refreshToken);
     }
 
 
@@ -44,6 +42,7 @@ public class ParticleAccessToken {
     public static synchronized ParticleAccessToken fromSavedSession() {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         String accessToken = sensitiveDataStorage.getToken();
+        String refreshToken = sensitiveDataStorage.getRefreshToken();
         Date expirationDate = sensitiveDataStorage.getTokenExpirationDate();
 
         // are either of the fields "falsey" or has the expr date passed?
@@ -51,7 +50,7 @@ public class ParticleAccessToken {
             return null;
         }
 
-        ParticleAccessToken token = new ParticleAccessToken(accessToken, expirationDate,
+        ParticleAccessToken token = new ParticleAccessToken(accessToken, expirationDate, refreshToken,
                 new Handler(Looper.getMainLooper()));
         token.scheduleExpiration();
         return token;
@@ -59,11 +58,17 @@ public class ParticleAccessToken {
 
 
     public static synchronized ParticleAccessToken fromTokenData(Date expirationDate, String accessToken) {
+        return fromTokenData(expirationDate, accessToken, null);
+    }
+
+    public static synchronized ParticleAccessToken fromTokenData(Date expirationDate, String accessToken,
+                                                                 @Nullable String refreshToken) {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         sensitiveDataStorage.saveToken(accessToken);
+        sensitiveDataStorage.saveRefreshToken(refreshToken);
         sensitiveDataStorage.saveTokenExpirationDate(expirationDate);
 
-        ParticleAccessToken token = new ParticleAccessToken(accessToken, expirationDate,
+        ParticleAccessToken token = new ParticleAccessToken(accessToken, expirationDate, refreshToken,
                 new Handler(Looper.getMainLooper()));
         token.scheduleExpiration();
         return token;
@@ -76,6 +81,7 @@ public class ParticleAccessToken {
     public static synchronized void removeSession() {
         SensitiveDataStorage sensitiveDataStorage = SDKGlobals.getSensitiveDataStorage();
         sensitiveDataStorage.resetToken();
+        sensitiveDataStorage.resetRefreshToken();
         sensitiveDataStorage.resetTokenExpirationDate();
     }
 
@@ -89,15 +95,18 @@ public class ParticleAccessToken {
     private final Handler handler;
 
     private String accessToken;
+    private String refreshToken;
     private Date expiryDate;
 
     private volatile Runnable expirationRunnable;
     private volatile ParticleAccessTokenDelegate delegate;
 
-    private ParticleAccessToken(String accessToken, Date expiryDate, Handler handler) {
+    private ParticleAccessToken(String accessToken, Date expiryDate, @Nullable String refreshToken,
+                                Handler handler) {
         this.accessToken = accessToken;
         this.expiryDate = expiryDate;
         this.handler = handler;
+        this.refreshToken = refreshToken;
     }
 
     /**
@@ -110,6 +119,15 @@ public class ParticleAccessToken {
             return null;
         }
         return accessToken;
+    }
+
+    /**
+     * Refresh token string to be used when calling cloud API to refresh access token
+     *
+     * @return Refresh token string.
+     */
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
     /**
@@ -140,12 +158,7 @@ public class ParticleAccessToken {
         // the delegate (in the default impl) will make a call to try logging back
         // in, but making network calls on the main thread is doubleplus ungood.
         // (It'll throw an exception if you even try this, as well it should!)
-        EZ.runAsync(new Runnable() {
-            @Override
-            public void run() {
-                delegate.accessTokenExpiredAt(ParticleAccessToken.this, expiryDate);
-            }
-        });
+        EZ.runAsync(() -> delegate.accessTokenExpiredAt(ParticleAccessToken.this, expiryDate));
     }
 
     private void scheduleExpiration() {
