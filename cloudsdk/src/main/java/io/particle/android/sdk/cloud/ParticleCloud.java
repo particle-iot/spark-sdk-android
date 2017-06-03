@@ -80,7 +80,7 @@ public class ParticleCloud {
     }
 
     private final ApiDefs.CloudApi mainApi;
-    private final ApiDefs.IdentityApi identityApi;
+    private ApiDefs.IdentityApi identityApi;
     // FIXME: document why this exists (and try to make it not exist...)
     private final ApiDefs.CloudApi deviceFastTimeoutApi;
     private final AppDataStorage appDataStorage;
@@ -117,6 +117,10 @@ public class ParticleCloud {
         }
         this.eventsDelegate = new EventsDelegate(mainApi, schemeAndHostname, gson, executor, this);
         this.parallelDeviceFetcher = ParallelDeviceFetcher.newFetcherUsingExecutor(executor);
+    }
+
+    public void setIdentityApi(ApiDefs.IdentityApi identityApi) {
+        this.identityApi = identityApi;
     }
 
     //region general public API
@@ -156,6 +160,10 @@ public class ParticleCloud {
 
     public boolean isLoggedIn() {
         return getLoggedInUsername() != null;
+    }
+    
+    public void setUser(ParticleUser user) {
+        this.user = user;
     }
 
     /**
