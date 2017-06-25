@@ -1,3 +1,8 @@
+0.4.6
+=====
+* Adding refresh and inject session token methods.
+
+
 0.4.5
 =====
 * Exposing iccid and data usage for electron.
