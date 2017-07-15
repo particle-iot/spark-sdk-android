@@ -253,9 +253,9 @@ public class ParticleDevice implements Parcelable {
 
     @WorkerThread
     public float getCurrentDataUsage() throws ParticleCloudException {
-        Response response = mainApi.getCurrentDataUsage(deviceState.lastIccid);
         float maxUsage = 0;
         try {
+            Response response = mainApi.getCurrentDataUsage(deviceState.lastIccid);
             JSONObject result = new JSONObject(new String(((TypedByteArray) response.getBody()).getBytes()));
             JSONArray usages = result.getJSONArray("usage_by_day");
 
@@ -268,7 +268,7 @@ public class ParticleDevice implements Parcelable {
                     }
                 }
             }
-        } catch (JSONException e) {
+        } catch (JSONException | RetrofitError e) {
             throw new ParticleCloudException(e);
         }
         return maxUsage;
