@@ -25,6 +25,7 @@ Full documentation, including a getting started guide, lots of API examples, sup
 
 ## Maintainers
 
+- Julius Skripkauskas [Github](https://github.com/cityvibes) | [Twitter](https://www.twitter.com/azemar)
 - Jens Knutson [Github](https://github.com/jensck/) | [Google+](https://google.com/+JensKnutson)
 - Ido Kleinman [Github](https://www.github.com/idokleinman) | [Twitter](https://www.twitter.com/idokleinman)
 

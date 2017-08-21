@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 
 // This is the library version used when deploying the artifact
-version = '0.4.6'
+version = '0.4.7'
 
 ext {
     bintrayRepo = 'android'
     bintrayName = 'cloud-sdk'
     bintrayOrg = 'particle'
-    
+
     publishedGroupId = 'io.particle'
     libraryName = 'Particle (formerly Spark) Android Cloud SDK library '
     artifact = 'cloudsdk'
@@ -35,8 +35,8 @@ ext {
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.3'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.1'
 
     dexOptions {
         javaMaxHeapSize "2g"
@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName project.version
         consumerProguardFiles 'consumer-proguard-rules.pro'
@@ -71,14 +71,19 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.android.support:support-fragment:25.3.1'
+    compile 'com.android.support:support-fragment:26.0.1'
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 }
 
+repositories {
+    maven {
+        url 'https://maven.google.com'
+    }
+}
+
 apply from: '../pom_generator_v1.gradle'
 apply from: '../bintray_upload_v1.gradle'
-
 
 // disable insane, build-breaking doclint tool in Java 8
 if (JavaVersion.current().isJava8Compatible()) {

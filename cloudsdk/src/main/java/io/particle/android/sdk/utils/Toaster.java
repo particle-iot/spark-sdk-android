@@ -31,12 +31,7 @@ public class Toaster {
 
     private static void showToast(final Activity activity, @Nullable final String msg,
                                   final int length) {
-        Runnable toastRunnable = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(activity, msg, length).show();
-            }
-        };
+        Runnable toastRunnable = () -> Toast.makeText(activity, msg, length).show();
 
         if (EZ.isThisTheMainThread()) {
             toastRunnable.run();

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 
 import java.io.IOException;
+import java.util.concurrent.RejectedExecutionException;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -65,8 +66,13 @@ public class Async {
 
     public static <T> AsyncApiWorker<ParticleDevice, T> executeAsync(ParticleDevice particleDevice,
                                                                      ApiWork<ParticleDevice, T> work) {
-        return (AsyncApiWorker<ParticleDevice, T>) new AsyncApiWorker<>(particleDevice, work)
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        try {
+            return (AsyncApiWorker<ParticleDevice, T>) new AsyncApiWorker<>(particleDevice, work)
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (RejectedExecutionException ex) {
+            //FIXME just throw particle exception
+            return null;
+        }
     }
 
 
@@ -129,7 +135,7 @@ public class Async {
             work.onTaskFinished();
             if (exception == null && ioException == null) {
                 work.onSuccess(result);
-                
+
             } else {
                 // FIXME: this error handling isn't quite right; fix it.
                 if (exception == null) {
