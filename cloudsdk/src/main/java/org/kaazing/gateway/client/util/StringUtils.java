@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StringUtils {
-    private static final Map<CharSequence, CharSequence> BASIC_ESCAPE = new HashMap<CharSequence, CharSequence>();
+    private static final Map<CharSequence, CharSequence> BASIC_ESCAPE = new HashMap<>();
 
     static {
         BASIC_ESCAPE.put("\"", "&quot;"); // " - double-quote

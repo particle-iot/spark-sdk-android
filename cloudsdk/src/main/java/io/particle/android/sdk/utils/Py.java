@@ -152,6 +152,7 @@ public class Py {
      * @param objects arbitrary number of objects.
      * @return a List from the objects param
      */
+    @SafeVarargs
     public static <T> List<T> list(T... objects) {
         return new ArrayList<>(Arrays.asList(objects));
     }
@@ -191,6 +192,7 @@ public class Py {
      * @param objects arbitrary number of objects.
      * @return a Set from the objects param
      */
+    @SafeVarargs
     public static <T> PySet<T> set(T... objects) {
         return set(Arrays.asList(objects));
     }
@@ -208,6 +210,7 @@ public class Py {
      * @param objects arbitrary number of objects.
      * @return an immutible List
      */
+    @SafeVarargs
     public static <T> List<T> tuple(T... objects) {
         return Collections.unmodifiableList(list(objects));
     }
@@ -225,6 +228,7 @@ public class Py {
      * @param objects arbitrary number of objects.
      * @return an immutable Set from the objects param
      */
+    @SafeVarargs
     public static <T> Set<T> frozenset(T... objects) {
         return Collections.unmodifiableSet(set(objects));
     }
@@ -300,7 +304,8 @@ public class Py {
          * @param others , one or more collections with
          * @return (see above)
          */
-        public PySet<T> getUnion(Collection<T>... others) {
+        @SafeVarargs
+        public final PySet<T> getUnion(Collection<T>... others) {
             PySet<T> newCopy = set(this);
             for (Collection<T> other : others) {
                 newCopy.addAll(other);
@@ -334,7 +339,8 @@ public class Py {
          * @param others
          * @return
          */
-        public PySet<T> getIntersection(Collection<T>... others) {
+        @SafeVarargs
+        public final PySet<T> getIntersection(Collection<T>... others) {
             PySet<T> newCopy = set(this);
             for (Collection<T> other : others) {
                 // NOTE: .retainAll() can be thought of as .retainOnly() or
@@ -368,7 +374,8 @@ public class Py {
          * @param others
          * @return
          */
-        public PySet<T> getDifference(Collection<T>... others) {
+        @SafeVarargs
+        public final PySet<T> getDifference(Collection<T>... others) {
             // Return a new set with elements in the set that are not in the
             // others.
             PySet<T> newCopy = set(this);
@@ -386,7 +393,8 @@ public class Py {
          * @param other
          * @return
          */
-        public PySet<T> getSymmetricDifference(Collection<T>... others) {
+        @SafeVarargs
+        public final PySet<T> getSymmetricDifference(Collection<T>... others) {
             // Return a new set with elements in either the set or other but not
             // both.
             PySet<T> union = set(this);

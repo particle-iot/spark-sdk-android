@@ -162,7 +162,7 @@ public class WebSocketNativeHandshakeHandler extends WebSocketHandlerAdapter {
     }
 
     protected static String[] getLines(String payload) {
-        List<String> lineList = new ArrayList<String>();
+        List<String> lineList = new ArrayList<>();
         int i=0;
         
         while (i < payload.length()) {

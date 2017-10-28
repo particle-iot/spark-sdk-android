@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class WSCompositeURI extends GenericURI<WSCompositeURI> {
 
-    static Map<String, String> wsEquivalent = new HashMap<String, String>();
+    static Map<String, String> wsEquivalent = new HashMap<>();
     static {
         wsEquivalent.put("ws", "ws");
         wsEquivalent.put("wse", "ws");

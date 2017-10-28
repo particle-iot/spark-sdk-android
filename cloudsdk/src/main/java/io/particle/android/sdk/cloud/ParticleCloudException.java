@@ -29,16 +29,24 @@ public class ParticleCloudException extends Exception {
 
     private static final TLog log = TLog.get(ParticleCloudException.class);
 
-    /** Identifies the event kind which triggered a {@link ParticleCloudException}. */
+    /**
+     * Identifies the event kind which triggered a {@link ParticleCloudException}.
+     */
     public enum Kind {
 
-        /** An {@link java.io.IOException} occurred while communicating to the server. */
+        /**
+         * An {@link java.io.IOException} occurred while communicating to the server.
+         */
         NETWORK,
 
-        /** An exception was thrown while (de)serializing a body. */
+        /**
+         * An exception was thrown while (de)serializing a body.
+         */
         CONVERSION,
 
-        /** A non-200 HTTP status code was received from the server. */
+        /**
+         * A non-200 HTTP status code was received from the server.
+         */
         HTTP,
 
         /**
@@ -117,21 +125,23 @@ public class ParticleCloudException extends Exception {
 
     /**
      * Response containing HTTP status code & body.
-     *
+     * <p>
      * May be null depending on the nature of the error.
      */
     public ResponseErrorData getResponseData() {
         return responseData;
     }
 
-    /** The event kind which triggered this error. */
+    /**
+     * The event kind which triggered this error.
+     */
     public Kind getKind() {
         return Kind.valueOf(innerError.getKind().toString());
     }
 
     /**
      * Any server-provided error message.  May be null.
-     *
+     * <p>
      * If the server sent multiple errors, they will be concatenated together with newline characters.
      *
      * @return server-provided error or null
@@ -150,7 +160,7 @@ public class ParticleCloudException extends Exception {
      */
     public String getBestMessage() {
         // FIXME: this isn't the right place for user-facing data
-        if (getKind() == Kind.NETWORK ) {
+        if (getKind() == Kind.NETWORK) {
             return "Unable to connect to the server.";
 
         } else if (getKind() == Kind.UNEXPECTED) {
@@ -178,7 +188,7 @@ public class ParticleCloudException extends Exception {
                 return jsonObject.getString("error");
             }
 
-        } catch (JSONException e) {
+        } catch (JSONException ignore) {
         }
         return null;
     }
@@ -189,7 +199,7 @@ public class ParticleCloudException extends Exception {
         if (jsonArray == null || jsonArray.length() == 0) {
             return errors;
         }
-        for (int i=0; i < jsonArray.length(); i++){
+        for (int i = 0; i < jsonArray.length(); i++) {
             String msg = null;
 
             JSONObject msgObj = jsonArray.optJSONObject(i);

@@ -36,12 +36,7 @@ public class HttpRequest {
     static volatile int nextId = 1;
     final int id;
 
-    public static final HttpRequestFactory HTTP_REQUEST_FACTORY = new HttpRequestFactory() {
-        @Override
-        public HttpRequest createHttpRequest(Method method, HttpURI uri, boolean async) {
-            return new HttpRequest(method, uri, async);
-        }
-    };
+    public static final HttpRequestFactory HTTP_REQUEST_FACTORY = HttpRequest::new;
 
     /** Possible ready states for the request */
     public enum ReadyState {
@@ -81,7 +76,7 @@ public class HttpRequest {
     private boolean async;
     
     /** Headers associated with request.  Headers must be set before or during requestReady event */
-    private Map<String, String> headers = new HashMap<String, String>();
+    private Map<String, String> headers = new HashMap<>();
 
     /** Response received for this request */
     private HttpResponse response;

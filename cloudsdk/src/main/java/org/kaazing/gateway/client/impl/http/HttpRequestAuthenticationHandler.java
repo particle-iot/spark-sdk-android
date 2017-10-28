@@ -90,10 +90,10 @@ public class HttpRequestAuthenticationHandler extends HttpRequestHandlerAdapter 
     }
 
     protected static String[] getLines(WrappedByteBuffer buf) {
-        List<String> lineList = new ArrayList<String>();
+        List<String> lineList = new ArrayList<>();
         while (buf.hasRemaining()) {
             byte next = buf.get();
-            List<Byte> lineText = new ArrayList<Byte>();
+            List<Byte> lineText = new ArrayList<>();
             while (next != 13) { // CR
                 lineText.add(next);
                 if (buf.hasRemaining()) {

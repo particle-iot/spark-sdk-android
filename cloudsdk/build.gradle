@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 
 // This is the library version used when deploying the artifact
 version = '0.4.7'
@@ -36,7 +35,7 @@ ext {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
 
     dexOptions {
         javaMaxHeapSize "2g"
@@ -65,15 +64,13 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     compile 'com.google.code.findbugs:jsr305:3.0.1'
-    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.squareup.okhttp:okhttp:2.7.5'
-    compile 'com.squareup.okio:okio:1.9.0'
+    compile 'com.squareup.okio:okio:1.13.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.android.support:support-fragment:26.0.1'
-
-    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
+    compile 'com.android.support:support-fragment:26.1.0'
 }
 
 repositories {

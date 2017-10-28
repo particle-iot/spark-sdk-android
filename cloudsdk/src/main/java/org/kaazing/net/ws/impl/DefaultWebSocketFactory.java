@@ -55,7 +55,7 @@ public final class DefaultWebSocketFactory extends WebSocketFactory {
     static {
         Class<WebSocketExtensionFactorySpi> clazz = WebSocketExtensionFactorySpi.class;
         ServiceLoader<WebSocketExtensionFactorySpi> loader = ServiceLoader.load(clazz);
-        Map<String, WebSocketExtensionFactorySpi> factories = new HashMap<String, WebSocketExtensionFactorySpi>();
+        Map<String, WebSocketExtensionFactorySpi> factories = new HashMap<>();
         
         for (WebSocketExtensionFactorySpi factory: loader) {
             String extensionName = factory.getExtensionName();
@@ -69,9 +69,9 @@ public final class DefaultWebSocketFactory extends WebSocketFactory {
     }
 
     public DefaultWebSocketFactory() {
-        _parameters = new HashMap<String, WsExtensionParameterValuesSpiImpl>();
+        _parameters = new HashMap<>();
 
-        _supportedExtensions = new HashSet<String>();
+        _supportedExtensions = new HashSet<>();
         _supportedExtensions.addAll(_extensionFactories.keySet());
 
         // ### TODO: Should _redirectOption be null or 
@@ -96,19 +96,19 @@ public final class DefaultWebSocketFactory extends WebSocketFactory {
         // Clone enabled protocols maintained at the WebSocketFactory level to
         // pass into the WebSocket instance.
         if (protocols != null) {
-            enabledProtocols = new HashSet<String>(Arrays.asList(protocols));
+            enabledProtocols = new HashSet<>(Arrays.asList(protocols));
         }
 
         // Clone enabled extensions maintained at the WebSocketFactory level to
         // pass into the WebSocket instance.
         if (_enabledExtensions != null) {
-            enabledExtensions = new ArrayList<String>(_enabledExtensions);
+            enabledExtensions = new ArrayList<>(_enabledExtensions);
         }
         
         // Clone the map of default parameters maintained at the 
         // WebSocketFactory level to pass into the WebSocket instance.
-        Map<String, WsExtensionParameterValuesSpiImpl> enabledParams = 
-                      new HashMap<String, WsExtensionParameterValuesSpiImpl>();
+        Map<String, WsExtensionParameterValuesSpiImpl> enabledParams =
+                new HashMap<>();
         enabledParams.putAll(_parameters);
         
         // Create a WebSocket instance that inherits the enabled protocols,
@@ -192,7 +192,7 @@ public final class DefaultWebSocketFactory extends WebSocketFactory {
             }
             
             if (_enabledExtensions == null) {
-                _enabledExtensions = new ArrayList<String>();
+                _enabledExtensions = new ArrayList<>();
             }
 
             _enabledExtensions.add(extension);

@@ -43,7 +43,7 @@ public class DefaultBasicChallengeHandler extends BasicChallengeHandler implemen
     private static final String CLASS_NAME = DefaultBasicChallengeHandler.class.getName();
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
 
-    private Map<String, LoginHandler> loginHandlersByRealm = new ConcurrentHashMap<String,LoginHandler>();
+    private Map<String, LoginHandler> loginHandlersByRealm = new ConcurrentHashMap<>();
 
     @Override
     public void setRealmLoginHandler(String realm, LoginHandler loginHandler) {

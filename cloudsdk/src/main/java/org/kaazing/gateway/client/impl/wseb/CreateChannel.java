@@ -36,7 +36,7 @@ class CreateChannel extends Channel {
     
     public CreateChannel() {
         super(0);
-        controlFrames = new HashMap<Integer, String>();
+        controlFrames = new HashMap<>();
     }
 
     public void setProtocols(String[] protocols) {

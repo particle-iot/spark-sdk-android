@@ -11,9 +11,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
+import io.particle.android.sdk.cloud.ParticleCloudSDK;
 import io.particle.android.sdk.cloud.ParticleDevice;
 import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.utils.Async;
@@ -35,19 +37,19 @@ public class DeviceInfoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_info);
         //Get and display device information
-        nameView = (TextView) findViewById(R.id.name);
-        productIdView = (TextView) findViewById(R.id.productId);
-        platformIdView = (TextView) findViewById(R.id.platformId);
-        ipAddressView = (TextView) findViewById(R.id.ipAddress);
-        lastAppNameView = (TextView) findViewById(R.id.lastAppName);
-        statusView = (TextView) findViewById(R.id.status);
-        lastHeardView = (TextView) findViewById(R.id.lastHeard);
-        cellularView = (TextView) findViewById(R.id.cellular);
-        imeiView = (TextView) findViewById(R.id.imei);
-        currentBuildView = (TextView) findViewById(R.id.currentBuild);
-        defaultBuildView = (TextView) findViewById(R.id.defaultBuild);
+        nameView = findViewById(R.id.name);
+        productIdView = findViewById(R.id.productId);
+        platformIdView = findViewById(R.id.platformId);
+        ipAddressView = findViewById(R.id.ipAddress);
+        lastAppNameView = findViewById(R.id.lastAppName);
+        statusView = findViewById(R.id.status);
+        lastHeardView = findViewById(R.id.lastHeard);
+        cellularView = findViewById(R.id.cellular);
+        imeiView = findViewById(R.id.imei);
+        currentBuildView = findViewById(R.id.currentBuild);
+        defaultBuildView = findViewById(R.id.defaultBuild);
 
-        Async.executeAsync(ParticleCloud.get(this), new Async.ApiWork<ParticleCloud, ParticleDevice>() {
+        Async.executeAsync(ParticleCloudSDK.getCloud(), new Async.ApiWork<ParticleCloud, ParticleDevice>() {
             @Override
             public ParticleDevice callApi(@NonNull ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
                 ParticleDevice device = ParticleCloud.getDevice(getIntent().getStringExtra(ARG_DEVICEID));
@@ -57,17 +59,17 @@ public class DeviceInfoActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(@NonNull ParticleDevice particleDevice) { // this goes on the main thread
-                nameView.setText("Name: " + particleDevice.getName());
-                productIdView.setText("Product id: " + particleDevice.getProductID());
-                platformIdView.setText("Platform id: " + particleDevice.getPlatformID());
-                ipAddressView.setText("Ip address: " + particleDevice.getIpAddress());
-                lastAppNameView.setText("Last app name: " + particleDevice.getLastAppName());
-                statusView.setText("Status: " + particleDevice.getStatus());
-                lastHeardView.setText("Last heard: " + particleDevice.getLastHeard());
-                cellularView.setText("Cellular: " + particleDevice.isCellular());
-                imeiView.setText("Imei: " + particleDevice.getImei());
-                currentBuildView.setText("Current build: " + particleDevice.getCurrentBuild());
-                defaultBuildView.setText("Default build: " + particleDevice.getDefaultBuild());
+                nameView.setText(String.format("Name: %s", particleDevice.getName()));
+                productIdView.setText(String.format(Locale.getDefault(), "Product id: %d", particleDevice.getProductID()));
+                platformIdView.setText(String.format(Locale.getDefault(), "Platform id: %d", particleDevice.getPlatformID()));
+                ipAddressView.setText(String.format("Ip address: %s", particleDevice.getIpAddress()));
+                lastAppNameView.setText(String.format("Last app name: %s", particleDevice.getLastAppName()));
+                statusView.setText(String.format("Status: %s", particleDevice.getStatus()));
+                lastHeardView.setText(String.format("Last heard: %s", particleDevice.getLastHeard()));
+                cellularView.setText(String.format("Cellular: %s", particleDevice.isCellular()));
+                imeiView.setText(String.format("Imei: %s", particleDevice.getImei()));
+                currentBuildView.setText(String.format("Current build: %s", particleDevice.getCurrentBuild()));
+                defaultBuildView.setText(String.format("Default build: %s", particleDevice.getDefaultBuild()));
             }
 
             @Override

@@ -45,12 +45,7 @@ public class WebSocketNativeHandler extends WebSocketHandlerAdapter {
     private static final String CLASS_NAME = WebSocketNativeHandler.class.getName();
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
     
-    public static WebSocketHandlerFactory TRANSPORT_HANDLER_FACTORY = new WebSocketHandlerFactory() {
-        @Override
-        public WebSocketHandler createWebSocketHandler() {
-            return new WebSocketTransportHandler();
-        }
-    };
+    public static WebSocketHandlerFactory TRANSPORT_HANDLER_FACTORY = WebSocketTransportHandler::new;
     
     private WebSocketNativeAuthenticationHandler authHandler = new WebSocketNativeAuthenticationHandler();
     private WebSocketNativeHandshakeHandler handshakeHandler = new WebSocketNativeHandshakeHandler();

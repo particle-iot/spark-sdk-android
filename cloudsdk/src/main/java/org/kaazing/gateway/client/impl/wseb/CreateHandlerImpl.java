@@ -56,12 +56,7 @@ class CreateHandlerImpl implements CreateHandler {
     private static final String CLASS_NAME = CreateHandler.class.getName();
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
     
-    static CreateHandlerFactory FACTORY = new CreateHandlerFactory() {
-        @Override
-        public CreateHandler createCreateHandler() {
-            return new CreateHandlerImpl();
-        }
-    };
+    static CreateHandlerFactory FACTORY = CreateHandlerImpl::new;
     
     private static final String HEADER_WEBSOCKET_PROTOCOL = "X-WebSocket-Protocol";
     private static final String HEADER_SEC_EXTENSIONS = "X-WebSocket-Extensions";

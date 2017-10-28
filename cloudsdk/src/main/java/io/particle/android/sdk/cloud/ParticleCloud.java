@@ -854,16 +854,6 @@ public class ParticleCloud {
                     log.e("Error while trying to refresh token: ", e);
                 }
             }
-            //TODO remove if login is not needed
-            // If user is null, don't bother because we have no credentials.
-//            if (user != null) {
-//                try {
-//                    logIn(user.getUser(), user.getPassword());
-//                    return;
-//                } catch (ParticleCloudException e) {
-//                    log.e("Error while trying to log in: ", e);
-//                }
-//            }
 
             ParticleAccessToken.removeSession();
             token = null;

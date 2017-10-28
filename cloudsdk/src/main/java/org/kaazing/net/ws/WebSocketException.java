@@ -30,7 +30,7 @@ public class WebSocketException extends IOException {
     private static final Map<Integer, String> _STATUS_CODES;
     
     static {
-        _STATUS_CODES = new HashMap<Integer, String>();
+        _STATUS_CODES = new HashMap<>();
         _STATUS_CODES.put(1000, "Connection has been closed normally");
         _STATUS_CODES.put(1001, "End-point is going away");
         _STATUS_CODES.put(1002, "Connection terminated due to protocol error");

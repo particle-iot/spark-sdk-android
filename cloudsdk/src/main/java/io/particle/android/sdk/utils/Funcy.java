@@ -159,6 +159,7 @@ public class Funcy {
 
     private static final Predicate<?> alwaysTrue = (Predicate<Object>) testTarget -> true;
     private static final Predicate<?> alwaysFalse = (Predicate<Object>) testTarget -> false;
+    @SuppressWarnings("Convert2MethodRef")
     private static final Predicate<?> notNull = (Predicate<Object>) testTarget -> testTarget != null;
 
 

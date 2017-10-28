@@ -57,7 +57,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
     private Node<ChallengeHandler, UriElement> rootNode;
 
     public void clear() {
-        rootNode = new Node<ChallengeHandler, UriElement>();
+        rootNode = new Node<>();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
 // --------------------------- CONSTRUCTORS ---------------------------
 
     public DefaultDispatchChallengeHandler() {
-        rootNode = new Node<ChallengeHandler, UriElement>();
+        rootNode = new Node<>();
     }
 
     @Override
@@ -214,7 +214,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
      */
     List<Token<UriElement>> tokenize(String s) throws IllegalArgumentException {
         if (s == null || s.length() == 0) {
-            return new ArrayList<Token<UriElement>>();
+            return new ArrayList<>();
         }
 
         //
@@ -232,7 +232,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         //
         // Detect what the scheme is, if any.
         //
-        List<Token<UriElement>> result = new ArrayList<Token<UriElement>>(10);
+        List<Token<UriElement>> result = new ArrayList<>(10);
         String scheme = "http";
         if (uri.getScheme() != null) {
             scheme = uri.getScheme();
@@ -277,36 +277,36 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         List<String> hostParts = Arrays.asList(host.split("\\."));
         Collections.reverse(hostParts);
         for (String hostPart: hostParts) {
-            result.add(new Token<UriElement>(hostPart, UriElement.HOST));
+            result.add(new Token<>(hostPart, UriElement.HOST));
         }
 
         if (parsedPortFromAuthority != null) {
-            result.add(new Token<UriElement>(parsedPortFromAuthority, UriElement.PORT));
+            result.add(new Token<>(parsedPortFromAuthority, UriElement.PORT));
         } else if (uri.getPort() > 0) {
-            result.add(new Token<UriElement>(String.valueOf(uri.getPort()), UriElement.PORT));
+            result.add(new Token<>(String.valueOf(uri.getPort()), UriElement.PORT));
         } else if (getDefaultPort(scheme) > 0) {
-            result.add(new Token<UriElement>(String.valueOf(getDefaultPort(scheme)), UriElement.PORT));
+            result.add(new Token<>(String.valueOf(getDefaultPort(scheme)), UriElement.PORT));
         }
 
 
         if ( parsedUserInfoFromAuthority != null ) {
             if ( userFromAuthority != null) {
-                result.add(new Token<UriElement>(userFromAuthority, UriElement.USERINFO));
+                result.add(new Token<>(userFromAuthority, UriElement.USERINFO));
             }
             if ( passwordFromAuthority != null ) {
-                result.add(new Token<UriElement>(passwordFromAuthority, UriElement.USERINFO));
+                result.add(new Token<>(passwordFromAuthority, UriElement.USERINFO));
             }
             if ( userFromAuthority == null && passwordFromAuthority == null) {
-                result.add(new Token<UriElement>(parsedUserInfoFromAuthority, UriElement.USERINFO));
+                result.add(new Token<>(parsedUserInfoFromAuthority, UriElement.USERINFO));
             }
         } else if (uri.getUserInfo() != null) {
             String userInfo = uri.getUserInfo();
             int colonIdx = userInfo.indexOf(":");
             if ( colonIdx >= 0) {
-                result.add(new Token<UriElement>(userInfo.substring(0, colonIdx), UriElement.USERINFO));
-                result.add(new Token<UriElement>(userInfo.substring(colonIdx+1), UriElement.USERINFO));
+                result.add(new Token<>(userInfo.substring(0, colonIdx), UriElement.USERINFO));
+                result.add(new Token<>(userInfo.substring(colonIdx + 1), UriElement.USERINFO));
             } else {
-                result.add(new Token<UriElement>(uri.getUserInfo(), UriElement.USERINFO));
+                result.add(new Token<>(uri.getUserInfo(), UriElement.USERINFO));
             }
         }
 
@@ -317,7 +317,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
             }
             if (isNotBlank(path)) {
                 for (String p: path.split("/")) {
-                    result.add(new Token<UriElement>(p, UriElement.PATH));
+                    result.add(new Token<>(p, UriElement.PATH));
                 }
             }
         }
@@ -332,7 +332,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         }
     }
 
-    static Map<String, Integer> defaultPortsByScheme = new HashMap<String,Integer>();
+    static Map<String, Integer> defaultPortsByScheme = new HashMap<>();
     static {
         defaultPortsByScheme.put("http", 80);
         defaultPortsByScheme.put("ws", 80);
@@ -379,7 +379,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * The parameterized type instances.
          * Optimized for fewer values per node.
          */
-        private List<T> values = new ArrayList<T>(3);
+        private List<T> values = new ArrayList<>(3);
 
         /**
          * An up-link to this Node instance's parent.
@@ -396,7 +396,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * Each link is accessed through the child Node's name.
          * This means that child names must be unique.
          */
-        private Map<String,Node<T,E>> children = new LinkedHashMap<String, Node<T,E>>();
+        private Map<String,Node<T,E>> children = new LinkedHashMap<>();
 
         /**
          * A method to access the wildcard character.
@@ -447,7 +447,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
                 throw new IllegalArgumentException("A node may not have a null name.");
             }
 
-            Node<T,E> result = new Node<T,E>(name, this, kind);
+            Node<T,E> result = new Node<>(name, this, kind);
             children.put(name, result);
             return result;
         }
@@ -498,7 +498,8 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @param values the values to add to this node instance
          * @throws IllegalArgumentException when attempting to add values to the root node.
          */
-        public void appendValues(T... values) {
+        @SafeVarargs
+        public final void appendValues(T... values) {
             if ( isRootNode() ) {
                 throw new IllegalArgumentException("Cannot set a values on the root node.");
             }
@@ -606,7 +607,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          */
         String getFullyQualifiedName() {
             StringBuilder b = new StringBuilder();
-            List<String> name = new ArrayList<String>();
+            List<String> name = new ArrayList<>();
             Node cursor = this;
             while (!cursor.isRootNode()) {
                 name.add(cursor.name);
@@ -625,7 +626,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         }
 
         public List<Node<T,E>> getChildrenAsList() {
-            return new ArrayList<Node<T,E>>(children.values());
+            return new ArrayList<>(children.values());
         }
 
         /**
@@ -655,7 +656,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @return a collection of all matching nodes, which may be empty if no matching nodes were found.
          */
         private List<Node<T,E>> findAllMatchingNodes(List<Token<E>> tokens, int tokenIdx) {
-            List<Node<T,E>> result = new ArrayList<Node<T,E>>();
+            List<Node<T,E>> result = new ArrayList<>();
 
             //
             // Iterate over this node's children.

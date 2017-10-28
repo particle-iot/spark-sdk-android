@@ -52,12 +52,7 @@ public class WebSocketSelectedHandlerImpl extends WebSocketHandlerAdapter implem
         WebSocketSelectedHandler createSelectedHandler();
     }
     
-    static WebSocketSelectedHandlerFactory FACTORY = new WebSocketSelectedHandlerFactory() {
-        @Override
-        public WebSocketSelectedHandlerImpl createSelectedHandler() {
-            return new WebSocketSelectedHandlerImpl();
-        }
-    };
+    static WebSocketSelectedHandlerFactory FACTORY = WebSocketSelectedHandlerImpl::new;
     
     protected WebSocketHandlerListener listener;
     

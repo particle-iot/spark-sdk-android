@@ -33,6 +33,7 @@ import org.kaazing.gateway.client.impl.wsn.WebSocketNativeChannel;
 import org.kaazing.gateway.client.impl.wsn.WebSocketNativeHandler;
 import org.kaazing.gateway.client.util.WrappedByteBuffer;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -57,43 +58,27 @@ public class WebSocketCompositeHandler implements WebSocketHandler {
 
     private WebSocketHandlerListener handlerListener = createListener();
 
-    static WebSocketSelectedHandlerFactory WEBSOCKET_NATIVE_HANDLER_FACTORY = new WebSocketSelectedHandlerFactory() {
-        @Override
-        public WebSocketSelectedHandler createSelectedHandler() {
-            WebSocketSelectedHandler selectedHandler = new WebSocketSelectedHandlerImpl();
-            WebSocketNativeHandler nativeHandler = new WebSocketNativeHandler();
-            selectedHandler.setNextHandler(nativeHandler);
-            return selectedHandler;
-        }
+    static WebSocketSelectedHandlerFactory WEBSOCKET_NATIVE_HANDLER_FACTORY = () -> {
+        WebSocketSelectedHandler selectedHandler = new WebSocketSelectedHandlerImpl();
+        WebSocketNativeHandler nativeHandler = new WebSocketNativeHandler();
+        selectedHandler.setNextHandler(nativeHandler);
+        return selectedHandler;
     };
     
-    static WebSocketSelectedHandlerFactory WEBSOCKET_EMULATED_HANDLER_FACTORY = new WebSocketSelectedHandlerFactory() {
-        @Override
-        public WebSocketSelectedHandler createSelectedHandler() {
-            WebSocketSelectedHandler selectedHandler = new WebSocketSelectedHandlerImpl();
-            WebSocketEmulatedHandler emulatedHandler = new WebSocketEmulatedHandler();
-            selectedHandler.setNextHandler(emulatedHandler);
-            return selectedHandler;
-        }
+    static WebSocketSelectedHandlerFactory WEBSOCKET_EMULATED_HANDLER_FACTORY = () -> {
+        WebSocketSelectedHandler selectedHandler = new WebSocketSelectedHandlerImpl();
+        WebSocketEmulatedHandler emulatedHandler = new WebSocketEmulatedHandler();
+        selectedHandler.setNextHandler(emulatedHandler);
+        return selectedHandler;
     };
     
     static interface WebSocketSelectedChannelFactory {
         WebSocketSelectedChannel createChannel(WSURI location);
     }
 
-    private final WebSocketSelectedChannelFactory WEBSOCKET_NATIVE_CHANNEL_FACTORY = new WebSocketSelectedChannelFactory() {
-        @Override
-        public WebSocketSelectedChannel createChannel(WSURI location) {
-            return new WebSocketNativeChannel(location);
-        }
-    };
+    private final WebSocketSelectedChannelFactory WEBSOCKET_NATIVE_CHANNEL_FACTORY = WebSocketNativeChannel::new;
 
-    private final WebSocketSelectedChannelFactory WEBSOCKET_EMULATED_CHANNEL_FACTORY = new WebSocketSelectedChannelFactory() {
-        @Override
-        public WebSocketSelectedChannel createChannel(WSURI location) {
-            return new WebSocketEmulatedChannel(location);
-        }
-    };
+    private final WebSocketSelectedChannelFactory WEBSOCKET_EMULATED_CHANNEL_FACTORY = WebSocketEmulatedChannel::new;
     
     static class WebSocketStrategy {
         String nativeEquivalent; // e.g. "ws"
@@ -109,8 +94,8 @@ public class WebSocketCompositeHandler implements WebSocketHandler {
 
     public static final WebSocketCompositeHandler COMPOSITE_HANDLER = new WebSocketCompositeHandler();
 
-    final Map<String, String[]> strategyChoices = new HashMap<String, String[]>();
-    final Map<String, WebSocketStrategy> strategyMap = new HashMap<String, WebSocketStrategy>();
+    final Map<String, String[]> strategyChoices = new HashMap<>();
+    final Map<String, WebSocketStrategy> strategyMap = new HashMap<>();
 
     private WebSocketHandlerListener listener;
     
@@ -162,7 +147,7 @@ public class WebSocketCompositeHandler implements WebSocketHandler {
         compositeChannel.requestedProtocols = protocols;
         
         String scheme = compositeChannel.getCompositeScheme();
-        if (scheme.indexOf(":") >= 0) {
+        if (scheme.contains(":")) {
             // qualified scheme: e.g. "java:wse" 
             WebSocketStrategy strategy = strategyMap.get(scheme);
             if (strategy == null) {
@@ -175,9 +160,7 @@ public class WebSocketCompositeHandler implements WebSocketHandler {
         else {
             String[] connectionStrategies = strategyChoices.get(scheme);
             if (connectionStrategies != null) {
-                for (String each : connectionStrategies) {
-                    compositeChannel.connectionStrategies.add(each);
-                }
+                Collections.addAll(compositeChannel.connectionStrategies, connectionStrategies);
             }
             else {
                 throw new IllegalArgumentException("Invalid connection scheme: "+scheme);

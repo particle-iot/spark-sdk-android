@@ -39,7 +39,7 @@ public abstract class WebSocketExtension {
     private static final Map<String, WebSocketExtension>     _extensions;
     
     static {
-        _extensions = new HashMap<String, WebSocketExtension>();
+        _extensions = new HashMap<>();
     };
     
     private Collection<Parameter<?>>     _parameters;
@@ -67,10 +67,10 @@ public abstract class WebSocketExtension {
             throw new IllegalArgumentException(s);            
         }
 
-        Parameter<T> parameter =  new Parameter<T>(this,
-                                                   parameterName, 
-                                                   parameterType, 
-                                                   parameterMetadata);
+        Parameter<T> parameter = new Parameter<>(this,
+                parameterName,
+                parameterType,
+                parameterMetadata);
         _parameters.add(parameter);
 
         return parameter;
@@ -82,7 +82,7 @@ public abstract class WebSocketExtension {
      * @param name    name of the WebSocketExtension
      */
     protected WebSocketExtension() {
-        _parameters = new ArrayList<Parameter<?>>();
+        _parameters = new ArrayList<>();
         _extensions.put(name(), this);
     }
 
@@ -163,7 +163,7 @@ public abstract class WebSocketExtension {
         }
 
         Collection<Parameter<?>> extnParameters = getParameters();
-        Collection<Parameter<?>> result = new ArrayList<Parameter<?>>();
+        Collection<Parameter<?>> result = new ArrayList<>();
         
         for (Parameter<?> extnParameter : extnParameters) {
             EnumSet<Metadata> paramMetadata = extnParameter.metadata();

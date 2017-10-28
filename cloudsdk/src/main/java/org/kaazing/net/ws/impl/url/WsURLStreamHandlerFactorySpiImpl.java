@@ -41,7 +41,7 @@ public class WsURLStreamHandlerFactorySpiImpl extends URLStreamHandlerFactorySpi
     static {
         Class<WebSocketExtensionFactorySpi> clazz = WebSocketExtensionFactorySpi.class;
         ServiceLoader<WebSocketExtensionFactorySpi> loader = ServiceLoader.load(clazz);
-        Map<String, WebSocketExtensionFactorySpi> factories = new HashMap<String, WebSocketExtensionFactorySpi>();
+        Map<String, WebSocketExtensionFactorySpi> factories = new HashMap<>();
         
         for (WebSocketExtensionFactorySpi factory: loader) {
             String extensionName = factory.getExtensionName();

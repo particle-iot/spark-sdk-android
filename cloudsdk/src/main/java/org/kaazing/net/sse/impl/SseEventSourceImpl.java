@@ -71,7 +71,7 @@ public class SseEventSourceImpl extends SseEventSource {
         
         // Used by the producer(i.e. the eventSourceListener) and the 
         // consumer(i.e. the SseEventReader).
-        _sharedQueue = new BlockingQueueImpl<Object>();
+        _sharedQueue = new BlockingQueueImpl<>();
 
     }
 

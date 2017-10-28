@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "io.particle.cloudsdk.example_app"
@@ -41,10 +40,8 @@ dependencies {
     // UNCOMMENT THE FOLLOWING TO USE A PUBLISHED VERSION OF THE SDK:
     //    compile 'io.particle:cloudsdk:0.3.3'
 
-    compile 'com.android.support:appcompat-v7:26.0.1'
-    compile 'com.android.support:support-fragment:26.0.1'
-
-    retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:support-fragment:26.1.0'
 }
 
 repositories {

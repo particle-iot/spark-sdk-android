@@ -21,7 +21,6 @@ import io.particle.android.sdk.utils.Parcelables;
 // MutableDeviceState class which will also have setters, and only expose the mutable concrete
 // class to whatever class ends up doing the device state management; *everything* else only ever
 // gets to see IDeviceState objects.  (This might interfere with using Parcelable though.)
-// FIXME: is device "state" really the right naming here?
 @ParametersAreNonnullByDefault
 class DeviceState implements Parcelable {
 

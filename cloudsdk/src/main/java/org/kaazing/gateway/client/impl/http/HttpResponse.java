@@ -31,7 +31,7 @@ public class HttpResponse {
 
     private int statusCode = 0;
     private String message;
-    private Map<String, String> headers = new HashMap<String, String>();
+    private Map<String, String> headers = new HashMap<>();
     private WrappedByteBuffer responseBuffer;
     
     public int getStatusCode() {
@@ -59,9 +59,9 @@ public class HttpResponse {
     }
     
     public String getAllHeaders() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (Entry<String, String> entry : headers.entrySet()) {
-            buf.append(entry.getKey() + ":" + entry.getValue() + "\n");
+            buf.append(entry.getKey()).append(":").append(entry.getValue()).append("\n");
         }
         return buf.toString();
     }
