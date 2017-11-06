@@ -205,7 +205,7 @@ public class WrappedByteBuffer {
         return this;
     }
 
-    private static final int max(int a, int b) {
+    private static int max(int a, int b) {
         return a > b ? a : b;
     }
 

@@ -139,7 +139,7 @@ class DownstreamHandlerImpl implements DownstreamHandler {
     private void reconnectIfNecessary(DownstreamChannel channel) {
         LOG.entering(CLASS_NAME, "reconnectIfNecessary");
 
-        if (channel.closing.get() == true) {
+        if (channel.closing.get()) {
             if (channel.outstandingRequests.size() == 0) {
                 LOG.fine("Closing: "+channel);
                 listener.downstreamClosed(channel);
@@ -299,7 +299,6 @@ class DownstreamHandlerImpl implements DownstreamHandler {
         } catch (URISyntaxException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
-        return;
     }
 
     @Override

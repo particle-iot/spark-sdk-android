@@ -111,7 +111,7 @@ public class WebSocketImpl extends WebSocket {
      * Values are CONNECTING = 0, OPEN = 1, CLOSING = 2, and CLOSED = 3;
      */
     enum ReadyState {
-        CONNECTING, OPEN, CLOSING, CLOSED;
+        CONNECTING, OPEN, CLOSING, CLOSED
     }
 
     /**
@@ -383,7 +383,7 @@ public class WebSocketImpl extends WebSocket {
 
     @Override
     public Collection<String> getEnabledExtensions() {
-        return (_enabledExtensions == null) ? Collections.<String>emptySet() :
+        return (_enabledExtensions == null) ? Collections.emptySet() :
                 unmodifiableCollection(_enabledExtensions);
     }
 
@@ -401,7 +401,7 @@ public class WebSocketImpl extends WebSocket {
 
     @Override
     public Collection<String> getEnabledProtocols() {
-        return (_enabledProtocols == null) ? Collections.<String>emptySet() :
+        return (_enabledProtocols == null) ? Collections.emptySet() :
                 unmodifiableCollection(_enabledProtocols);
     }
 
@@ -479,7 +479,7 @@ public class WebSocketImpl extends WebSocket {
             throw new IllegalStateException(s);
         }
 
-        return (_negotiatedExtensions == null) ? Collections.<String>emptySet() :
+        return (_negotiatedExtensions == null) ? Collections.emptySet() :
                 unmodifiableCollection(_negotiatedExtensions);
     }
 
@@ -542,7 +542,7 @@ public class WebSocketImpl extends WebSocket {
                 return _reader;
             }
 
-            WsMessageReaderAdapter adapter = null;
+            WsMessageReaderAdapter adapter;
             adapter = new WsMessageReaderAdapter(getMessageReader());
             _reader = new WsReaderImpl(adapter);
         }
@@ -552,7 +552,7 @@ public class WebSocketImpl extends WebSocket {
 
     @Override
     public Collection<String> getSupportedExtensions() {
-        return (_supportedExtensions == null) ? Collections.<String>emptySet() :
+        return (_supportedExtensions == null) ? Collections.emptySet() :
                 unmodifiableCollection(_supportedExtensions);
     }
 
@@ -601,7 +601,7 @@ public class WebSocketImpl extends WebSocket {
         }
 
         if (extensions == null) {
-            _enabledExtensions = extensions;
+            _enabledExtensions = null;
             return;
         }
 
@@ -651,10 +651,7 @@ public class WebSocketImpl extends WebSocket {
         }
 
         _enabledProtocols = new ArrayList<>();
-
-        for (String protocol : protocols) {
-            _enabledProtocols.add(protocol);
-        }
+        _enabledProtocols.addAll(protocols);
     }
 
     @Override
@@ -866,7 +863,7 @@ public class WebSocketImpl extends WebSocket {
         WebSocketExtension extension =
                 WebSocketExtension.getWebSocketExtension(extensionName);
         Collection<Parameter<?>> extnParameters = extension.getParameters();
-        StringBuffer buffer = new StringBuffer(extension.name());
+        StringBuilder buffer = new StringBuilder(extension.name());
 
         // We are using extnParameters to iterate as we want the ordered list
         // of parameters.
@@ -924,7 +921,7 @@ public class WebSocketImpl extends WebSocket {
         // for each extension, create a WebSocketExtensionSpi instance for each 
         // of the enabled extensions and pass WebSocketExtensionParameterValuesSpi
         // that should contain the values of the enabled parameters.
-        StringBuffer extensionsHeader = new StringBuffer("");
+        StringBuilder extensionsHeader = new StringBuilder("");
         Map<String, WebSocketExtensionHandlerSpi> handlers = new HashMap<>();
 
         for (String extensionName : getEnabledExtensions()) {
@@ -992,8 +989,8 @@ public class WebSocketImpl extends WebSocket {
             for (int i = 1; i < properties.length; i++) {
                 String property = properties[i].trim();
                 String[] pair = property.split("=");
-                Parameter<?> parameter = null;
-                String paramValue = null;
+                Parameter<?> parameter;
+                String paramValue;
 
                 if (pair.length == 1) {
                     // We are dealing with an anonymous parameter. Since the

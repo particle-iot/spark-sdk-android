@@ -335,9 +335,6 @@ public class Py {
         /**
          * Return a new set with elements common to this set and all elements
          * from <code>others</code>.
-         *
-         * @param others
-         * @return
          */
         @SafeVarargs
         public final PySet<T> getIntersection(Collection<T>... others) {
@@ -355,9 +352,6 @@ public class Py {
         /**
          * Return a new set with elements in this set which do not exist in
          * <code>other</code>.
-         *
-         * @param other
-         * @return
          */
         public PySet<T> getDifference(Collection<T> other) {
             // Return a new set with elements in the set that are not in the
@@ -370,9 +364,6 @@ public class Py {
         /**
          * Return a new set with elements in this set which do not exist in any
          * of the <code>others</code>.
-         *
-         * @param others
-         * @return
          */
         @SafeVarargs
         public final PySet<T> getDifference(Collection<T>... others) {
@@ -389,9 +380,6 @@ public class Py {
         /**
          * Return a new set with elements in this set which do not exist in any
          * of the <code>others</code>.
-         *
-         * @param other
-         * @return
          */
         @SafeVarargs
         public final PySet<T> getSymmetricDifference(Collection<T>... others) {

@@ -82,9 +82,7 @@ public class WebSocketNativeHandshakeHandler extends WebSocketHandlerAdapter {
         else {
             nextProtocols = new String[protocols.length+1];
             nextProtocols[0] = WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE;
-            for (int i=0; i<protocols.length; i++) {
-                nextProtocols[i+1] = protocols[i];
-            }
+            System.arraycopy(protocols, 0, nextProtocols, 1, protocols.length);
         }
         nextHandler.processConnect(channel, uri, nextProtocols);
     }

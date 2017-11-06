@@ -76,14 +76,14 @@ public class WebSocketNativeBridgeHandler implements WebSocketHandler, ProxyList
             
             String[] params;
             if (protocols != null) {
-                String s = "";
+                StringBuilder s = new StringBuilder();
                 for (int i=0; i<protocols.length; i++) {
                     if (i>0) {
-                        s += ",";
+                        s.append(",");
                     }
-                    s += protocols[i];
+                    s.append(protocols[i]);
                 }
-                params = new String[] { "WEBSOCKET", uri.toString(), s, ""};
+                params = new String[] { "WEBSOCKET", uri.toString(), s.toString(), ""};
             } else {
                 params = new String[] { "WEBSOCKET", uri.toString() };
             }

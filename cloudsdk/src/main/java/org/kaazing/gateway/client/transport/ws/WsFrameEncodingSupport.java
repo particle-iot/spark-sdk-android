@@ -70,7 +70,7 @@ public class WsFrameEncodingSupport {
            return b;
     }
 
-    protected static enum Opcode {
+    protected enum Opcode {
         CONTINUATION(0),
         TEXT(1),
         BINARY(2),

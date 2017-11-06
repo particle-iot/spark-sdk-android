@@ -46,10 +46,7 @@ public class WebSocketNativeHandler extends WebSocketHandlerAdapter {
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
     
     public static WebSocketHandlerFactory TRANSPORT_HANDLER_FACTORY = WebSocketTransportHandler::new;
-    
-    private WebSocketNativeAuthenticationHandler authHandler = new WebSocketNativeAuthenticationHandler();
-    private WebSocketNativeHandshakeHandler handshakeHandler = new WebSocketNativeHandshakeHandler();
-    private WebSocketNativeBalancingHandler balancingHandler = new WebSocketNativeBalancingHandler();
+
     // private WebSocketNativeCodec codec = new WebSocketNativeCodec();
 
     /**
@@ -58,8 +55,11 @@ public class WebSocketNativeHandler extends WebSocketHandlerAdapter {
      */
     public WebSocketNativeHandler() {
         LOG.entering(CLASS_NAME, "<init>");
-        
+
+        WebSocketNativeHandshakeHandler handshakeHandler = new WebSocketNativeHandshakeHandler();
+        WebSocketNativeAuthenticationHandler authHandler = new WebSocketNativeAuthenticationHandler();
         authHandler.setNextHandler(handshakeHandler);
+        WebSocketNativeBalancingHandler balancingHandler = new WebSocketNativeBalancingHandler();
         handshakeHandler.setNextHandler(balancingHandler);
 
         WebSocketHandler transportHandler = TRANSPORT_HANDLER_FACTORY.createWebSocketHandler();

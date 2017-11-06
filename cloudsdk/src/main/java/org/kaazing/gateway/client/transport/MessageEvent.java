@@ -75,9 +75,9 @@ public class MessageEvent extends Event {
     }
     
     public String toString() {
-        String ret = "MessageEvent [type=" + type + " messageType="+messageType+" data=" + data + " origin " + origin + " lastEventId=" + lastEventId + "{";
+        StringBuilder ret = new StringBuilder("MessageEvent [type=" + type + " messageType=" + messageType + " data=" + data + " origin " + origin + " lastEventId=" + lastEventId + "{");
         for (Object a : params) {
-            ret += a + " ";
+            ret.append(a).append(" ");
         }
         return ret + "}]";
     }

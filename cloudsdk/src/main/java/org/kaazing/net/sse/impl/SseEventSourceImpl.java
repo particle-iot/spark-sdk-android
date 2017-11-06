@@ -236,7 +236,7 @@ public class SseEventSourceImpl extends SseEventSource {
     }
     
     private synchronized void connectionFailed(Exception exception) {
-        SseException ex = null;
+        SseException ex;
 
         if (exception == null) {
             ex = new SseException("Connection Failed");

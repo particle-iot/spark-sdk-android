@@ -46,9 +46,9 @@ public class AuthenticateEvent extends Event {
     }
 
     public String toString() {
-        String ret = "AuthenticateEvent [type=" + type + " challenge=" + challenge + "{";
+        StringBuilder ret = new StringBuilder("AuthenticateEvent [type=" + type + " challenge=" + challenge + "{");
         for (Object a : params) {
-            ret += a + " ";
+            ret.append(a).append(" ");
         }
         return ret + "}]";
     }

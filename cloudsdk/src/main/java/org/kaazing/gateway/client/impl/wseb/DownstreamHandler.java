@@ -26,7 +26,7 @@ import org.kaazing.gateway.client.util.HttpURI;
 
 interface DownstreamHandler {
     void processConnect(DownstreamChannel downstreamChannel, HttpURI downstreamUri);
-    public void processClose(DownstreamChannel channel);
+    void processClose(DownstreamChannel channel);
     void setListener(DownstreamHandlerListener downstreamHandlerListener);
     void setNextHandler(HttpRequestHandler nextHandler);
 }

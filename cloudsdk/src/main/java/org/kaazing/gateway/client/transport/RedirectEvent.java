@@ -46,9 +46,9 @@ public class RedirectEvent extends Event {
     }
 
     public String toString() {
-        String ret = "RedirectEvent [type=" + type + " location=" + location + "{";
+        StringBuilder ret = new StringBuilder("RedirectEvent [type=" + type + " location=" + location + "{");
         for (Object a : params) {
-            ret += a + " ";
+            ret.append(a).append(" ");
         }
         return ret + "}]";
     }

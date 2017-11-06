@@ -75,11 +75,11 @@ public class WebSocketDelegateImpl implements WebSocketDelegate {
     public static final int CLOSE_NO_STATUS = 1005;
     public static final int CLOSE_ABNORMAL = 1006;
         
-    static enum ConnectionStatus {
+    enum ConnectionStatus {
         START, STATUS_101_READ, CONNECTION_UPGRADE_READ, COMPLETED, ERRORED
     }
 
-    public static enum ReadyState {
+    public enum ReadyState {
         CONNECTING, OPEN, CLOSING, CLOSED;
     }
     
@@ -502,21 +502,21 @@ public class WebSocketDelegateImpl implements WebSocketDelegate {
             if (requestedProtocols != null && requestedProtocols.length > 0) {
                 headerNames[headerIndex] = HEADER_PROTOCOL;
                 
-                String value;
+                StringBuilder value;
                 if (requestedProtocols.length == 1) {
-                    value = requestedProtocols[0];
+                    value = new StringBuilder(requestedProtocols[0]);
                 }
                 else {
-                    value = "";
+                    value = new StringBuilder();
                     for (int i=0; i<requestedProtocols.length; i++) {
                         if (i>0) {
-                            value += ",";
+                            value.append(",");
                         }
-                        value += requestedProtocols[i];
+                        value.append(requestedProtocols[i]);
                     }
                 }
                 
-                headerValues[headerIndex++] = value;
+                headerValues[headerIndex++] = value.toString();
             }
 
             if (cookies != null) {

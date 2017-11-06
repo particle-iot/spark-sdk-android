@@ -22,12 +22,13 @@
 package org.kaazing.gateway.client.transport.ws;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class WsMessage {
 
-    public static enum Kind {
+    public enum Kind {
         BINARY, TEXT, CLOSE, COMMAND, PING, PONG
-    };
+    }
 
     private Kind kind;
     
@@ -48,11 +49,9 @@ public class WsMessage {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(getKind());
-        builder.append(':');
-        builder.append(' ');
-        builder.append(buf.array().toString());
-        return builder.toString();
+        return String.valueOf(getKind()) +
+                ':' +
+                ' ' +
+                Arrays.toString(buf.array());
     }
 }

@@ -55,7 +55,7 @@ class DownstreamChannel extends Channel {
     String cookie;
     
     //KG-6984 move decoder into DownstreamChannel - persist state information for each websocket downstream 
-    WebSocketEmulatedDecoder<DownstreamChannel> decoder;
+    final WebSocketEmulatedDecoder<DownstreamChannel> decoder;
     
     public DownstreamChannel(HttpURI location, String cookie) {
         this(location, cookie, 0);

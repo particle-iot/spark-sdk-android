@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2007-2014 Kaazing Corporation. All rights reserved.
- * 
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -8,9 +8,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -39,6 +39,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /*
  * WebSocket Native Handler Chain
  * NativeHandler - AuthenticationHandler - HandshakeHandler - ControlFrameHandler - {BalancingHandler} - Codec - BridgeHandler
@@ -58,47 +59,47 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
 
     /**
      * Connect to the WebSocket
-     * 
+     *
      * @throws Exception
      */
     @Override
     public void processConnect(WebSocketChannel channel, WSURI uri, String[] protocols) {
-        LOG.entering(CLASS_NAME, "connect", new Object[] { uri, protocols });
-        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel)channel;
+        LOG.entering(CLASS_NAME, "connect", new Object[]{uri, protocols});
+        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel) channel;
         wsChannel.balanced.set(0);
         nextHandler.processConnect(channel, uri.addQueryParameter(".kl=Y"), protocols);
     }
 
     /**
      * Connect to the WebSocket
-     * 
+     *
      * @throws Exception
      */
     private void reconnect(WebSocketChannel channel, WSURI uri, String protocol) {
-        LOG.entering(CLASS_NAME, "reconnect", new Object[] { uri, protocol });
+        LOG.entering(CLASS_NAME, "reconnect", new Object[]{uri, protocol});
 
-        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel)channel;
+        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel) channel;
         wsChannel.redirectUri = uri;
-        
-        WebSocketCompositeChannel compChannel = (WebSocketCompositeChannel)channel.getParent();
+
+        WebSocketCompositeChannel compChannel = (WebSocketCompositeChannel) channel.getParent();
         HttpRedirectPolicy option = compChannel.getFollowRedirect();
         URI currentURI = channel.getLocation().getURI();
         URI redirectURI = uri.getURI();
-        
+
         // option will be null only for unit tests.
         if ((option != null) && (option.compare(currentURI, redirectURI) != 0)) {
             String s = String.format("%s: Cannot redirect from '%s' to '%s'",
-                                     option, currentURI, redirectURI);
+                    option, currentURI, redirectURI);
             channel.preventFallback = true;
             throw new IllegalStateException(s);
         }
-        
+
         wsChannel.reconnecting.compareAndSet(false, true);
     }
 
     void handleBinaryMessageReceived(WebSocketChannel channel, WrappedByteBuffer message) {
         LOG.entering(CLASS_NAME, "handleMessageReceived", message);
-        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel)channel;
+        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel) channel;
         if (wsChannel.balanced.get() <= 1 && message.remaining() >= 4) {
             byte[] prefix = new byte[3];
             message.mark();
@@ -106,8 +107,7 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
             String prefixString;
             try {
                 prefixString = new String(prefix, "UTF-8");
-            }
-            catch (UnsupportedEncodingException e1) {
+            } catch (UnsupportedEncodingException e1) {
                 throw new IllegalStateException(e1);
             }
             if (prefixString.charAt(0) == '\uf0ff') {
@@ -118,15 +118,12 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
                     if (wsChannel.balanced.getAndIncrement() == 0) {
                         //first balancer message, fire kaazing handshake
                         listener.connectionOpened(channel, WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE);
-                    }
-                    else {
+                    } else {
                         //second balancer message, fire open
                         //TODO: how to pass 'real' protocol to client?
-                        listener.connectionOpened(channel,"");
+                        listener.connectionOpened(channel, "");
                     }
-                    return;
-                }
-                else if (code == 'R') {
+                } else if (code == 'R') {
                     try {
                         String reconnectLocation = message.getString(UTF8);
                         LOG.finest("Balancer redirect location = " + StringUtils.stripControlCharacters(reconnectLocation));
@@ -134,34 +131,29 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
                         WSURI uri = new WSURI(reconnectLocation);
                         reconnect(channel, uri, channel.getProtocol());
                         nextHandler.processClose(channel, 0, null);
-                        return;
-                    } 
-                    catch (URISyntaxException e) {
+                    } catch (URISyntaxException e) {
                         LOG.log(Level.WARNING, e.getMessage(), e);
                         listener.connectionFailed(channel, e);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         LOG.log(Level.WARNING, e.getMessage(), e);
                         listener.connectionFailed(channel, e);
                     }
                 }
-            }
-            else {
+            } else {
                 message.reset();
                 listener.binaryMessageReceived(wsChannel, message);
             }
-        }
-        else {
+        } else {
             listener.binaryMessageReceived(channel, message);
         }
     }
 
     void handleTextMessageReceived(WebSocketChannel channel, String message) {
         LOG.entering(CLASS_NAME, "handleTextMessageReceived", message);
-        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel)channel;
+        WebSocketNativeChannel wsChannel = (WebSocketNativeChannel) channel;
         if (wsChannel.balanced.get() <= 1 &&
-            message.length() >= 2 &&
-            message.charAt(0) == '\uf0ff') {
+                message.length() >= 2 &&
+                message.charAt(0) == '\uf0ff') {
 
             int code = message.charAt(1);
             LOG.finest("Balancer code = " + code);
@@ -172,13 +164,11 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
                 // Extended Handshake.
                 if (wsChannel.balanced.incrementAndGet() == 1) {
                     listener.connectionOpened(channel, WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE);
-                }
-                else {
+                } else {
 //                    listener.connectionOpened(channel, WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE);
                     listener.connectionOpened(channel, "");
                 }
-            }
-            else if (code == 'R') {
+            } else if (code == 'R') {
                 try {
                     String reconnectLocation = message.substring(2);
                     LOG.finest("Balancer redirect location = " + StringUtils.stripControlCharacters(reconnectLocation));
@@ -186,28 +176,24 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
                     WSURI uri = new WSURI(reconnectLocation);
                     reconnect(channel, uri, channel.getProtocol());
                     nextHandler.processClose(channel, 0, null);
-                } 
-                catch (URISyntaxException e) {
+                } catch (URISyntaxException e) {
+                    LOG.log(Level.WARNING, e.getMessage(), e);
+                    listener.connectionFailed(channel, e);
+                } catch (Exception e) {
                     LOG.log(Level.WARNING, e.getMessage(), e);
                     listener.connectionFailed(channel, e);
                 }
-                catch (Exception e) {
-                    LOG.log(Level.WARNING, e.getMessage(), e);
-                    listener.connectionFailed(channel, e);
-                }
-            }
-            else {
+            } else {
                 listener.textMessageReceived(channel, message);
             }
-        }
-        else {
+        } else {
             listener.textMessageReceived(channel, message);
         }
     }
-    
+
     public void setNextHandler(WebSocketHandler handler) {
         this.nextHandler = handler;
-        
+
         handler.setListener(new WebSocketHandlerListener() {
 
             @Override
@@ -215,7 +201,7 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
                 /* We have to wait until the balancer responds for kaazing gateway */
                 if (!WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE.equals(protocol)) {
                     //Non-kaazing gateway, fire open event
-                    WebSocketNativeChannel wsChannel = (WebSocketNativeChannel)channel;
+                    WebSocketNativeChannel wsChannel = (WebSocketNativeChannel) channel;
                     wsChannel.balanced.set(2); //turn off balancer message check
                     listener.connectionOpened(channel, protocol);
                 }
@@ -229,12 +215,10 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
                     WSURI uri = new WSURI(location);
                     reconnect(channel, uri, channel.getProtocol());
                     nextHandler.processClose(channel, 0, null);
-                } 
-                catch (URISyntaxException e) {
+                } catch (URISyntaxException e) {
                     LOG.log(Level.WARNING, e.getMessage(), e);
                     listener.connectionFailed(channel, e);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     LOG.log(Level.WARNING, e.getMessage(), e);
                     listener.connectionFailed(channel, e);
                 }
@@ -257,28 +241,24 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
 
             @Override
             public void connectionClosed(WebSocketChannel channel, boolean wasClean, int code, String reason) {
-                WebSocketNativeChannel wsChannel = (WebSocketNativeChannel)channel;
+                WebSocketNativeChannel wsChannel = (WebSocketNativeChannel) channel;
                 if (wsChannel.reconnecting.compareAndSet(true, false)) {
                     //balancer redirect, open a new connection to redirectUri
                     wsChannel.reconnected.set(true);
-                    
+
                     // add kaazing protocol header
                     String[] nextProtocols;
                     String[] requestedProtocols = wsChannel.getRequestedProtocols();
                     if (requestedProtocols == null || requestedProtocols.length == 0) {
-                        nextProtocols = new String[] { WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE };
-                    }
-                    else {
-                        nextProtocols = new String[requestedProtocols.length+1];
+                        nextProtocols = new String[]{WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE};
+                    } else {
+                        nextProtocols = new String[requestedProtocols.length + 1];
                         nextProtocols[0] = WebSocketHandshakeObject.KAAZING_EXTENDED_HANDSHAKE;
-                        for (int i=0; i<requestedProtocols.length; i++) {
-                            nextProtocols[i+1] = requestedProtocols[i];
-                        }
+                        System.arraycopy(requestedProtocols, 0, nextProtocols, 1, requestedProtocols.length);
                     }
-                    
+
                     processConnect(channel, wsChannel.redirectUri, nextProtocols);
-                }
-                else {
+                } else {
                     listener.connectionClosed(channel, wasClean, code, reason);
                 }
             }
@@ -287,13 +267,12 @@ public class WebSocketNativeBalancingHandler extends WebSocketHandlerAdapter {
             public void connectionClosed(WebSocketChannel channel, Exception ex) {
                 listener.connectionClosed(channel, ex);
             }
-                
+
             @Override
             public void connectionFailed(WebSocketChannel channel, Exception ex) {
                 if (ex == null) {
                     listener.connectionClosed(channel, false, 0, null);
-                }
-                else {
+                } else {
                     listener.connectionClosed(channel, ex);
                 }
             }

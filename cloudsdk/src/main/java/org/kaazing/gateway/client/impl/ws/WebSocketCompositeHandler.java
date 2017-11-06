@@ -56,8 +56,6 @@ public class WebSocketCompositeHandler implements WebSocketHandler {
     private static final String CLASS_NAME = WebSocketCompositeHandler.class.getName();
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
 
-    private WebSocketHandlerListener handlerListener = createListener();
-
     static WebSocketSelectedHandlerFactory WEBSOCKET_NATIVE_HANDLER_FACTORY = () -> {
         WebSocketSelectedHandler selectedHandler = new WebSocketSelectedHandlerImpl();
         WebSocketNativeHandler nativeHandler = new WebSocketNativeHandler();
@@ -108,6 +106,7 @@ public class WebSocketCompositeHandler implements WebSocketHandler {
         LOG.entering(CLASS_NAME, "<init>");
         
         WebSocketSelectedHandler nativeHandler = WEBSOCKET_NATIVE_HANDLER_FACTORY.createSelectedHandler();
+        WebSocketHandlerListener handlerListener = createListener();
         nativeHandler.setListener(handlerListener);
 
         WebSocketSelectedHandler emulatedHandler = WEBSOCKET_EMULATED_HANDLER_FACTORY.createSelectedHandler();
