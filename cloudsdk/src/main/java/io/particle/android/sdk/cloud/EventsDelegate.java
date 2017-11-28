@@ -210,7 +210,6 @@ class EventsDelegate {
     }
 
 
-    // FIXME: Start sharing some of the strings with the constants that need to be defined in ApiDefs
     private static class EventApiUris {
 
         private final String EVENTS = "events";

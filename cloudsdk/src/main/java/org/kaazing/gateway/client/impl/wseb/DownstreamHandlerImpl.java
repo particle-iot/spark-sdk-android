@@ -58,12 +58,7 @@ class DownstreamHandlerImpl implements DownstreamHandler {
     
     private static String IDLE_TIMEOUT_HEADER = "X-Idle-Timeout";
     
-    static DownstreamHandlerFactory FACTORY = new DownstreamHandlerFactory() {
-        @Override
-        public DownstreamHandler createDownstreamHandler() {
-            return new DownstreamHandlerImpl();
-        }
-    };
+    static DownstreamHandlerFactory FACTORY = DownstreamHandlerImpl::new;
     
     private static final int PROXY_MODE_TIMEOUT_MILLIS = 5000;
     static boolean DISABLE_FALLBACK = false;
@@ -144,7 +139,7 @@ class DownstreamHandlerImpl implements DownstreamHandler {
     private void reconnectIfNecessary(DownstreamChannel channel) {
         LOG.entering(CLASS_NAME, "reconnectIfNecessary");
 
-        if (channel.closing.get() == true) {
+        if (channel.closing.get()) {
             if (channel.outstandingRequests.size() == 0) {
                 LOG.fine("Closing: "+channel);
                 listener.downstreamClosed(channel);
@@ -205,13 +200,7 @@ class DownstreamHandlerImpl implements DownstreamHandler {
     }
     //-------------------------------------------------------------------------------//
 
-    DecoderInput<DownstreamChannel> in = new DecoderInput<DownstreamChannel>() {
-
-        @Override
-        public WrappedByteBuffer read(DownstreamChannel channel) {
-            return channel.buffersToRead.poll();
-        }
-    };
+    DecoderInput<DownstreamChannel> in = channel -> channel.buffersToRead.poll();
 
     //KG-6984 move decoder into DownstreamChannel - persist state information for each websocket downstream 
     //private WebSocketEmulatedDecoder<DownstreamChannel> decoder = new WebSocketEmulatedDecoderImpl<DownstreamChannel>();
@@ -310,7 +299,6 @@ class DownstreamHandlerImpl implements DownstreamHandler {
         } catch (URISyntaxException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
-        return;
     }
 
     @Override

@@ -42,8 +42,8 @@ class DownstreamChannel extends Channel {
     final AtomicBoolean reconnecting = new AtomicBoolean(false);
     final AtomicBoolean closing = new AtomicBoolean(false);
     final AtomicBoolean attemptProxyModeFallback = new AtomicBoolean(false);
-    Set<HttpRequest> outstandingRequests = new HashSet<HttpRequest>(5);
-    Queue<WrappedByteBuffer> buffersToRead = new LinkedList<WrappedByteBuffer>();
+    Set<HttpRequest> outstandingRequests = new HashSet<>(5);
+    Queue<WrappedByteBuffer> buffersToRead = new LinkedList<>();
     int nextMessageAt;
     
     //--------Idle Timeout-------------//
@@ -55,7 +55,7 @@ class DownstreamChannel extends Channel {
     String cookie;
     
     //KG-6984 move decoder into DownstreamChannel - persist state information for each websocket downstream 
-    WebSocketEmulatedDecoder<DownstreamChannel> decoder;
+    final WebSocketEmulatedDecoder<DownstreamChannel> decoder;
     
     public DownstreamChannel(HttpURI location, String cookie) {
         this(location, cookie, 0);
@@ -65,7 +65,7 @@ class DownstreamChannel extends Channel {
         super(sequence);
         this.cookie = cookie;
         this.location = location;
-        this.decoder = new WebSocketEmulatedDecoderImpl<DownstreamChannel>();
+        this.decoder = new WebSocketEmulatedDecoderImpl<>();
         
         attemptProxyModeFallback.set(!location.isSecure());
     }

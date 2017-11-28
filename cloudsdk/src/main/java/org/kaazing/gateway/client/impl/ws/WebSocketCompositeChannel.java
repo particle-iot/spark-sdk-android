@@ -37,7 +37,7 @@ public class WebSocketCompositeChannel extends WebSocketChannel {
 
     String[]                        requestedProtocols;
 
-    protected List<String>          connectionStrategies = new LinkedList<String>();
+    protected List<String>          connectionStrategies = new LinkedList<>();
     protected ReadyState            readyState = ReadyState.CLOSED;
     protected boolean               closing = false;
 

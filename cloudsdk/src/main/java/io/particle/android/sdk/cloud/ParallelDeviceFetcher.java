@@ -70,12 +70,7 @@ class ParallelDeviceFetcher {
         // Assemble the list of Callables
         List<Callable<DeviceFetchResult>> callables = list();
         for (final SimpleDevice device : simpleDevices) {
-            callables.add(new Callable<DeviceFetchResult>() {
-                @Override
-                public DeviceFetchResult call() throws Exception {
-                    return getDevice(cloudApi, device.id);
-                }
-            });
+            callables.add(() -> getDevice(cloudApi, device.id));
         }
 
 

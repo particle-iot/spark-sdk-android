@@ -50,7 +50,7 @@ public class FrameProcessor {
     /*
      * Processing state machine
      */
-    static enum DecodingState {
+    enum DecodingState {
         START_OF_FRAME,
         READING_PAYLOADLENGTH,
         READING_PAYLOADLENGTH_EXT,

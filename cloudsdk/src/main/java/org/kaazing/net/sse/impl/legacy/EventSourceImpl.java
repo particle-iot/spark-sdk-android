@@ -43,7 +43,7 @@ public class EventSourceImpl extends EventSource {
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
 
     private SseEventStream stream = null;
-    private final List<EventSourceListener> listeners = new ArrayList<EventSourceListener>();
+    private final List<EventSourceListener> listeners = new ArrayList<>();
 
     /**
      * EventSource provides a text-based stream abstraction for Java

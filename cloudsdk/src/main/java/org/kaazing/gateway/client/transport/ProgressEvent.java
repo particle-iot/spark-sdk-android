@@ -57,9 +57,9 @@ public class ProgressEvent extends Event {
     }
 
     public String toString() {
-        String ret = "ProgressEvent [type=" + type + " payload=" + payload + "{";
+        StringBuilder ret = new StringBuilder("ProgressEvent [type=" + type + " payload=" + payload + "{");
         for(Object a: params) {
-            ret += a + " ";
+            ret.append(a).append(" ");
         }
         return ret + "}]";
     }

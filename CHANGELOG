@@ -1,3 +1,9 @@
+0.4.8
+=====
+* Android libraries update, refactoring.
+* Reset password bug fix.
+
+
 0.4.7
 =====
 * Android libraries update, catching async task RejectedExecutionException.

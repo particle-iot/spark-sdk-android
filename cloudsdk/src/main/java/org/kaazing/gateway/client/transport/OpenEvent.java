@@ -41,9 +41,9 @@ public class OpenEvent extends Event {
     }
 
     public String toString() {
-        String ret = "OpenEvent [type=" + type + " + {";
+        StringBuilder ret = new StringBuilder("OpenEvent [type=" + type + " + {");
         for(Object a: params) {
-            ret += a + " ";
+            ret.append(a).append(" ");
         }
         return ret + "}]";
     }

@@ -75,11 +75,11 @@ public class WebSocketDelegateImpl implements WebSocketDelegate {
     public static final int CLOSE_NO_STATUS = 1005;
     public static final int CLOSE_ABNORMAL = 1006;
         
-    static enum ConnectionStatus {
+    enum ConnectionStatus {
         START, STATUS_101_READ, CONNECTION_UPGRADE_READ, COMPLETED, ERRORED
     }
 
-    public static enum ReadyState {
+    public enum ReadyState {
         CONNECTING, OPEN, CLOSING, CLOSED;
     }
     
@@ -148,19 +148,9 @@ public class WebSocketDelegateImpl implements WebSocketDelegate {
     private int code = CLOSE_ABNORMAL;
     private String reason = "";
     
-    HttpRequestDelegateFactory HTTP_REQUEST_DELEGATE_FACTORY = new HttpRequestDelegateFactory() {
-        @Override
-        public HttpRequestDelegate createHttpRequestDelegate() {
-            return new HttpRequestDelegateImpl();
-        }
-    };
+    HttpRequestDelegateFactory HTTP_REQUEST_DELEGATE_FACTORY = HttpRequestDelegateImpl::new;
 
-    BridgeSocketFactory BRIDGE_SOCKET_FACTORY = new BridgeSocketFactory() {
-        @Override
-        public BridgeSocket createSocket(boolean secure) throws IOException {
-            return new BridgeSocketImpl(secure);
-        }
-    };
+    BridgeSocketFactory BRIDGE_SOCKET_FACTORY = BridgeSocketImpl::new;
 
     /**
      * WebSocket Java API for use in Java Web Start applications
@@ -425,10 +415,10 @@ public class WebSocketDelegateImpl implements WebSocketDelegate {
     }
 
     private static String[] getLines(ByteBuffer buf) {
-        List<String> lineList = new ArrayList<String>();
+        List<String> lineList = new ArrayList<>();
         while (buf.hasRemaining()) {
             byte next = buf.get();
-            List<Byte> lineText = new ArrayList<Byte>();
+            List<Byte> lineText = new ArrayList<>();
             while (next != 13) { // CR
                 lineText.add(next);
                 if (buf.hasRemaining()) {
@@ -512,21 +502,21 @@ public class WebSocketDelegateImpl implements WebSocketDelegate {
             if (requestedProtocols != null && requestedProtocols.length > 0) {
                 headerNames[headerIndex] = HEADER_PROTOCOL;
                 
-                String value;
+                StringBuilder value;
                 if (requestedProtocols.length == 1) {
-                    value = requestedProtocols[0];
+                    value = new StringBuilder(requestedProtocols[0]);
                 }
                 else {
-                    value = "";
+                    value = new StringBuilder();
                     for (int i=0; i<requestedProtocols.length; i++) {
                         if (i>0) {
-                            value += ",";
+                            value.append(",");
                         }
-                        value += requestedProtocols[i];
+                        value.append(requestedProtocols[i]);
                     }
                 }
                 
-                headerValues[headerIndex++] = value;
+                headerValues[headerIndex++] = value.toString();
             }
 
             if (cookies != null) {
@@ -908,52 +898,49 @@ public class WebSocketDelegateImpl implements WebSocketDelegate {
                     throw new IllegalArgumentException("WebSocket Connection upgrade unsuccessful");
                 }
 
-                FrameProcessor frameProcessor = new FrameProcessor(new FrameProcessorListener() {
-                    @Override
-                    public void messageReceived(ByteBuffer buffer, String messageType) {
-                        // update timestamp that is used to record the timestamp of last received message
-                        lastMessageTimestamp.set(System.currentTimeMillis());
-                        if (messageType == "TEXT" || messageType == "BINARY") {
-                            // fire message event if readyState == OPEN
-                            if (WebSocketDelegateImpl.this.readyState == ReadyState.OPEN) {
-                                listener.messageReceived(new MessageEvent(buffer, null, null, messageType));
-                            }
+                FrameProcessor frameProcessor = new FrameProcessor((buffer, messageType) -> {
+                    // update timestamp that is used to record the timestamp of last received message
+                    lastMessageTimestamp.set(System.currentTimeMillis());
+                    if (messageType == "TEXT" || messageType == "BINARY") {
+                        // fire message event if readyState == OPEN
+                        if (WebSocketDelegateImpl.this.readyState == ReadyState.OPEN) {
+                            listener.messageReceived(new MessageEvent(buffer, null, null, messageType));
                         }
-                        else if (messageType == "PING") {
-                            //PING received, send PONG
-                            ByteBuffer frame = WsFrameEncodingSupport.rfc6455Encode(new WsMessage(buffer, Kind.PONG), new Random().nextInt());
-                            WebSocketDelegateImpl.this.send(frame);
-                            
-                        }
-                        else if (messageType == "CLOSE") {
-                            WebSocketDelegateImpl.this.wasClean = true;
-                            if (buffer.remaining() < 2) {
-                                WebSocketDelegateImpl.this.code = CLOSE_NO_STATUS; //no status code was actually present
-                            }
-                            else {
-                                WebSocketDelegateImpl.this.code = buffer.getShort();
-                            
-                                if (buffer.hasRemaining()) {
-                                    WebSocketDelegateImpl.this.reason = UTF8.decode(buffer).toString();
-                                }
-                            }
-                            if (WebSocketDelegateImpl.this.readyState == ReadyState.OPEN) {
-                                //close frame received, echo close frame
-                                WebSocketDelegateImpl.this.readyState = ReadyState.CLOSING;
-                                buffer.flip();
-                                WsMessage message = new WsMessage(buffer, Kind.CLOSE);
-                                ByteBuffer frame = WsFrameEncodingSupport.rfc6455Encode(message, new Random().nextInt());
-                                WebSocketDelegateImpl.this.send(frame);
-                            }
-                            if (WebSocketDelegateImpl.this.readyState == ReadyState.CONNECTING) {
-                                WebSocketDelegateImpl.this.readyState = ReadyState.CLOSING;
-                            }
-                            
+                    }
+                    else if (messageType == "PING") {
+                        //PING received, send PONG
+                        ByteBuffer frame = WsFrameEncodingSupport.rfc6455Encode(new WsMessage(buffer, Kind.PONG), new Random().nextInt());
+                        WebSocketDelegateImpl.this.send(frame);
+
+                    }
+                    else if (messageType == "CLOSE") {
+                        WebSocketDelegateImpl.this.wasClean = true;
+                        if (buffer.remaining() < 2) {
+                            WebSocketDelegateImpl.this.code = CLOSE_NO_STATUS; //no status code was actually present
                         }
                         else {
-                            //unknown type
-                            throw new IllegalArgumentException("Unknown message type: " + messageType);
+                            WebSocketDelegateImpl.this.code = buffer.getShort();
+
+                            if (buffer.hasRemaining()) {
+                                WebSocketDelegateImpl.this.reason = UTF8.decode(buffer).toString();
+                            }
                         }
+                        if (WebSocketDelegateImpl.this.readyState == ReadyState.OPEN) {
+                            //close frame received, echo close frame
+                            WebSocketDelegateImpl.this.readyState = ReadyState.CLOSING;
+                            buffer.flip();
+                            WsMessage message = new WsMessage(buffer, Kind.CLOSE);
+                            ByteBuffer frame = WsFrameEncodingSupport.rfc6455Encode(message, new Random().nextInt());
+                            WebSocketDelegateImpl.this.send(frame);
+                        }
+                        if (WebSocketDelegateImpl.this.readyState == ReadyState.CONNECTING) {
+                            WebSocketDelegateImpl.this.readyState = ReadyState.CLOSING;
+                        }
+
+                    }
+                    else {
+                        //unknown type
+                        throw new IllegalArgumentException("Unknown message type: " + messageType);
                     }
                 });
 

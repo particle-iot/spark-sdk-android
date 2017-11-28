@@ -38,7 +38,7 @@ public abstract class ClassLoaderFactory {
     
     public abstract String getCrossOriginProxyClass();
     
-    public static final void setInstance(ClassLoaderFactory factory) {
+    public static void setInstance(ClassLoaderFactory factory) {
         sharedInstance = factory;
     }
 

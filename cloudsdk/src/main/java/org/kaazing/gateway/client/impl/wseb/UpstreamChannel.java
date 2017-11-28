@@ -33,7 +33,7 @@ class UpstreamChannel extends Channel {
     HttpURI location;
     String cookie;
 
-    ConcurrentLinkedQueue<WrappedByteBuffer> sendQueue = new ConcurrentLinkedQueue<WrappedByteBuffer>();
+    ConcurrentLinkedQueue<WrappedByteBuffer> sendQueue = new ConcurrentLinkedQueue<>();
     AtomicBoolean sendInFlight = new AtomicBoolean(false);
     HttpRequest request;
     

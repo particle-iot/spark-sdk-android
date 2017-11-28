@@ -63,7 +63,7 @@ public final class URLFactory {
     static {
         Class<URLStreamHandlerFactorySpi> clazz = URLStreamHandlerFactorySpi.class;
         ServiceLoader<URLStreamHandlerFactorySpi> loader = ServiceLoader.load(clazz);
-        _factories = new HashMap<String, URLStreamHandlerFactorySpi>();
+        _factories = new HashMap<>();
 
         for (URLStreamHandlerFactorySpi factory : loader) {
             Collection<String> protocols = factory.getSupportedProtocols();

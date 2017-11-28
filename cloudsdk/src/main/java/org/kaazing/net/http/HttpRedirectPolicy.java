@@ -232,12 +232,12 @@ public enum HttpRedirectPolicy implements Comparator<URI> {
                 return hostname;
             }
             
-            String baseDomain = "";
+            StringBuilder baseDomain = new StringBuilder();
             for (int i = 1; i < tokens.length; i++) {
-                baseDomain += "." + tokens[i];
+                baseDomain.append(".").append(tokens[i]);
             }
             
-            return baseDomain;
+            return baseDomain.toString();
         }
     },
     

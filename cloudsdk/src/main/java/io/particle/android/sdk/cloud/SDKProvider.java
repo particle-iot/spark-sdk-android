@@ -91,6 +91,7 @@ class SDKProvider {
         BlockingQueue<Runnable> poolWorkQueue = new LinkedBlockingQueue<>(1024);
         ThreadFactory threadFactory = new ThreadFactory() {
             private final AtomicInteger mCount = new AtomicInteger(1);
+
             public Thread newThread(Runnable r) {
                 return new Thread(r, "Particle Exec #" + mCount.getAndIncrement());
             }

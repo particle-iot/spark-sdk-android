@@ -41,9 +41,9 @@ public class LoadEvent extends Event {
     }
 
     public String toString() {
-        String ret = "LoadEvent [type=" + type + " responseBuffer=" + responseBuffer + "{";
+        StringBuilder ret = new StringBuilder("LoadEvent [type=" + type + " responseBuffer=" + responseBuffer + "{");
         for(Object a: params) {
-            ret += a + " ";
+            ret.append(a).append(" ");
         }
         return ret + "}]";
     }

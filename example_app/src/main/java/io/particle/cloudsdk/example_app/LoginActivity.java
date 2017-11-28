@@ -1,5 +1,6 @@
 package io.particle.cloudsdk.example_app;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
+import io.particle.android.sdk.cloud.ParticleCloudSDK;
 import io.particle.android.sdk.cloud.ParticleDevice;
 import io.particle.android.sdk.utils.Async;
 import io.particle.android.sdk.utils.Toaster;
@@ -21,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ParticleCloudSDK.init(this);
         setContentView(R.layout.activity_login);
 
         findViewById(R.id.login_button).setOnClickListener(
@@ -29,11 +32,12 @@ public class LoginActivity extends AppCompatActivity {
                     final String password = ((EditText) findViewById(R.id.password)).getText().toString();
 
                     // Don't:
+                    @SuppressLint("StaticFieldLeak")
                     AsyncTask task = new AsyncTask() {
                         @Override
                         protected Object doInBackground(Object[] params) {
                             try {
-                                ParticleCloud.get(LoginActivity.this).logIn(email, password);
+                                ParticleCloudSDK.getCloud().logIn(email, password);
 
                             } catch (final ParticleCloudException e) {
                                 Runnable mainThread = () -> {
@@ -55,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                     //-------
 
                     // DO!:
-                    Async.executeAsync(ParticleCloud.get(v.getContext()), new Async.ApiWork<ParticleCloud, Object>() {
+                    Async.executeAsync(ParticleCloudSDK.getCloud(), new Async.ApiWork<ParticleCloud, Object>() {
 
                         private ParticleDevice mDevice;
 
@@ -71,7 +75,6 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.d("BANANA", "analogvalue: " + obj);
                             } catch (ParticleDevice.VariableDoesNotExistException e) {
                                 Toaster.s(LoginActivity.this, "Error reading variable");
-                                obj = -1;
                             }
 
                             try {

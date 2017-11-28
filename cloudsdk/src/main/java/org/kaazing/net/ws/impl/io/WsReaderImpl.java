@@ -113,12 +113,7 @@ public class WsReaderImpl extends Reader {
     @Override
     public boolean ready() throws IOException {
         checkStreamClosed();
-        
-        if ((_charBuffer == null) || !_charBuffer.hasRemaining()) {
-            return false;
-        }
-
-        return true;
+        return !((_charBuffer == null) || !_charBuffer.hasRemaining());
     }
 
     @Override

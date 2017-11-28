@@ -205,7 +205,7 @@ public class WrappedByteBuffer {
         return this;
     }
 
-    private static final int max(int a, int b) {
+    private static int max(int a, int b) {
         return a > b ? a : b;
     }
 
@@ -510,7 +510,7 @@ public class WrappedByteBuffer {
      * @return the buffer
      */
     public WrappedByteBuffer putUnsignedInt(long value) {
-        this.putInt((int)value & 0xFFFFFFFF);
+        this.putInt((int) value);
         return this;
     }
 
@@ -524,7 +524,7 @@ public class WrappedByteBuffer {
      */
     public WrappedByteBuffer putUnsignedIntAt(int index, long value) {
         _checkForWriteAt(index, 4);
-        this.putIntAt(index, (int)value & 0xFFFFFFFF);
+        this.putIntAt(index, (int) value);
         return this;
     }
 

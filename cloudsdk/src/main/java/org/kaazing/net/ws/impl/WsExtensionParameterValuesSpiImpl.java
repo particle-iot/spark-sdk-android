@@ -37,7 +37,7 @@ public final class WsExtensionParameterValuesSpiImpl extends WebSocketExtensionP
     private final Map<Parameter<?>, Object> values;
     
     WsExtensionParameterValuesSpiImpl() {
-        values = new HashMap<Parameter<?>, Object>();
+        values = new HashMap<>();
     }
     
     @Override

@@ -33,20 +33,16 @@ public class HttpRequestTransportHandler extends HttpRequestHandlerAdapter {
     private static final String CLASS_NAME = HttpRequestTransportHandler.class.getName();
     private static final Logger LOG = Logger.getLogger(CLASS_NAME);
 
-    public static HttpRequestHandlerFactory DEFAULT_FACTORY = new HttpRequestHandlerFactory() {
-        
-        @Override
-        public HttpRequestHandler createHandler() {
-            HttpRequestHandler requestHandler = new HttpRequestTransportHandler();
-            
-            if (LOG.isLoggable(Level.FINE)) {
-                HttpRequestLoggingHandler loggingHandler = new HttpRequestLoggingHandler();
-                loggingHandler.setNextHandler(requestHandler);
-                requestHandler = loggingHandler;
-            }
-            
-            return requestHandler;
+    public static HttpRequestHandlerFactory DEFAULT_FACTORY = () -> {
+        HttpRequestHandler requestHandler = new HttpRequestTransportHandler();
+
+        if (LOG.isLoggable(Level.FINE)) {
+            HttpRequestLoggingHandler loggingHandler = new HttpRequestLoggingHandler();
+            loggingHandler.setNextHandler(requestHandler);
+            requestHandler = loggingHandler;
         }
+
+        return requestHandler;
     };
 
     @Override

@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2007-2014 Kaazing Corporation. All rights reserved.
- * 
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -8,9 +8,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -54,10 +54,11 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         PORT,
         PATH
     }
+
     private Node<ChallengeHandler, UriElement> rootNode;
 
     public void clear() {
-        rootNode = new Node<ChallengeHandler, UriElement>();
+        rootNode = new Node<>();
     }
 
     @Override
@@ -75,12 +76,10 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
     }
 
 
-
-
 // --------------------------- CONSTRUCTORS ---------------------------
 
     public DefaultDispatchChallengeHandler() {
-        rootNode = new Node<ChallengeHandler, UriElement>();
+        rootNode = new Node<>();
     }
 
     @Override
@@ -140,8 +139,8 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
     }
 
 
-
 // -------------------------- OTHER METHODS --------------------------
+
     /**
      * Locate all challenge handlers to serve the given location.
      *
@@ -171,7 +170,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         ChallengeHandler result = null;
         String location = challengeRequest.getLocation();
         if (location != null) {
-            Node<ChallengeHandler,UriElement> resultNode = findBestMatchingNode(location);
+            Node<ChallengeHandler, UriElement> resultNode = findBestMatchingNode(location);
 
             //
             // If we found an exact or wildcard match, try to find a handler
@@ -214,14 +213,14 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
      */
     List<Token<UriElement>> tokenize(String s) throws IllegalArgumentException {
         if (s == null || s.length() == 0) {
-            return new ArrayList<Token<UriElement>>();
+            return new ArrayList<>();
         }
 
         //
         // Make sure if a scheme is not specified, we default one before we parse as a URI.
         //
-        if ( !SCHEME_URI_PATTERN.matcher(s).matches()) {
-            s = ("http://")+s;
+        if (!SCHEME_URI_PATTERN.matcher(s).matches()) {
+            s = ("http://") + s;
         }
 
         //
@@ -232,7 +231,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         //
         // Detect what the scheme is, if any.
         //
-        List<Token<UriElement>> result = new ArrayList<Token<UriElement>>(10);
+        List<Token<UriElement>> result = new ArrayList<>(10);
         String scheme = "http";
         if (uri.getScheme() != null) {
             scheme = uri.getScheme();
@@ -252,17 +251,17 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
             if (authority != null) {
                 host = authority;
                 int asteriskIdx = host.indexOf("@");
-                if ( asteriskIdx >= 0) {
+                if (asteriskIdx >= 0) {
                     parsedUserInfoFromAuthority = host.substring(0, asteriskIdx);
-                    host = host.substring(asteriskIdx+1);
+                    host = host.substring(asteriskIdx + 1);
                     int colonIdx = parsedUserInfoFromAuthority.indexOf(":");
-                    if ( colonIdx >= 0) {
+                    if (colonIdx >= 0) {
                         userFromAuthority = parsedUserInfoFromAuthority.substring(0, colonIdx);
-                        passwordFromAuthority = parsedUserInfoFromAuthority.substring(colonIdx+1);
+                        passwordFromAuthority = parsedUserInfoFromAuthority.substring(colonIdx + 1);
                     }
                 }
                 int colonIdx = host.indexOf(":");
-                if ( colonIdx >=0 ) {
+                if (colonIdx >= 0) {
                     parsedPortFromAuthority = host.substring(colonIdx + 1);
                     host = host.substring(0, colonIdx);
                 }
@@ -276,37 +275,37 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
         //
         List<String> hostParts = Arrays.asList(host.split("\\."));
         Collections.reverse(hostParts);
-        for (String hostPart: hostParts) {
-            result.add(new Token<UriElement>(hostPart, UriElement.HOST));
+        for (String hostPart : hostParts) {
+            result.add(new Token<>(hostPart, UriElement.HOST));
         }
 
         if (parsedPortFromAuthority != null) {
-            result.add(new Token<UriElement>(parsedPortFromAuthority, UriElement.PORT));
+            result.add(new Token<>(parsedPortFromAuthority, UriElement.PORT));
         } else if (uri.getPort() > 0) {
-            result.add(new Token<UriElement>(String.valueOf(uri.getPort()), UriElement.PORT));
+            result.add(new Token<>(String.valueOf(uri.getPort()), UriElement.PORT));
         } else if (getDefaultPort(scheme) > 0) {
-            result.add(new Token<UriElement>(String.valueOf(getDefaultPort(scheme)), UriElement.PORT));
+            result.add(new Token<>(String.valueOf(getDefaultPort(scheme)), UriElement.PORT));
         }
 
 
-        if ( parsedUserInfoFromAuthority != null ) {
-            if ( userFromAuthority != null) {
-                result.add(new Token<UriElement>(userFromAuthority, UriElement.USERINFO));
+        if (parsedUserInfoFromAuthority != null) {
+            if (userFromAuthority != null) {
+                result.add(new Token<>(userFromAuthority, UriElement.USERINFO));
             }
-            if ( passwordFromAuthority != null ) {
-                result.add(new Token<UriElement>(passwordFromAuthority, UriElement.USERINFO));
+            if (passwordFromAuthority != null) {
+                result.add(new Token<>(passwordFromAuthority, UriElement.USERINFO));
             }
-            if ( userFromAuthority == null && passwordFromAuthority == null) {
-                result.add(new Token<UriElement>(parsedUserInfoFromAuthority, UriElement.USERINFO));
+            if (userFromAuthority == null && passwordFromAuthority == null) {
+                result.add(new Token<>(parsedUserInfoFromAuthority, UriElement.USERINFO));
             }
         } else if (uri.getUserInfo() != null) {
             String userInfo = uri.getUserInfo();
             int colonIdx = userInfo.indexOf(":");
-            if ( colonIdx >= 0) {
-                result.add(new Token<UriElement>(userInfo.substring(0, colonIdx), UriElement.USERINFO));
-                result.add(new Token<UriElement>(userInfo.substring(colonIdx+1), UriElement.USERINFO));
+            if (colonIdx >= 0) {
+                result.add(new Token<>(userInfo.substring(0, colonIdx), UriElement.USERINFO));
+                result.add(new Token<>(userInfo.substring(colonIdx + 1), UriElement.USERINFO));
             } else {
-                result.add(new Token<UriElement>(uri.getUserInfo(), UriElement.USERINFO));
+                result.add(new Token<>(uri.getUserInfo(), UriElement.USERINFO));
             }
         }
 
@@ -316,8 +315,8 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
                 path = path.substring(1);
             }
             if (isNotBlank(path)) {
-                for (String p: path.split("/")) {
-                    result.add(new Token<UriElement>(p, UriElement.PATH));
+                for (String p : path.split("/")) {
+                    result.add(new Token<>(p, UriElement.PATH));
                 }
             }
         }
@@ -325,14 +324,15 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
     }
 
     int getDefaultPort(String scheme) {
-        if ( defaultPortsByScheme.containsKey(scheme.toLowerCase())) {
+        if (defaultPortsByScheme.containsKey(scheme.toLowerCase())) {
             return defaultPortsByScheme.get(scheme);
         } else {
             return -1;
         }
     }
 
-    static Map<String, Integer> defaultPortsByScheme = new HashMap<String,Integer>();
+    static Map<String, Integer> defaultPortsByScheme = new HashMap<>();
+
     static {
         defaultPortsByScheme.put("http", 80);
         defaultPortsByScheme.put("ws", 80);
@@ -379,7 +379,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * The parameterized type instances.
          * Optimized for fewer values per node.
          */
-        private List<T> values = new ArrayList<T>(3);
+        private List<T> values = new ArrayList<>(3);
 
         /**
          * An up-link to this Node instance's parent.
@@ -396,7 +396,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * Each link is accessed through the child Node's name.
          * This means that child names must be unique.
          */
-        private Map<String,Node<T,E>> children = new LinkedHashMap<String, Node<T,E>>();
+        private Map<String, Node<T, E>> children = new LinkedHashMap<>();
 
         /**
          * A method to access the wildcard character.
@@ -412,8 +412,8 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * Create a new root node, with a null name and parent.
          */
         Node() {
-            this.name=null;
-            this.parent=null;
+            this.name = null;
+            this.parent = null;
             this.kind = null;
         }
 
@@ -424,7 +424,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @param parent  the parent of the new node to establish the new node's place in the tree.
          * @param kind    the kind of the node instance to create.
          */
-        private Node(String name, Node<T,E> parent, E kind) {
+        private Node(String name, Node<T, E> parent, E kind) {
             this.name = name;
             this.parent = parent;
             this.kind = kind;
@@ -442,12 +442,12 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @return the freshly added Node, for chained calls if needed.
          * @throws IllegalArgumentException if the name is null or empty
          */
-        public Node<T,E> addChild(String name, E kind) {
-            if ( name == null || name.length() == 0) {
+        public Node<T, E> addChild(String name, E kind) {
+            if (name == null || name.length() == 0) {
                 throw new IllegalArgumentException("A node may not have a null name.");
             }
 
-            Node<T,E> result = new Node<T,E>(name, this, kind);
+            Node<T, E> result = new Node<>(name, this, kind);
             children.put(name, result);
             return result;
         }
@@ -473,8 +473,8 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @return the child node instance corresponding to the provided name,
          * or <code>null</code> if no such node can be found.
          */
-        public Node<T,E> getChild(String name) {
-                return children.get(name);
+        public Node<T, E> getChild(String name) {
+            return children.get(name);
         }
 
         /**
@@ -484,7 +484,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          */
         public int getDistanceFromRoot() {
             int result = 0;
-            Node<T,E> cursor = this;
+            Node<T, E> cursor = this;
             while (!cursor.isRootNode()) {
                 result++;
                 cursor = cursor.getParent();
@@ -498,11 +498,12 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @param values the values to add to this node instance
          * @throws IllegalArgumentException when attempting to add values to the root node.
          */
-        public void appendValues(T... values) {
-            if ( isRootNode() ) {
+        @SafeVarargs
+        public final void appendValues(T... values) {
+            if (isRootNode()) {
                 throw new IllegalArgumentException("Cannot set a values on the root node.");
             }
-            if ( values != null ) {
+            if (values != null) {
                 this.values.addAll(Arrays.asList(values));
             }
         }
@@ -512,7 +513,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @param value the value to remove from this node instance.
          */
         public void removeValue(T value) {
-            if ( isRootNode() ) {
+            if (isRootNode()) {
                 return;
             }
             this.values.remove(value);
@@ -532,7 +533,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @return true iff values have been stored in this node.
          */
         public boolean hasValues() {
-            return values != null && values.size()>0;
+            return values != null && values.size() > 0;
         }
 
         /**
@@ -542,7 +543,7 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @return a link to the parent instance of this node, or <code>null</code>
          * when invoked on the root node.
          */
-        public Node<T,E> getParent() {
+        public Node<T, E> getParent() {
             return parent;
         }
 
@@ -587,9 +588,8 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @return true iff this node instance's name is equal to {@link #getWildcardChar()}.
          */
         public boolean isWildcard() {
-            return name!=null && name.equals(getWildcardChar());
+            return name != null && name.equals(getWildcardChar());
         }
-
 
 
         boolean hasWildcardChild() {
@@ -606,26 +606,26 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          */
         String getFullyQualifiedName() {
             StringBuilder b = new StringBuilder();
-            List<String> name = new ArrayList<String>();
+            List<String> name = new ArrayList<>();
             Node cursor = this;
             while (!cursor.isRootNode()) {
                 name.add(cursor.name);
                 cursor = cursor.parent;
             }
             Collections.reverse(name);
-            for(String s: name) {
+            for (String s : name) {
                 b.append(s).append('.');
             }
 
-            if ( b.length() >= 1 && b.charAt(b.length()-1) == '.') {
-                b.deleteCharAt(b.length()-1);
+            if (b.length() >= 1 && b.charAt(b.length() - 1) == '.') {
+                b.deleteCharAt(b.length() - 1);
             }
 
             return b.toString();
         }
 
-        public List<Node<T,E>> getChildrenAsList() {
-            return new ArrayList<Node<T,E>>(children.values());
+        public List<Node<T, E>> getChildrenAsList() {
+            return new ArrayList<>(children.values());
         }
 
         /**
@@ -634,12 +634,12 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @param tokenIdx   the index into the tokens to commence matching at.
          * @return the best matching node or {@code null} if no matching node could be found.
          */
-        Node<T,E> findBestMatchingNode(List<Token<E>> tokens, int tokenIdx) {
-            List<Node<T,E>> matches = findAllMatchingNodes(tokens, tokenIdx);
+        Node<T, E> findBestMatchingNode(List<Token<E>> tokens, int tokenIdx) {
+            List<Node<T, E>> matches = findAllMatchingNodes(tokens, tokenIdx);
 
-            Node<T,E> resultNode = null;
+            Node<T, E> resultNode = null;
             int score = 0;
-            for (Node<T,E> node : matches) {
+            for (Node<T, E> node : matches) {
                 if (node.getDistanceFromRoot() > score) {
                     score = node.getDistanceFromRoot();
                     resultNode = node;
@@ -654,14 +654,14 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
          * @param tokenIdx   the index into the tokens to commence matching at.
          * @return a collection of all matching nodes, which may be empty if no matching nodes were found.
          */
-        private List<Node<T,E>> findAllMatchingNodes(List<Token<E>> tokens, int tokenIdx) {
-            List<Node<T,E>> result = new ArrayList<Node<T,E>>();
+        private List<Node<T, E>> findAllMatchingNodes(List<Token<E>> tokens, int tokenIdx) {
+            List<Node<T, E>> result = new ArrayList<>();
 
             //
             // Iterate over this node's children.
             //
-            List<Node<T,E>> nodes = this.getChildrenAsList();
-            for (Node<T,E> node : nodes) {
+            List<Node<T, E>> nodes = this.getChildrenAsList();
+            for (Node<T, E> node : nodes) {
 
                 //
                 // Do any tokens match the child node?
@@ -682,8 +682,8 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
                         if (node.hasValues()) {
                             result.add(node);
                         }
-                        if ( node.hasWildcardChild()) {
-                            Node<T,E> child = node.getChild(getWildcardChar());
+                        if (node.hasWildcardChild()) {
+                            Node<T, E> child = node.getChild(getWildcardChar());
                             if (child.getKind() != getKind()) {
                                 node = null;
                             } else {
@@ -736,13 +736,13 @@ public class DefaultDispatchChallengeHandler extends DispatchChallengeHandler {
             } else {
 
                 // Return no match because wildcards match within Node kinds
-                if ( this.kind != tokens.get(tokenIdx).getKind()) {
+                if (this.kind != tokens.get(tokenIdx).getKind()) {
                     return -1;
                 }
 
                 do {
                     tokenIdx++;
-                } while ( tokenIdx < tokens.size() && this.kind == tokens.get(tokenIdx).getKind());
+                } while (tokenIdx < tokens.size() && this.kind == tokens.get(tokenIdx).getKind());
                 return tokenIdx;
             }
         }

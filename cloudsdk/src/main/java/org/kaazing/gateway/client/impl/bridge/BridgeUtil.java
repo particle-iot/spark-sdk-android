@@ -24,8 +24,6 @@ package org.kaazing.gateway.client.impl.bridge;
 import org.kaazing.gateway.client.impl.bridge.XoaEvent.XoaEventKind;
 import org.kaazing.gateway.client.util.StringUtils;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URI;
 import java.net.URL;
@@ -43,8 +41,8 @@ public class BridgeUtil {
     private static final String SOA_MESSAGE = "soaMessage";
     private static final String XOP_MESSAGE = "xopMessage";
 
-    private static Map<String, PropertyChangeSupport> schemeAuthorityToXopMap = new ConcurrentHashMap<String, PropertyChangeSupport>();
-    private static Map<Integer, Proxy> handlerIdToHtml5ObjectMap = new ConcurrentHashMap<Integer, Proxy>();
+    private static Map<String, PropertyChangeSupport> schemeAuthorityToXopMap = new ConcurrentHashMap<>();
+    private static Map<Integer, Proxy> handlerIdToHtml5ObjectMap = new ConcurrentHashMap<>();
 
     private static AtomicInteger sHtml5ObjectIdCounter = new AtomicInteger(new SecureRandom().nextInt(10000));
     
@@ -151,15 +149,12 @@ public class BridgeUtil {
                 Class<?> remoteProxyClass = loader.loadClass(classLoaderFactory.getCrossOriginProxyClass());
 
                 xop = (PropertyChangeSupport) remoteProxyClass.newInstance();
-                xop.addPropertyChangeListener(XOP_MESSAGE, new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        Object[] args = (Object[]) evt.getNewValue();
-                        Integer proxyId = (Integer) args[0];
-                        String eventType = (String) args[1];
-                        Object[] params = (Object[]) args[2];
-                        eventReceived(proxyId, eventType, params);
-                    }
+                xop.addPropertyChangeListener(XOP_MESSAGE, evt -> {
+                    Object[] args = (Object[]) evt.getNewValue();
+                    Integer proxyId = (Integer) args[0];
+                    String eventType = (String) args[1];
+                    Object[] params = (Object[]) args[2];
+                    eventReceived(proxyId, eventType, params);
                 });
 
                 schemeAuthorityToXopMap.put(getSchemeAuthority(uri), xop);

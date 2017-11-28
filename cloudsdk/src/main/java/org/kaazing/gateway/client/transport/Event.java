@@ -69,9 +69,9 @@ public class Event {
     }
 
     public String toString() {
-        String ret = "Event[type:" + type + "{";
+        StringBuilder ret = new StringBuilder("Event[type:" + type + "{");
         for (Object a : params) {
-            ret += a + " ";
+            ret.append(a).append(" ");
         }
         return ret + "}]";
     }

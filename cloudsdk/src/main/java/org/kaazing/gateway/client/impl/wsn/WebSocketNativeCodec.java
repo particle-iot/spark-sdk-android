@@ -56,12 +56,7 @@ public class WebSocketNativeCodec extends WebSocketHandlerAdapter {
     public void setNextHandler(final WebSocketHandler handler) {
         super.setNextHandler(handler);
         
-        out = new EncoderOutput<WebSocketChannel>() {
-            @Override
-            public void write(WebSocketChannel channel, WrappedByteBuffer buffer) {
-                handler.processBinaryMessage(channel, buffer);
-            }
-        };
+        out = handler::processBinaryMessage;
         
         // TODO: use WebSocketHandlerListenerAdapter
         nextHandler.setListener(new WebSocketHandlerListener() {

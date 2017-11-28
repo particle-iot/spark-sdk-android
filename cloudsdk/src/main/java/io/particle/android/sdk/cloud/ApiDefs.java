@@ -30,8 +30,6 @@ import retrofit.mime.TypedOutput;
  */
 public class ApiDefs {
 
-    // FIXME: turn some of these common strings into constants?
-
     /**
      * The main Particle cloud API
      */
@@ -154,7 +152,8 @@ public class ApiDefs {
         @POST("/oauth/token")
         Responses.LogInResponse logIn(@Field("grant_type") String grantType,
                                       @Field("refresh_token") String refreshToken);
-      
+
+        @FormUrlEncoded
         @POST("/v1/user/password-reset")
         Response requestPasswordReset(@Field("username") String email);
 

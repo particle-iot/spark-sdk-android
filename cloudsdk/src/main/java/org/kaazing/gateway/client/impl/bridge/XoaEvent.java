@@ -58,9 +58,9 @@ public class XoaEvent implements Serializable {
     }
 
     public String toString() {
-        String out = "EventID:" + getHandlerId() + "," + getKind().name() + "[";
-        for (int i = 0; i < params.length; i++) {
-            out += params[i] + ",";
+        StringBuilder out = new StringBuilder("EventID:" + getHandlerId() + "," + getKind().name() + "[");
+        for (Object param : params) {
+            out.append(param).append(",");
         }
         return out + "]";
     }
@@ -103,9 +103,9 @@ public class XoaEvent implements Serializable {
 
         public static XoaEventKind getName(String in) {
             final XoaEventKind[] v = values();
-            for (int i = 0; i < v.length; i++) {
-                if (v[i].name.equals(in)) {
-                    return v[i];
+            for (XoaEventKind aV : v) {
+                if (aV.name.equals(in)) {
+                    return aV;
                 }
             }
             return UNDEFINED;
