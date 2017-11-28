@@ -34,8 +34,8 @@ ext {
 
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.1'
 
     dexOptions {
         javaMaxHeapSize "2g"
@@ -43,7 +43,7 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName project.version
         consumerProguardFiles 'consumer-proguard-rules.pro'
@@ -70,7 +70,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.android.support:support-fragment:26.1.0'
+    compile 'com.android.support:support-fragment:27.0.1'
 }
 
 repositories {

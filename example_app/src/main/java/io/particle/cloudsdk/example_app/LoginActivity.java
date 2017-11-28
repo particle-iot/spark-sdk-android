@@ -23,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ParticleCloudSDK.init(this);
         setContentView(R.layout.activity_login);
 
         findViewById(R.id.login_button).setOnClickListener(
