@@ -31,4 +31,4 @@ Full documentation, including a getting started guide, lots of API examples, sup
 
 ## License
 
-The Particle Android Cloud SDK is available under the Apache License 2.0.  See [the LICENSE file](https://github.com/spark/spark-sdk-android/blob/master/LICENSE) for the complete text of the license.
+The Particle Android Cloud SDK is available under the Apache License 2.0.  See [the LICENSE file](https://github.com/particle-iot/spark-sdk-android/blob/master/LICENSE) for the complete text of the license.

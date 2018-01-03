@@ -18,8 +18,8 @@ ext {
             'read and write data to/from Particle Core/Photon devices and (via exposed variables and functions)\n' +
             'publish and subscribe events to/from the cloud or to/from devices (coming soon).'
 
-    siteUrl = 'https://github.com/spark/spark-sdk-android'
-    gitUrl = 'https://github.com/spark/spark-sdk-android.git'
+    siteUrl = 'https://github.com/particle-iot/spark-sdk-android'
+    gitUrl = 'https://github.com/particle-iot/spark-sdk-android.git'
 
     libraryVersion = project.version
 
