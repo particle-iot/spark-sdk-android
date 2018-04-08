@@ -28,6 +28,7 @@ import io.particle.android.sdk.cloud.Responses.ReadIntVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadObjectVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadStringVariableResponse;
 import io.particle.android.sdk.cloud.Responses.ReadVariableResponse;
+import io.particle.android.sdk.cloud.exceptions.ParticleCloudException;
 import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.utils.ParticleInternalStringUtils;
 import io.particle.android.sdk.utils.Preconditions;

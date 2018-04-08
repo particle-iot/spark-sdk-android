@@ -35,6 +35,8 @@ import io.particle.android.sdk.cloud.ParticleDevice.VariableType;
 import io.particle.android.sdk.cloud.Responses.Models;
 import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
+import io.particle.android.sdk.cloud.exceptions.PartialDeviceListResultException;
+import io.particle.android.sdk.cloud.exceptions.ParticleCloudException;
 import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.cloud.models.SignUpInfo;
 import io.particle.android.sdk.persistance.AppDataStorage;
@@ -862,10 +864,6 @@ public class ParticleCloud {
     //endregion
 
     private static Func<String, VariableType> toVariableType = value -> {
-        if (value == null) {
-            return null;
-        }
-
         switch (value) {
             case "int32":
                 return VariableType.INT;
@@ -877,28 +875,5 @@ public class ParticleCloud {
                 return null;
         }
     };
-
-
-    // FIXME: review and polish this.  The more I think about it, the more I like it, but
-    // make sure it's what we _really_ want.   Maybe apply it to the regular getDevices() too?
-    public static class PartialDeviceListResultException extends Exception {
-
-        final List<ParticleDevice> devices;
-
-        public PartialDeviceListResultException(List<ParticleDevice> devices, Exception cause) {
-            super(cause);
-            this.devices = devices;
-        }
-
-        public PartialDeviceListResultException(List<ParticleDevice> devices, RetrofitError error) {
-            super(error);
-            this.devices = devices;
-        }
-
-        public PartialDeviceListResultException(List<ParticleDevice> devices) {
-            super("Undefined error while fetching devices");
-            this.devices = devices;
-        }
-    }
 
 }

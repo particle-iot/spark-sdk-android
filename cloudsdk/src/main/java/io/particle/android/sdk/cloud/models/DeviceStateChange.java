@@ -18,7 +18,6 @@ public class DeviceStateChange implements Parcelable {
         this.state = state;
     }
 
-
     @Override
     public int describeContents() {
         return 0;

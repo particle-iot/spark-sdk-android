@@ -35,7 +35,6 @@ class SDKProvider {
 
     SDKProvider(Context context,
                 @Nullable OauthBasicAuthCredentialsProvider oAuthCredentialsProvider) {
-
         this.ctx = context.getApplicationContext();
 
         if (oAuthCredentialsProvider == null) {

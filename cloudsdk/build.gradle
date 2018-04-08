@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 // This is the library version used when deploying the artifact
-version = '0.4.8'
+version = '0.4.9'
 
 ext {
     bintrayRepo = 'android'
@@ -35,7 +35,7 @@ ext {
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.1'
+    buildToolsVersion '27.0.3'
 
     dexOptions {
         javaMaxHeapSize "2g"
@@ -64,13 +64,13 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     compile 'com.google.code.findbugs:jsr305:3.0.1'
-    compile 'com.google.code.gson:gson:2.8.1'
+    compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.squareup.okhttp:okhttp:2.7.5'
-    compile 'com.squareup.okio:okio:1.13.0'
+    compile 'com.squareup.okio:okio:1.14.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.android.support:support-fragment:27.0.1'
+    compile 'com.android.support:support-fragment:27.1.1'
 }
 
 repositories {
