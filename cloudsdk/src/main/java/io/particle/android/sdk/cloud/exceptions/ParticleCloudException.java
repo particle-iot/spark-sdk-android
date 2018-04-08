@@ -1,4 +1,4 @@
-package io.particle.android.sdk.cloud;
+package io.particle.android.sdk.cloud.exceptions;
 
 
 import org.json.JSONArray;
@@ -200,7 +200,7 @@ public class ParticleCloudException extends Exception {
             return errors;
         }
         for (int i = 0; i < jsonArray.length(); i++) {
-            String msg = null;
+            String msg;
 
             JSONObject msgObj = jsonArray.optJSONObject(i);
             if (msgObj != null) {

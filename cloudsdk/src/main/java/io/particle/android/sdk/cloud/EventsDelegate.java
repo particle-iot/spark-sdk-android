@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import io.particle.android.sdk.cloud.ApiDefs.CloudApi;
+import io.particle.android.sdk.cloud.exceptions.ParticleCloudException;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
 
@@ -208,7 +209,6 @@ class EventsDelegate {
             }
         }
     }
-
 
     private static class EventApiUris {
 

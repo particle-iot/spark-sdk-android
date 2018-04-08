@@ -95,8 +95,8 @@ public class ParticleAccessToken {
     private final Handler handler;
 
     private String accessToken;
-    private String refreshToken;
-    private Date expiryDate;
+    private final String refreshToken;
+    private final Date expiryDate;
 
     private volatile Runnable expirationRunnable;
     private volatile ParticleAccessTokenDelegate delegate;

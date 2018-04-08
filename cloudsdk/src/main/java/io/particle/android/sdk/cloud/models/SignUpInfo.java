@@ -13,7 +13,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 public class SignUpInfo implements Parcelable {
-    private String username, password, email;
+    private final String username, password, email;
     @SerializedName("grant_type") @Nullable
     private String grantType;
     @SerializedName("account_info") @Nullable

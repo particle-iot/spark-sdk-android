@@ -1,6 +1,7 @@
 package io.particle.android.sdk.utils;
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
@@ -15,7 +16,7 @@ public class Toaster {
      * <p/>
      * This is safe to call from background/worker threads.
      */
-    public static void s(final Activity activity, @Nullable final String msg) {
+    public static void s(@NonNull final Activity activity, @Nullable final String msg) {
         showToast(activity, msg, Toast.LENGTH_SHORT);
     }
 
@@ -24,12 +25,12 @@ public class Toaster {
      * <p/>
      * This is safe to call from background/worker threads.
      */
-    public static void l(final Activity activity, @Nullable final String msg) {
+    public static void l(@NonNull final Activity activity, @Nullable final String msg) {
         showToast(activity, msg, Toast.LENGTH_LONG);
     }
 
 
-    private static void showToast(final Activity activity, @Nullable final String msg,
+    private static void showToast(@NonNull final Activity activity, @Nullable final String msg,
                                   final int length) {
         Runnable toastRunnable = () -> Toast.makeText(activity, msg, length).show();
 
