@@ -7,7 +7,7 @@ import retrofit.RetrofitError;
 
 public class PartialDeviceListResultException extends Exception {
 
-    final List<ParticleDevice> devices;
+    public final List<ParticleDevice> devices;
 
     public PartialDeviceListResultException(List<ParticleDevice> devices, Exception cause) {
         super(cause);

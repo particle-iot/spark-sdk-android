@@ -1,3 +1,8 @@
+0.5.0
+=====
+* Exposing list of devices beyond package within PartialDeviceListResultException.
+
+
 0.4.9
 =====
 * Android libraries update, refactoring.
