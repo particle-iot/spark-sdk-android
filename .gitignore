@@ -37,24 +37,21 @@ proguard/
 *.log
 
 
-# IntelliJ project files that shouldn't be checked in
-/.idea/workspace.xml
-/.idea/libraries
-# Android Studio doesn't put these in .gitignore by default, but I can't see that they 
-# do anything useful as shared resources, they just create a lot of committ clutter, 
-# and they get automatically regenerated constantly.  Thus, they're receiving the 
-# mighty ban hammer of .gitignore.
+# IDEA/Android Studio
+# We want to IGNORE most of .idea
 *.iml
+/.idea/*
 
-# Intellij
-*.iml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/libraries
-.idea/inspectionProfiles/Project_Default.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/qaplug_profiles.xml
+# IDEA/Android Studio exceptions
+# And these are the files we explicitly want to *KEEP*,
+!/.idea/codeStyles/
+!/.idea/copyright/
+!/.idea/fileTemplates/
+!/.idea/inspectionProfiles/
+!/.idea/scopes/
+!/.idea/codeStyleSettings.xml
+!/.idea/encodings.xml
+!/.idea/.name
 
 # Keystore files
 *.jks
