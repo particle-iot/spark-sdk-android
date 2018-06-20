@@ -35,7 +35,6 @@ ext {
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
 
     dexOptions {
         javaMaxHeapSize "2g"
@@ -61,23 +60,18 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.google.code.findbugs:jsr305:3.0.1'
-    compile 'com.google.code.gson:gson:2.8.2'
-    compile 'com.squareup.okhttp:okhttp:2.7.5'
-    compile 'com.squareup.okio:okio:1.14.0'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'org.greenrobot:eventbus:3.0.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.google.code.findbugs:jsr305:3.0.1'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+    implementation 'com.squareup.okio:okio:1.14.0'
+    implementation 'com.squareup.retrofit:retrofit:1.9.0'
+    implementation 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.android.support:support-fragment:27.1.1'
+    implementation 'com.android.support:support-fragment:27.1.1'
 }
 
-repositories {
-    maven {
-        url 'https://maven.google.com'
-    }
-}
 
 apply from: '../pom_generator_v1.gradle'
 apply from: '../bintray_upload_v1.gradle'
