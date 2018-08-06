@@ -113,14 +113,15 @@ public class ParticleCloudException extends Exception {
 
     public ParticleCloudException(Exception exception) {
         super(exception);
-        // FIXME: ugly hack to get around even uglier bug.
-        this.innerError = RetrofitError.unexpectedError("(URL UNKNOWN)", exception);
-        this.responseData = null;
-    }
 
-    ParticleCloudException(RetrofitError innerError) {
-        this.innerError = innerError;
-        this.responseData = buildResponseData(innerError);
+        if (exception instanceof RetrofitError){
+            this.innerError = (RetrofitError) exception;
+            this.responseData = buildResponseData(innerError);
+        }else{
+            // FIXME: ugly hack to get around even uglier bug.
+            this.innerError = RetrofitError.unexpectedError("(URL UNKNOWN)", exception);
+            this.responseData = null;
+        }
     }
 
     /**
@@ -152,6 +153,26 @@ public class ParticleCloudException extends Exception {
             serverErrorMessage = loadServerErrorMsg();
         }
         return serverErrorMessage;
+    }
+
+    /**
+     * Server-provided multi-factor auth token.  May be null.
+     *
+     * @return server-provided multi-factor auth token or null
+     */
+    public String getMfaToken() {
+        if (responseData == null || responseData.getBody() == null) {
+            return null;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(responseData.getBody());
+            if (jsonObject.has("mfa_token")) {
+                return jsonObject.getString("mfa_token");
+            }
+
+        } catch (JSONException ignore) {
+        }
+        return null;
     }
 
     /**

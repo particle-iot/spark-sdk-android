@@ -9,6 +9,6 @@
     ATTENTION: This should be NONE for any production build; setting it to anything else
     will log HTTP headers, meaning that the user's token (and other potentially sensitive info)
     would be logged in plaintext! -->
-    <string name="http_log_level">NONE</string>
+    <string name="http_log_level">FULL</string>
 
 </resources>
