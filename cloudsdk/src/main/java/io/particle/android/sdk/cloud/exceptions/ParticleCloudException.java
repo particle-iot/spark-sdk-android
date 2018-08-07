@@ -105,22 +105,23 @@ public class ParticleCloudException extends Exception {
 
     }
 
+    final ResponseErrorData responseData;
 
     private final RetrofitError innerError;
-    private final ResponseErrorData responseData;
     private boolean checkedForServerErrorMsg = false;
     private String serverErrorMessage;
 
     public ParticleCloudException(Exception exception) {
         super(exception);
-        // FIXME: ugly hack to get around even uglier bug.
-        this.innerError = RetrofitError.unexpectedError("(URL UNKNOWN)", exception);
-        this.responseData = null;
-    }
 
-    ParticleCloudException(RetrofitError innerError) {
-        this.innerError = innerError;
-        this.responseData = buildResponseData(innerError);
+        if (exception instanceof RetrofitError){
+            this.innerError = (RetrofitError) exception;
+            this.responseData = buildResponseData(innerError);
+        }else{
+            // FIXME: ugly hack to get around even uglier bug.
+            this.innerError = RetrofitError.unexpectedError("(URL UNKNOWN)", exception);
+            this.responseData = null;
+        }
     }
 
     /**

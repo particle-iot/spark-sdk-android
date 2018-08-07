@@ -150,6 +150,12 @@ public class ApiDefs {
 
         @FormUrlEncoded
         @POST("/oauth/token")
+        Responses.LogInResponse authenticate(@Field("grant_type") String grantType,
+                                      @Field("mfa_token") String mfaToken,
+                                      @Field("otp") String otp);
+
+        @FormUrlEncoded
+        @POST("/oauth/token")
         Responses.LogInResponse logIn(@Field("grant_type") String grantType,
                                       @Field("refresh_token") String refreshToken);
 

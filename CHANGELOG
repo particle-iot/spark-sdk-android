@@ -1,3 +1,8 @@
+0.5.1
+=====
+* New features - Two factor authentication.
+
+
 0.5.0
 =====
 * Exposing list of devices beyond package within PartialDeviceListResultException.

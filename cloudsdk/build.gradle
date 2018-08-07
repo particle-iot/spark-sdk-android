@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 // This is the library version used when deploying the artifact
-version = '0.5.0'
+version = '0.5.1'
 
 ext {
     bintrayRepo = 'android'
@@ -61,16 +61,16 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    api fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.google.code.findbugs:jsr305:3.0.1'
-    compile 'com.google.code.gson:gson:2.8.2'
-    compile 'com.squareup.okhttp:okhttp:2.7.5'
-    compile 'com.squareup.okio:okio:1.14.0'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
-    compile 'org.greenrobot:eventbus:3.0.0'
+    api 'com.google.code.findbugs:jsr305:3.0.2'
+    api 'com.google.code.gson:gson:2.8.2'
+    api 'com.squareup.okhttp:okhttp:2.7.5'
+    api 'com.squareup.okio:okio:1.14.0'
+    api 'com.squareup.retrofit:retrofit:1.9.0'
+    api 'org.greenrobot:eventbus:3.0.0'
 
-    compile 'com.android.support:support-fragment:27.1.1'
+    api 'com.android.support:support-fragment:27.1.1'
 }
 
 repositories {
@@ -89,6 +89,3 @@ if (JavaVersion.current().isJava8Compatible()) {
         options.addStringOption('Xdoclint:none', '-quiet')
     }
 }
-
-
-apply plugin: 'com.getkeepsafe.dexcount'
