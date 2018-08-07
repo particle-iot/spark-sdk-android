@@ -38,6 +38,7 @@ import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
 import io.particle.android.sdk.cloud.exceptions.PartialDeviceListResultException;
 import io.particle.android.sdk.cloud.exceptions.ParticleCloudException;
+import io.particle.android.sdk.cloud.exceptions.ParticleLoginException;
 import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.cloud.models.SignUpInfo;
 import io.particle.android.sdk.persistance.AppDataStorage;
@@ -173,7 +174,7 @@ public class ParticleCloud {
             Responses.LogInResponse response = identityApi.logIn("password", user, password);
             onLogIn(response, user, password);
         } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
+            throw new ParticleLoginException(error);
         }
     }
 
@@ -191,7 +192,7 @@ public class ParticleCloud {
             Responses.LogInResponse response = identityApi.authenticate("urn:custom:mfa-otp", mfaToken, otp);
             onLogIn(response, user, password);
         } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
+            throw new ParticleLoginException(error);
         }
     }
 
@@ -250,7 +251,7 @@ public class ParticleCloud {
         try {
             signUpAndLogInWithCustomer(new SignUpInfo(email, password), productId);
         } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
+            throw new ParticleLoginException(error);
         }
     }
 
@@ -273,7 +274,7 @@ public class ParticleCloud {
             Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(signUpInfo, productId);
             onLogIn(response, signUpInfo.getUsername(), signUpInfo.getPassword());
         } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
+            throw new ParticleLoginException(error);
         }
     }
 

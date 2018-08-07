@@ -105,9 +105,9 @@ public class ParticleCloudException extends Exception {
 
     }
 
+    final ResponseErrorData responseData;
 
     private final RetrofitError innerError;
-    private final ResponseErrorData responseData;
     private boolean checkedForServerErrorMsg = false;
     private String serverErrorMessage;
 
@@ -153,26 +153,6 @@ public class ParticleCloudException extends Exception {
             serverErrorMessage = loadServerErrorMsg();
         }
         return serverErrorMessage;
-    }
-
-    /**
-     * Server-provided multi-factor auth token.  May be null.
-     *
-     * @return server-provided multi-factor auth token or null
-     */
-    public String getMfaToken() {
-        if (responseData == null || responseData.getBody() == null) {
-            return null;
-        }
-        try {
-            JSONObject jsonObject = new JSONObject(responseData.getBody());
-            if (jsonObject.has("mfa_token")) {
-                return jsonObject.getString("mfa_token");
-            }
-
-        } catch (JSONException ignore) {
-        }
-        return null;
     }
 
     /**
