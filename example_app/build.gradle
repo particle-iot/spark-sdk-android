@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "io.particle.cloudsdk.example_app"
@@ -27,25 +26,19 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // BY DEFAULT, BUILD APP AGAINST THE LOCAL SDK SOURCE
     // (i.e.: make modifications to the SDK source in the local repo show up in this app
     // just by rebuilding)
-    compile project(':cloudsdk')
+    implementation project(':cloudsdk')
     //
     // **OR**
     //
     // comment out the above, and
     // UNCOMMENT THE FOLLOWING TO USE A PUBLISHED VERSION OF THE SDK:
-    //    compile 'io.particle:cloudsdk:0.3.3'
+    //    implementation 'io.particle:cloudsdk:0.3.3'
 
-    compile 'com.android.support:appcompat-v7:27.1.1'
-    compile 'com.android.support:support-fragment:27.1.1'
-}
-
-repositories {
-    maven {
-        url 'https://maven.google.com'
-    }
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-fragment:27.1.1'
 }

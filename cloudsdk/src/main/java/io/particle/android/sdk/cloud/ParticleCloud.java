@@ -3,6 +3,7 @@ package io.particle.android.sdk.cloud;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.support.v4.content.LocalBroadcastManager;
@@ -44,6 +45,7 @@ import io.particle.android.sdk.cloud.models.SignUpInfo;
 import io.particle.android.sdk.persistance.AppDataStorage;
 import io.particle.android.sdk.utils.Funcy;
 import io.particle.android.sdk.utils.Funcy.Func;
+import io.particle.android.sdk.utils.Funcy.Predicate;
 import io.particle.android.sdk.utils.Py.PySet;
 import io.particle.android.sdk.utils.TLog;
 import retrofit.RetrofitError;
@@ -368,6 +370,21 @@ public class ParticleCloud {
             throw new ParticleCloudException(error);
         }
     }
+
+    @WorkerThread
+    public boolean userOwnsDevice(@NonNull String deviceId) throws ParticleCloudException {
+        String idLower = deviceId.toLowerCase();
+        try {
+            List<SimpleDevice> devices = mainApi.getDevices();
+            SimpleDevice firstMatch = Funcy.findFirstMatch(devices,
+                    testTarget -> idLower.equals(testTarget.id.toLowerCase())
+            );
+            return firstMatch != null;
+        } catch (RetrofitError error) {
+            throw new ParticleCloudException(error);
+        }
+    }
+
 
     // FIXME: devise a less temporary way to expose this method
     // FIXME: stop the duplication that's happening here
