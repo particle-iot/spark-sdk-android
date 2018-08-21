@@ -39,6 +39,7 @@ import io.particle.android.sdk.cloud.Responses.Models.CompleteDevice;
 import io.particle.android.sdk.cloud.Responses.Models.SimpleDevice;
 import io.particle.android.sdk.cloud.exceptions.PartialDeviceListResultException;
 import io.particle.android.sdk.cloud.exceptions.ParticleCloudException;
+import io.particle.android.sdk.cloud.exceptions.ParticleLoginException;
 import io.particle.android.sdk.cloud.models.DeviceStateChange;
 import io.particle.android.sdk.cloud.models.SignUpInfo;
 import io.particle.android.sdk.persistance.AppDataStorage;
@@ -175,7 +176,25 @@ public class ParticleCloud {
             Responses.LogInResponse response = identityApi.logIn("password", user, password);
             onLogIn(response, user, password);
         } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
+            throw new ParticleLoginException(error);
+        }
+    }
+
+    /**
+     * Login with existing account credentials to Particle cloud
+     *
+     * @param user     User name, must be a valid email address
+     * @param password Password
+     * @param mfaToken Multi factor authentication token from server.
+     * @param otp      One time password from authentication app.
+     */
+    @WorkerThread
+    public void logIn(String user, String password, String mfaToken, String otp) throws ParticleCloudException {
+        try {
+            Responses.LogInResponse response = identityApi.authenticate("urn:custom:mfa-otp", mfaToken, otp);
+            onLogIn(response, user, password);
+        } catch (RetrofitError error) {
+            throw new ParticleLoginException(error);
         }
     }
 
@@ -234,7 +253,7 @@ public class ParticleCloud {
         try {
             signUpAndLogInWithCustomer(new SignUpInfo(email, password), productId);
         } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
+            throw new ParticleLoginException(error);
         }
     }
 
@@ -257,7 +276,7 @@ public class ParticleCloud {
             Responses.LogInResponse response = identityApi.signUpAndLogInWithCustomer(signUpInfo, productId);
             onLogIn(response, signUpInfo.getUsername(), signUpInfo.getPassword());
         } catch (RetrofitError error) {
-            throw new ParticleCloudException(error);
+            throw new ParticleLoginException(error);
         }
     }
 
@@ -565,7 +584,7 @@ public class ParticleCloud {
     /**
      * NOTE: This method will be deprecated in the future. Please use
      * {@link #subscribeToMyDevicesEvents(String, ParticleEventHandler)} instead.
-     *
+     * <p>
      * Subscribe to the <em>firehose</em> of public events, plus all private events published by
      * the devices the API user owns.
      *
