@@ -545,6 +545,9 @@ public class ParticleCloud {
     }
 
     /**
+     * NOTE: This method will be deprecated in the future. Please use
+     * {@link #subscribeToMyDevicesEvents(String, ParticleEventHandler)} instead.
+     *
      * Subscribe to the <em>firehose</em> of public events, plus all private events published by
      * the devices the API user owns.
      *
@@ -556,6 +559,8 @@ public class ParticleCloud {
     @WorkerThread
     public long subscribeToAllEvents(@Nullable String eventNamePrefix, ParticleEventHandler handler)
             throws IOException {
+        Log.w("ParticleCloud", "This method will be deprecated in the future. " +
+                "Please use subscribeToMyDevicesEvents() instead.");
         return eventsDelegate.subscribeToAllEvents(eventNamePrefix, handler);
     }
 
