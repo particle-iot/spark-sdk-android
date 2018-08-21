@@ -57,7 +57,12 @@ public class ParticleDevice implements Parcelable {
         RED_BEAR_DUO,
         BLUZ,
         DIGISTUMP_OAK,
-        ELECTRON;
+        ELECTRON,
+        ARGON,
+        BORON,
+        XENON;
+
+        // FIXME: ADD MESH TYPES BELOW
 
         public static ParticleDeviceType fromInt(int intValue) {
             switch (intValue) {
